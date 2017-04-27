@@ -1,0 +1,6 @@
+{
+  'extends': 'planck',
+  'env': {
+    'browser': true,
+  },
+}

@@ -1,0 +1,11 @@
+{
+  'extends': 'planck',
+  'globals': {
+    'describe': true,
+    'expect': true,
+    'it': true,
+  },
+  'rules': {
+    'no-unused-expressions': 0,
+  },
+}
