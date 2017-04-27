@@ -22,13 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import './core/Aggregate'
-import './core/AggregateFunction'
-import './core/AssertionError'
-import './core/FilePath'
-import './core/Hash'
-import './core/ImplementationError'
-import './core/Namespace'
-import './core/Semaphore'
-import './core/Stride'
-import './core/Transferral'
+import md5 from 'md5'
+import stringify from 'json-stable-stringify'
+
+export default function Hash(object) {
+  return md5(stringify(object))
+}

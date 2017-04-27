@@ -1,7 +1,7 @@
 //
 //  The MIT License
 //
-//  Copyright (C) 2017-Present Shota Matsuda
+//  Copyright (C) 2016-Present Shota Matsuda
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a
 //  copy of this software and associated documentation files (the "Software"),
@@ -53,6 +53,7 @@ gulp.task('build:main', () => {
     sourceMap: true,
     plugins: [
       nodeResolve({ main: true, module: true, browser: true }),
+      commonjs(),
       babel({
         presets: [
           ['es2015', { modules: false }],
@@ -64,7 +65,6 @@ gulp.task('build:main', () => {
           'external-helpers',
         ],
       }),
-      commonjs(),
     ],
   })
   .on('error', function error(error) {
@@ -89,6 +89,7 @@ gulp.task('build:module', () => {
     format: 'es',
     plugins: [
       nodeResolve({ main: true, module: true, browser: true }),
+      commonjs(),
       babel({
         presets: [
           'es2017',
@@ -98,7 +99,6 @@ gulp.task('build:module', () => {
           'external-helpers',
         ],
       }),
-      commonjs(),
     ],
   })
   .on('error', function error(error) {
@@ -149,6 +149,7 @@ gulp.task('test:build', () => {
     format: 'cjs',
     plugins: [
       nodeResolve({ main: true, module: true }),
+      commonjs(),
       babel({
         presets: [
           ['env', {
@@ -160,7 +161,6 @@ gulp.task('test:build', () => {
           'external-helpers',
         ],
       }),
-      commonjs(),
     ],
   })
   .on('error', function error(error) {

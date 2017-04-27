@@ -22,13 +22,18 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import './core/Aggregate'
-import './core/AggregateFunction'
-import './core/AssertionError'
-import './core/FilePath'
-import './core/Hash'
-import './core/ImplementationError'
-import './core/Namespace'
-import './core/Semaphore'
-import './core/Stride'
-import './core/Transferral'
+import { Hash } from '../..'
+
+const chai = require('chai')
+
+const expect = chai.expect
+
+describe('Hash', () => {
+  it('generates a stable hash for objects', () => {
+    const hash1 = Hash({ a: 'a', b: [1, 2, { a: 'a', b: 'b' }] })
+    const hash2 = Hash({ b: [1, 2, { b: 'b', a: 'a' }], a: 'a' })
+    const hash3 = Hash({ a: 'a', b: [{ a: 'a', b: 'b' }, 1, 2] })
+    expect(hash1).equal(hash2)
+    expect(hash1).not.equal(hash3)
+  })
+})
