@@ -28,7 +28,10 @@ export const internal = Namespace('AggregateFunction')
 
 export default class AggregateFunction {
   // This constructor provides for inheritance only
-  constructor(targets = []) {
+  constructor(namespace, ...targets) {
+    if (namespace !== internal) {
+      throw new Error()
+    }
     const scope = internal(this)
     scope.targets = targets
   }
@@ -45,7 +48,7 @@ export default class AggregateFunction {
   }
 
   static new(...args) {
-    const instance = new this(...args)
+    const instance = new this(internal, ...args)
     return new Proxy(() => {}, instance)
   }
 }

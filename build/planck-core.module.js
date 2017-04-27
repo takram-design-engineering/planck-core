@@ -60,7 +60,10 @@ const internal$1 = Namespace('AggregateFunction');
 
 class AggregateFunction {
   // This constructor provides for inheritance only
-  constructor(targets = []) {
+  constructor(namespace, ...targets) {
+    if (namespace !== internal$1) {
+      throw new Error();
+    }
     const scope = internal$1(this);
     scope.targets = targets;
   }
@@ -77,7 +80,7 @@ class AggregateFunction {
   }
 
   static new(...args) {
-    const instance = new this(...args);
+    const instance = new this(internal$1, ...args);
     return new Proxy(() => {}, instance);
   }
 }
@@ -110,7 +113,10 @@ const internal$$1 = Namespace('Aggregate');
 
 class Aggregate {
   // This constructor provides for inheritance only
-  constructor(targets = []) {
+  constructor(namespace, ...targets) {
+    if (namespace !== internal$$1) {
+      throw new Error();
+    }
     const scope = internal$$1(this);
     scope.targets = targets;
   }
@@ -129,7 +135,7 @@ class Aggregate {
       return typeof Reflect.get(target, property) === 'function';
     });
     if (aggregative) {
-      return AggregateFunction.new(scope.targets.map(target => {
+      return AggregateFunction.new(...scope.targets.map(target => {
         return Reflect.get(target, property).bind(target);
       }));
     }
@@ -141,7 +147,7 @@ class Aggregate {
   }
 
   static new(...args) {
-    const instance = new this(...args);
+    const instance = new this(internal$$1, ...args);
     return new Proxy({}, instance);
   }
 }

@@ -30,27 +30,31 @@ const expect = chai.expect
 
 describe('Aggregate', () => {
   class T {
-    constructor() {
-      this.value = false
-    }
-
     set(other) {
       this.value = other
     }
   }
-  const targets = [new T(), new T(), new T()]
-  const aggregate = Aggregate.new(targets)
 
   it('supports instanceof', () => {
-    expect(aggregate).instanceof(Aggregate)
+    expect(Aggregate.new()).instanceof(Aggregate)
+  })
+
+  it('throws an error when new operator is used', () => {
+    expect(() => {
+      new Aggregate()
+    }).throw(Error)
   })
 
   it('stores property', () => {
+    const targets = [new T(), new T(), new T()]
+    const aggregate = Aggregate.new(...targets)
     aggregate.property = true
     expect(aggregate.property).equal(true)
   })
 
-  it('returns one of the target properties', () => {
+  it('returns the property of the first target', () => {
+    const targets = [new T(), new T(), new T()]
+    const aggregate = Aggregate.new(...targets)
     targets.forEach((target, index) => {
       target.value = index
     })
@@ -58,17 +62,15 @@ describe('Aggregate', () => {
   })
 
   it('propagates property set to all the targets', () => {
-    targets.forEach(target => {
-      target.value = false
-    })
+    const targets = [new T(), new T(), new T()]
+    const aggregate = Aggregate.new(...targets)
     aggregate.value = true
     targets.forEach(target => expect(target.value).equal(true))
   })
 
   it('propagates function call to all the targets', () => {
-    targets.forEach(target => {
-      target.value = false
-    })
+    const targets = [new T(), new T(), new T()]
+    const aggregate = Aggregate.new(...targets)
     aggregate.set('a')
     targets.forEach(target => expect(target.value).equal('a'))
   })

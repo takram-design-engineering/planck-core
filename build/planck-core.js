@@ -162,11 +162,18 @@ var internal$1 = Namespace('AggregateFunction');
 
 var AggregateFunction = function () {
   // This constructor provides for inheritance only
-  function AggregateFunction() {
-    var targets = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  function AggregateFunction(namespace) {
     classCallCheck(this, AggregateFunction);
 
+    if (namespace !== internal$1) {
+      throw new Error();
+    }
     var scope = internal$1(this);
+
+    for (var _len = arguments.length, targets = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      targets[_key - 1] = arguments[_key];
+    }
+
     scope.targets = targets;
   }
 
@@ -186,11 +193,11 @@ var AggregateFunction = function () {
   }], [{
     key: 'new',
     value: function _new() {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
       }
 
-      var instance = new (Function.prototype.bind.apply(this, [null].concat(args)))();
+      var instance = new (Function.prototype.bind.apply(this, [null].concat([internal$1], args)))();
       return new Proxy(function () {}, instance);
     }
   }]);
@@ -225,11 +232,18 @@ var internal$$1 = Namespace('Aggregate');
 
 var Aggregate = function () {
   // This constructor provides for inheritance only
-  function Aggregate() {
-    var targets = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  function Aggregate(namespace) {
     classCallCheck(this, Aggregate);
 
+    if (namespace !== internal$$1) {
+      throw new Error();
+    }
     var scope = internal$$1(this);
+
+    for (var _len = arguments.length, targets = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      targets[_key - 1] = arguments[_key];
+    }
+
     scope.targets = targets;
   }
 
@@ -250,9 +264,9 @@ var Aggregate = function () {
         return typeof Reflect.get(target, property) === 'function';
       });
       if (aggregative) {
-        return AggregateFunction.new(scope.targets.map(function (target) {
+        return AggregateFunction.new.apply(AggregateFunction, toConsumableArray(scope.targets.map(function (target) {
           return Reflect.get(target, property).bind(target);
-        }));
+        })));
       }
       return Reflect.get(scope.targets[0], property, receiver);
     }
@@ -264,11 +278,11 @@ var Aggregate = function () {
   }], [{
     key: 'new',
     value: function _new() {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
       }
 
-      var instance = new (Function.prototype.bind.apply(this, [null].concat(args)))();
+      var instance = new (Function.prototype.bind.apply(this, [null].concat([internal$$1], args)))();
       return new Proxy({}, instance);
     }
   }]);

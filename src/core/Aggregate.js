@@ -29,7 +29,10 @@ export const internal = Namespace('Aggregate')
 
 export default class Aggregate {
   // This constructor provides for inheritance only
-  constructor(targets = []) {
+  constructor(namespace, ...targets) {
+    if (namespace !== internal) {
+      throw new Error()
+    }
     const scope = internal(this)
     scope.targets = targets
   }
@@ -48,7 +51,7 @@ export default class Aggregate {
       return typeof Reflect.get(target, property) === 'function'
     })
     if (aggregative) {
-      return AggregateFunction.new(scope.targets.map(target => {
+      return AggregateFunction.new(...scope.targets.map(target => {
         return Reflect.get(target, property).bind(target)
       }))
     }
@@ -60,7 +63,7 @@ export default class Aggregate {
   }
 
   static new(...args) {
-    const instance = new this(...args)
+    const instance = new this(internal, ...args)
     return new Proxy({}, instance)
   }
 }

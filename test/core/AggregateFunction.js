@@ -31,18 +31,23 @@ const expect = chai.expect
 chai.use(require('sinon-chai'))
 
 describe('AggregateFunction', () => {
-  const targets = [
-    sinon.stub().returns('a'),
-    sinon.stub().returns('b'),
-    sinon.stub().returns('c'),
-  ]
-  const aggregate = AggregateFunction.new(targets)
-
   it('supports instanceof', () => {
-    expect(aggregate).instanceof(AggregateFunction)
+    expect(AggregateFunction.new()).instanceof(AggregateFunction)
+  })
+
+  it('throws an error when new operator is used', () => {
+    expect(() => {
+      new AggregateFunction()
+    }).throw(Error)
   })
 
   it('propagates call to all the targets', () => {
+    const targets = [
+      sinon.stub().returns('a'),
+      sinon.stub().returns('b'),
+      sinon.stub().returns('c'),
+    ]
+    const aggregate = AggregateFunction.new(...targets)
     const result = aggregate()
     targets.forEach(target => expect(target).calledOnce)
     expect(result[0]).equal('a')
