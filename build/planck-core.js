@@ -378,7 +378,7 @@ var Environment = function () {
       throw new Error();
     }
   }, {
-    key: 'global',
+    key: 'self',
     get: function get$$1() {
       switch (this.type) {
         case 'browser':
@@ -1811,11 +1811,11 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
 if (Environment.type === 'node') {
   // eslint-disable-next-line global-require
   var encoding = require('text-encoding');
-  if (Environment.global.TextEncoder === undefined) {
-    Environment.global.TextEncoder = encoding.TextEncoder;
+  if (Environment.self.TextEncoder === undefined) {
+    Environment.self.TextEncoder = encoding.TextEncoder;
   }
-  if (Environment.global.TextDecoder === undefined) {
-    Environment.global.TextDecoder = encoding.TextDecoder;
+  if (Environment.self.TextDecoder === undefined) {
+    Environment.self.TextDecoder = encoding.TextDecoder;
   }
 }
 
@@ -1862,7 +1862,7 @@ var Transferral = function () {
       var _this = this;
 
       Object.values(geometry.data.attributes).forEach(function (attribute) {
-        var constructor = Environment.global[attribute.type];
+        var constructor = Environment.self[attribute.type];
         var buffer = new constructor(attribute.array).buffer;
         attribute.array = _this.pack(buffer);
       });
@@ -1873,7 +1873,7 @@ var Transferral = function () {
       var _this2 = this;
 
       Object.values(geometry.data.attributes).forEach(function (attribute) {
-        var constructor = Environment.global[attribute.type];
+        var constructor = Environment.self[attribute.type];
         var buffer = _this2.unpack(attribute.array);
         attribute.array = Array.from(new constructor(buffer));
       });

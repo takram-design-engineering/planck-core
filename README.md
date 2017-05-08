@@ -66,7 +66,7 @@ console.log(aggregate.func())  // ['a', 'b']
 
 ### Environment Detection
 
-`Environment` has 2 properties `type` and `global`. The `type` is either “browser”, “worker” or “node”, and `global` is either `window`, `self` or `global` in their respective environments.
+`Environment` has 2 properties `type` and `self`. The `type` is either “browser”, “worker” or “node”, and `self` is either `window`, `self` or `global` in their respective environments.
 
 #### Example
 
@@ -74,13 +74,13 @@ console.log(aggregate.func())  // ['a', 'b']
 import { Environment } from 'planck-core'
 
 if (Environment.type === 'node') {
-  Environment.global.module = require('module')
+  Environment.self.module = require('module')
 } else if (Environment.type === 'worker') {
-  Environment.global.module = importScripts('/js/module.js')
+  Environment.self.module = importScripts('/js/module.js')
 }
 // Assume the module is already loaded in browser
 
-Environment.global.module()
+Environment.self.module()
 ```
 
 ### Promise-based Semaphore

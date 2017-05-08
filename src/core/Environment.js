@@ -49,7 +49,7 @@ export default class Environment {
     throw new Error()
   }
 
-  static get global() {
+  static get self() {
     switch (this.type) {
       case 'browser':
         return window

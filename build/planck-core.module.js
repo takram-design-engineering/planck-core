@@ -235,7 +235,7 @@ class Environment {
     throw new Error();
   }
 
-  static get global() {
+  static get self() {
     switch (this.type) {
       case 'browser':
         return window;
@@ -1589,11 +1589,11 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
 if (Environment.type === 'node') {
   // eslint-disable-next-line global-require
   const encoding = require('text-encoding');
-  if (Environment.global.TextEncoder === undefined) {
-    Environment.global.TextEncoder = encoding.TextEncoder;
+  if (Environment.self.TextEncoder === undefined) {
+    Environment.self.TextEncoder = encoding.TextEncoder;
   }
-  if (Environment.global.TextDecoder === undefined) {
-    Environment.global.TextDecoder = encoding.TextDecoder;
+  if (Environment.self.TextDecoder === undefined) {
+    Environment.self.TextDecoder = encoding.TextDecoder;
   }
 }
 
@@ -1628,7 +1628,7 @@ class Transferral {
 
   static packBufferGeometry(geometry) {
     Object.values(geometry.data.attributes).forEach(attribute => {
-      const constructor = Environment.global[attribute.type];
+      const constructor = Environment.self[attribute.type];
       const buffer = new constructor(attribute.array).buffer;
       attribute.array = this.pack(buffer);
     });
@@ -1636,7 +1636,7 @@ class Transferral {
 
   static unpackBufferGeometry(geometry) {
     Object.values(geometry.data.attributes).forEach(attribute => {
-      const constructor = Environment.global[attribute.type];
+      const constructor = Environment.self[attribute.type];
       const buffer = this.unpack(attribute.array);
       attribute.array = Array.from(new constructor(buffer));
     });
