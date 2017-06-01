@@ -22,9 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import { FilePath } from '../..'
-
 const chai = require('chai')
+
+const { FilePath } = require('../..')
 
 const expect = chai.expect
 

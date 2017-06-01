@@ -22,10 +22,10 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import { Namespace } from '../..'
-
 const chai = require('chai')
 const sinon = require('sinon')
+
+const { Namespace } = require('../..')
 
 const expect = chai.expect
 chai.use(require('sinon-chai'))

@@ -22,9 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import { Aggregate } from '../..'
-
 const chai = require('chai')
+
+const { Aggregate } = require('../..')
 
 const expect = chai.expect
 
@@ -41,6 +41,7 @@ describe('Aggregate', () => {
 
   it('throws an error when new operator is used', () => {
     expect(() => {
+      // eslint-disable-next-line no-new
       new Aggregate()
     }).throw(Error)
   })

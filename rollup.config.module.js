@@ -22,13 +22,29 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import './core/Aggregate'
-import './core/AggregateFunction'
-import './core/AssertionError'
-import './core/FilePath'
-import './core/Hash'
-import './core/ImplementationError'
-import './core/Namespace'
-import './core/Semaphore'
-import './core/Stride'
-import './core/Transferral'
+import babel from 'rollup-plugin-babel'
+import commonjs from 'rollup-plugin-commonjs'
+import nodeResolve from 'rollup-plugin-node-resolve'
+
+export default {
+  entry: './src/main.js',
+  plugins: [
+    nodeResolve({ main: true, module: true, browser: true }),
+    commonjs(),
+    babel({
+      presets: [
+        'es2017',
+        'stage-3',
+      ],
+      plugins: [
+        'external-helpers',
+      ],
+    }),
+  ],
+  targets: [
+    {
+      format: 'es',
+      dest: './build/planck-core.module.js',
+    },
+  ],
+}

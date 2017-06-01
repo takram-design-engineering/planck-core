@@ -22,38 +22,33 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-const chai = require('chai')
-const sinon = require('sinon')
-const sinonChai = require('sinon-chai')
+import babel from 'rollup-plugin-babel'
+import commonjs from 'rollup-plugin-commonjs'
+import nodeResolve from 'rollup-plugin-node-resolve'
 
-const { AggregateFunction } = require('../..')
-
-const expect = chai.expect
-chai.use(sinonChai)
-
-describe('AggregateFunction', () => {
-  it('supports instanceof', () => {
-    expect(AggregateFunction.new()).instanceof(AggregateFunction)
-  })
-
-  it('throws an error when new operator is used', () => {
-    expect(() => {
-      // eslint-disable-next-line no-new
-      new AggregateFunction()
-    }).throw(Error)
-  })
-
-  it('propagates call to all the targets', () => {
-    const targets = [
-      sinon.stub().returns('a'),
-      sinon.stub().returns('b'),
-      sinon.stub().returns('c'),
-    ]
-    const aggregate = AggregateFunction.new(...targets)
-    const result = aggregate()
-    targets.forEach(target => expect(target).calledOnce)
-    expect(result[0]).equal('a')
-    expect(result[1]).equal('b')
-    expect(result[2]).equal('c')
-  })
-})
+export default {
+  entry: './src/main.js',
+  sourceMap: true,
+  plugins: [
+    nodeResolve({ main: true, module: true, browser: true }),
+    commonjs(),
+    babel({
+      presets: [
+        ['es2015', { modules: false }],
+        'es2016',
+        'es2017',
+        'stage-3',
+      ],
+      plugins: [
+        'external-helpers',
+      ],
+    }),
+  ],
+  targets: [
+    {
+      format: 'umd',
+      moduleName: 'Planck',
+      dest: './build/planck-core.js',
+    },
+  ],
+}
