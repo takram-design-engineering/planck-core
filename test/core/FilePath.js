@@ -22,9 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-const chai = require('chai')
+import chai from 'chai'
 
-const { FilePath } = require('../..')
+import { Environment, FilePath } from '../..'
 
 const expect = chai.expect
 
@@ -34,10 +34,21 @@ describe('FilePath', () => {
   })
 
   it('joins components', () => {
+    expect(FilePath.resolve('./a', './b')).equal('a/b')
+    expect(FilePath.resolve('a', '', 'b')).equal('a/b')
+    expect(FilePath.resolve('a', '/', 'b')).equal('a/b')
     expect(FilePath.resolve('a', 'b', '')).equal('a/b')
   })
 
   it('normalizes relative parts but no above root', () => {
+    expect(FilePath.resolve('../a')).equal('a')
+    expect(FilePath.resolve('a', '../b')).equal('a/b')
     expect(FilePath.resolve('../a/../b', '../c/d', '../e')).equal('b/c/e')
+  })
+
+  it('normalizes relative parts but no above root', () => {
+    expect(FilePath.resolve('/')).equal('')
+    expect(FilePath.resolve('/a')).equal('a')
+    expect(FilePath.resolve('/a', '/b')).equal('b')
   })
 })

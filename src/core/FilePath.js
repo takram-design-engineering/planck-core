@@ -22,6 +22,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+import URL from 'url-parse'
+
 import Environment from '../core/Environment'
 import Namespace from '../core/Namespace'
 
@@ -32,45 +34,6 @@ if (Environment.type === 'node') {
 }
 
 export const internal = Namespace('FilePath')
-
-export default class FilePath {
-  static get self() {
-    switch (Environment.type) {
-      case 'browser':
-        return document.currentScript.src
-      case 'worker':
-        return self.location.href
-      case 'node':
-        return __filename
-      default:
-        break
-    }
-    throw new Error()
-  }
-
-  static resolve(arg, ...rest) {
-    let separator
-    let root
-    if (Environment.type !== 'node') {
-      separator = '/'
-      root = `${this.self.split('/').slice(0, -2).join('/')}/`
-    } else {
-      separator = path.sep
-      root = ''
-    }
-    let first = arg
-    if (first.startsWith(root)) {
-      first = first.substr(root.length)
-    }
-    const parts = [
-      ...resolveRelativePath(first.split(separator)),
-      ...resolveRelativePath(rest.reduce((parts, part) => {
-        return [...parts, ...part.split(separator)]
-      }, [])),
-    ]
-    return root + parts.join(separator)
-  }
-}
 
 function resolveRelativePath(parts) {
   return parts.reduce((result, part) => {
@@ -84,3 +47,49 @@ function resolveRelativePath(parts) {
     return [...result, part]
   }, [])
 }
+
+export default class FilePath {
+  static get self() {
+    const scope = internal(this)
+    return scope.self
+  }
+
+  static get current() {
+    switch (Environment.type) {
+      case 'browser':
+        if (document.currentScript.src) {
+          return document.currentScript.src
+        }
+        return window.location.href
+      case 'worker':
+        return self.location.href
+      case 'node':
+        return __filename
+      default:
+        break
+    }
+    throw new Error()
+  }
+
+  static resolve(root, ...rest) {
+    let origin
+    let separator
+    if (Environment.type !== 'node') {
+      const pathname = new URL(this.self).pathname
+      origin = `${pathname.substr(0, pathname.lastIndexOf('/'))}`
+      separator = '/'
+    } else {
+      origin = ''
+      separator = path.sep
+    }
+    const parts = [
+      ...resolveRelativePath(root.split(separator)),
+      ...resolveRelativePath(rest.reduce((parts, part) => {
+        return [...parts, ...part.split(separator)]
+      }, [])),
+    ]
+    return [origin, ...parts].join(separator)
+  }
+}
+
+internal(FilePath).self = FilePath.current
