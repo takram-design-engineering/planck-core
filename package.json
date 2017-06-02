@@ -17,17 +17,22 @@
     "src"
   ],
   "scripts": {
-    "build": "(npm run build-main & npm run build-module) && npm run compress",
+    "build": "npm run build-main & npm run build-module",
     "build-main": "rollup -c",
     "build-module": "rollup -c rollup.config.module.js",
+    "precompress": "npm run build",
     "compress": "uglifyjs build/planck-core.js -cm > build/planck-core.min.js",
     "lint": "eslint src test",
+    "pretest": "npm run build",
     "test": "mocha --recursive test/core",
-    "test-browser": "npm run test-browser-build",
-    "test-browser-build": "rollup -c rollup.config.test.js -w"
+    "pretest-browser": "npm run build",
+    "test-browser": "npm run test-browser-build && npm run test-browser-start",
+    "test-browser-build": "rollup -c rollup.config.test.js",
+    "test-browser-start": "browser-sync start --server . --startPath test"
   },
   "dependencies": {
     "base64-arraybuffer": "^0.1.5",
+    "d3-dsv": "^1.0.5",
     "json-stable-stringify": "^1.0.1",
     "md5": "^2.2.1",
     "request": "^2.81.0",
@@ -45,7 +50,6 @@
     "browser-sync": "^2.18.12",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "d3-dsv": "^1.0.5",
     "eslint": "^3.19.0",
     "eslint-config-planck": "github:takram-design-engineering/eslint-config-planck",
     "mocha": "^3.4.2",
@@ -54,7 +58,6 @@
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-watch": "^3.2.2",
     "sinon": "^2.3.2",
     "sinon-chai": "^2.10.0",
     "uglify-js": "^3.0.14"

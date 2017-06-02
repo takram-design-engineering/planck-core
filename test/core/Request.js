@@ -1,187 +1,214 @@
-// //
-// //  The MIT License
-// //
-// //  Copyright (C) 2016-Present Shota Matsuda
-// //
-// //  Permission is hereby granted, free of charge, to any person obtaining a
-// //  copy of this software and associated documentation files (the "Software"),
-// //  to deal in the Software without restriction, including without limitation
-// //  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// //  and/or sell copies of the Software, and to permit persons to whom the
-// //  Software is furnished to do so, subject to the following conditions:
-// //
-// //  The above copyright notice and this permission notice shall be included in
-// //  all copies or substantial portions of the Software.
-// //
-// //  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// //  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// //  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// //  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// //  DEALINGS IN THE SOFTWARE.
-// //
 //
-// import * as d3 from 'd3-dsv'
-// import chai from 'chai'
-// import chaiAsPromised from 'chai-as-promised'
-// import nock from 'nock'
+//  The MIT License
 //
-// import { Request } from '../..'
+//  Copyright (C) 2016-Present Shota Matsuda
 //
-// global.d3 = d3
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
 //
-// const expect = chai.expect
-// chai.use(chaiAsPromised)
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
 //
-// describe('Request', () => {
-//   describe('#text', () => {
-//     it('resolves a string when fulfilled', () => {
-//       const expected = 'response'
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(200, expected)
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
 //
-//       return expect(Request.text('http://localhost')).fulfilled
-//         .then(response => {
-//           expect(response).equal(expected)
-//         })
-//     })
-//
-//     it('rejects with status code other than 200', () => {
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(404)
-//
-//       return expect(Request.text('http://localhost')).rejected
-//         .then(error => {
-//           expect(error).equal(404)
-//         })
-//     })
-//   })
-//
-//   describe('#json', () => {
-//     it('resolves an object when fulfilled', () => {
-//       const expected = { response: 'response' }
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(200, JSON.stringify(expected))
-//
-//       return expect(Request.json('http://localhost')).fulfilled
-//         .then(response => {
-//           expect(response).deep.equal(expected)
-//         })
-//     })
-//
-//     it('rejects with error when the response is malformed', () => {
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(200, 'malformed')
-//
-//       return expect(Request.json('http://localhost')).rejected
-//         .then(error => {
-//           expect(error).instanceof(Error)
-//         })
-//     })
-//
-//     it('rejects with status code other than 200', () => {
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(404)
-//
-//       return expect(Request.json('http://localhost')).rejected
-//         .then(error => {
-//           expect(error).equal(404)
-//         })
-//     })
-//   })
-//
-//   describe('#buffer', () => {
-//     it('resolves a buffer when fulfilled', () => {
-//       const expected = new Float32Array([1, 2, 3, 4]).buffer
-//       const buffer = new Buffer(expected.byteLength)
-//       const view = new Uint8Array(expected)
-//       for (let i = 0; i < buffer.length; ++i) {
-//         buffer[i] = view[i]
-//       }
-//
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(200, buffer)
-//
-//       return expect(Request.buffer('http://localhost')).fulfilled
-//         .then(response => {
-//           expect(response).instanceof(ArrayBuffer)
-//           expect(response.byteLength).equal(expected.byteLength)
-//           const responseView = new Float32Array(response)
-//           const expectedView = new Float32Array(expected)
-//           for (let i = 0; i < responseView.length; ++i) {
-//             expect(responseView[i]).equal(expectedView[i])
-//           }
-//         })
-//     })
-//
-//     it('rejects with status code other than 200', () => {
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(404)
-//
-//       return expect(Request.buffer('http://localhost')).rejected
-//         .then(error => {
-//           expect(error).equal(404)
-//         })
-//     })
-//   })
-//
-//   describe('#csv', () => {
-//     it('resolves a string when fulfilled', () => {
-//       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(200, d3.csvFormat(expected))
-//
-//       return expect(Request.csv('http://localhost')).fulfilled
-//         .then(response => {
-//           delete response.columns
-//           expect(response).deep.equal(expected)
-//         })
-//     })
-//
-//     it('rejects with status code other than 200', () => {
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(404)
-//
-//       return expect(Request.csv('http://localhost')).rejected
-//         .then(error => {
-//           expect(error).equal(404)
-//         })
-//     })
-//   })
-//
-//   describe('#tsv', () => {
-//     it('resolves a string when fulfilled', () => {
-//       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(200, d3.tsvFormat(expected))
-//
-//       return expect(Request.tsv('http://localhost')).fulfilled
-//         .then(response => {
-//           delete response.columns
-//           expect(response).deep.equal(expected)
-//         })
-//     })
-//
-//     it('rejects with status code other than 200', () => {
-//       nock('http://localhost')
-//         .get('/')
-//         .reply(404)
-//
-//       return expect(Request.tsv('http://localhost')).rejected
-//         .then(error => {
-//           expect(error).equal(404)
-//         })
-//     })
-//   })
-// })
+
+import * as d3 from 'd3-dsv'
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+import nock from 'nock'
+
+import { Environment, Request } from '../..'
+
+const expect = chai.expect
+chai.use(chaiAsPromised)
+
+if (Environment.type === 'node') {
+  global.d3 = d3
+}
+
+describe('Request', () => {
+  const host = 'http://localhost:3000'
+
+  describe('#text', () => {
+    it('resolves a string when fulfilled', () => {
+      const path = '/test/core/data/text'
+      const expected = 'response'
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(200, expected)
+      }
+      return expect(Request.text(`${host}${path}`)).fulfilled
+        .then(response => {
+          expect(response).equal(expected)
+        })
+    })
+
+    it('rejects with status code other than 200', () => {
+      const path = '/test/core/data/404'
+      if (Environment.type === 'node') {
+        nock('http://localhost:3000/')
+          .get(path)
+          .reply(404)
+      }
+      return expect(Request.text(`${host}${path}`)).rejected
+        .then(error => {
+          expect(error).equal(404)
+        })
+    })
+  })
+
+  describe('#json', () => {
+    it('resolves an object when fulfilled', () => {
+      const path = '/test/core/data/json'
+      const expected = { a: 1, b: 'c' }
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(200, JSON.stringify(expected))
+      }
+      return expect(Request.json(`${host}${path}`)).fulfilled
+        .then(response => {
+          expect(response).deep.equal(expected)
+        })
+    })
+
+    it('rejects with error when the response is malformed', () => {
+      const path = '/test/core/data/malformed'
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(200, '!malformed')
+      }
+      return expect(Request.json(`${host}${path}`)).rejected
+        .then(error => {
+          expect(error).instanceof(Error)
+        })
+    })
+
+    it('rejects with status code other than 200', () => {
+      const path = '/test/core/data/404'
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(404)
+      }
+      return expect(Request.json(`${host}${path}`)).rejected
+        .then(error => {
+          expect(error).equal(404)
+        })
+    })
+  })
+
+  describe('#buffer', () => {
+    it('resolves a buffer when fulfilled', () => {
+      const path = '/test/core/data/buffer'
+      const expected = new Float32Array([1, 2, 3, 4]).buffer
+
+      if (Environment.type === 'node') {
+        const buffer = new Buffer(expected.byteLength)
+        const view = new Uint8Array(expected)
+        for (let i = 0; i < buffer.length; ++i) {
+          buffer[i] = view[i]
+        }
+
+        nock(host)
+          .get(path)
+          .reply(200, buffer)
+      }
+      return expect(Request.buffer(`${host}${path}`)).fulfilled
+        .then(response => {
+          expect(response).instanceof(ArrayBuffer)
+          expect(response.byteLength).equal(expected.byteLength)
+          const responseView = new Float32Array(response)
+          const expectedView = new Float32Array(expected)
+          for (let i = 0; i < responseView.length; ++i) {
+            expect(responseView[i]).equal(expectedView[i])
+          }
+        })
+    })
+
+    it('rejects with status code other than 200', () => {
+      const path = '/test/core/data/404'
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(404)
+      }
+      return expect(Request.buffer(`${host}${path}`)).rejected
+        .then(error => {
+          expect(error).equal(404)
+        })
+    })
+  })
+
+  describe('#csv', () => {
+    it('resolves a string when fulfilled', () => {
+      const path = '/test/core/data/csv'
+      const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(200, d3.csvFormat(expected))
+      }
+      return expect(Request.csv(`${host}${path}`)).fulfilled
+        .then(response => {
+          delete response.columns
+          expect(response).deep.equal(expected)
+        })
+    })
+
+    it('rejects with status code other than 200', () => {
+      const path = '/test/core/data/404'
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(404)
+      }
+      return expect(Request.csv(`${host}${path}`)).rejected
+        .then(error => {
+          expect(error).equal(404)
+        })
+    })
+  })
+
+  describe('#tsv', () => {
+    it('resolves a string when fulfilled', () => {
+      const path = '/test/core/data/tsv'
+      const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(200, d3.tsvFormat(expected))
+      }
+      return expect(Request.tsv(`${host}${path}`)).fulfilled
+        .then(response => {
+          delete response.columns
+          expect(response).deep.equal(expected)
+        })
+    })
+
+    it('rejects with status code other than 200', () => {
+      const path = '/test/core/data/404'
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(404)
+      }
+      return expect(Request.tsv(`${host}${path}`)).rejected
+        .then(error => {
+          expect(error).equal(404)
+        })
+    })
+  })
+})

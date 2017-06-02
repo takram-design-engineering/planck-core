@@ -128,4 +128,4 @@ jspm_packages
 # Project
 !/build
 /build/*.map
-/build/test
+/build/test.js

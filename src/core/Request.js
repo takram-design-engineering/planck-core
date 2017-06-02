@@ -22,24 +22,22 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import URL from 'url-parse'
-
 import Environment from '../core/Environment'
 import Namespace from '../core/Namespace'
+import URL from '../core/URL'
 
 /* eslint-disable global-require */
 let readFile
-let readFileSync
 let request
 if (Environment.type === 'node') {
-  ({ readFile, readFileSync } = require('fs'))
+  ({ readFile } = require('fs'))
   request = require('request')
 }
 /* eslint-enable global-require */
 
 export const internal = Namespace('Request')
 
-function webRequest(url, options) {
+function browserRequest(url, options) {
   return new Promise((resolve, reject) => {
     const parsed = new URL(url, true)
     if (options.query) {
@@ -58,6 +56,10 @@ function webRequest(url, options) {
         reject(request.status)
         return
       }
+      if (request.response === null && options.type === 'json') {
+        reject(new Error('Could not parse JSON'))
+        return
+      }
       resolve(request.response)
     }, false)
     request.send()
@@ -65,6 +67,17 @@ function webRequest(url, options) {
 }
 
 function nodeRequest(url, options) {
+  if (options.local) {
+    return new Promise((resolve, reject) => {
+      readFile(url, options.encoding, (error, response) => {
+        if (error) {
+          reject(error)
+          return
+        }
+        resolve(response)
+      })
+    })
+  }
   return new Promise((resolve, reject) => {
     request({
       url,
@@ -84,29 +97,9 @@ function nodeRequest(url, options) {
   })
 }
 
-function fileRequest(path, options) {
-  if (options.async) {
-    return new Promise((resolve, reject) => {
-      readFile(path, options.encoding, (error, response) => {
-        if (error) {
-          reject(error)
-          return
-        }
-        resolve(response)
-      })
-    })
-  }
-  return Promise.resolve(readFileSync(path, options.encoding))
-}
-
 function performRequest(url, options) {
   if (Environment.type === 'node') {
-    let promise
-    if (options.local) {
-      promise = fileRequest(url, options)
-    } else {
-      promise = nodeRequest(url, options)
-    }
+    const promise = nodeRequest(url, options)
     if (options.type === 'json') {
       return promise.then(response => {
         if (typeof response !== 'string') {
@@ -130,7 +123,7 @@ function performRequest(url, options) {
     }
     return promise
   }
-  return webRequest(url, options)
+  return browserRequest(url, options)
 }
 
 function parseArguments(...args) {
@@ -144,7 +137,6 @@ function parseArguments(...args) {
   }
   options = Object.assign({}, {
     type: 'text',
-    async: true,
     local: false,
     encoding: 'utf-8',
   }, options)

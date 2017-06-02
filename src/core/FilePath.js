@@ -22,31 +22,10 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import URL from 'url-parse'
-
 import Environment from '../core/Environment'
 import Namespace from '../core/Namespace'
 
-let path
-if (Environment.type === 'node') {
-  // eslint-disable-next-line global-require
-  path = require('path')
-}
-
 export const internal = Namespace('FilePath')
-
-function resolveRelativePath(parts) {
-  return parts.reduce((result, part) => {
-    if (part.length === 0 || part === '.') {
-      return result
-    }
-    if (part === '..') {
-      result.pop()
-      return result
-    }
-    return [...result, part]
-  }, [])
-}
 
 export default class FilePath {
   static get self() {
@@ -64,31 +43,11 @@ export default class FilePath {
       case 'worker':
         return self.location.href
       case 'node':
-        return __filename
+        return process.cwd()
       default:
         break
     }
     throw new Error()
-  }
-
-  static resolve(root, ...rest) {
-    let origin
-    let separator
-    if (Environment.type !== 'node') {
-      const pathname = new URL(this.self).pathname
-      origin = `${pathname.substr(0, pathname.lastIndexOf('/'))}`
-      separator = '/'
-    } else {
-      origin = ''
-      separator = path.sep
-    }
-    const parts = [
-      ...resolveRelativePath(root.split(separator)),
-      ...resolveRelativePath(rest.reduce((parts, part) => {
-        return [...parts, ...part.split(separator)]
-      }, [])),
-    ]
-    return [origin, ...parts].join(separator)
   }
 }
 

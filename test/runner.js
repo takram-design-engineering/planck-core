@@ -37,9 +37,10 @@ window.addEventListener('load', event => {
 
   runner.on('fail', (test, error) => {
     const titles = []
-    while (test.parent.title) {
-      titles.push(test.parent.title)
-      test = test.parent
+    let current = test
+    while (current.parent.title) {
+      titles.push(current.parent.title)
+      current = current.parent
     }
     titles.reverse()
     results.push({

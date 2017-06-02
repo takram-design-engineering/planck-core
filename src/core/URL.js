@@ -22,33 +22,7 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import chai from 'chai'
+import urlParse from 'url-parse'
 
-import { Environment, FilePath } from '../..'
-
-const expect = chai.expect
-
-describe('FilePath', () => {
-  it('returns an absolute path', () => {
-    expect(FilePath.resolve('path')).equal('path')
-  })
-
-  it('joins components', () => {
-    expect(FilePath.resolve('./a', './b')).equal('a/b')
-    expect(FilePath.resolve('a', '', 'b')).equal('a/b')
-    expect(FilePath.resolve('a', '/', 'b')).equal('a/b')
-    expect(FilePath.resolve('a', 'b', '')).equal('a/b')
-  })
-
-  it('normalizes relative parts but no above root', () => {
-    expect(FilePath.resolve('../a')).equal('a')
-    expect(FilePath.resolve('a', '../b')).equal('a/b')
-    expect(FilePath.resolve('../a/../b', '../c/d', '../e')).equal('b/c/e')
-  })
-
-  it('normalizes relative parts but no above root', () => {
-    expect(FilePath.resolve('/')).equal('')
-    expect(FilePath.resolve('/a')).equal('a')
-    expect(FilePath.resolve('/a', '/b')).equal('b')
-  })
-})
+// Just use url-parse for now
+export default class URL extends urlParse {}
