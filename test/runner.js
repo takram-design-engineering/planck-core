@@ -22,38 +22,33 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import chai from 'chai'
-import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
+import mocha from 'mocha'
 
-import { AggregateFunction } from '../..'
+mocha.setup('bdd')
 
-const expect = chai.expect
-chai.use(sinonChai)
+window.addEventListener('load', event => {
+  const runner = mocha.run()
+  const results = []
 
-describe('AggregateFunction', () => {
-  it('supports instanceof', () => {
-    expect(AggregateFunction.new()).instanceof(AggregateFunction)
+  runner.on('end', () => {
+    window.mochaResults = runner.stats
+    window.mochaResults.reports = results
   })
 
-  it('throws an error when new operator is used', () => {
-    expect(() => {
-      // eslint-disable-next-line no-new
-      new AggregateFunction()
-    }).throw(Error)
+  runner.on('fail', (test, error) => {
+    const titles = []
+    let current = test
+    while (current.parent.title) {
+      titles.push(current.parent.title)
+      current = current.parent
+    }
+    titles.reverse()
+    results.push({
+      name: test.title,
+      results: false,
+      message: error.message,
+      stack: error.stack,
+      titles,
+    })
   })
-
-  it('propagates call to all the targets', () => {
-    const targets = [
-      sinon.stub().returns('a'),
-      sinon.stub().returns('b'),
-      sinon.stub().returns('c'),
-    ]
-    const aggregate = AggregateFunction.new(...targets)
-    const result = aggregate()
-    targets.forEach(target => expect(target).calledOnce)
-    expect(result[0]).equal('a')
-    expect(result[1]).equal('b')
-    expect(result[2]).equal('c')
-  })
-})
+}, false)

@@ -25,62 +25,30 @@
 import Environment from '../core/Environment'
 import Namespace from '../core/Namespace'
 
-let path
-if (Environment.type === 'node') {
-  // eslint-disable-next-line global-require
-  path = require('path')
-}
-
 export const internal = Namespace('FilePath')
 
 export default class FilePath {
   static get self() {
+    const scope = internal(this)
+    return scope.self
+  }
+
+  static get current() {
     switch (Environment.type) {
       case 'browser':
-        return document.currentScript.src
+        if (document.currentScript.src) {
+          return document.currentScript.src
+        }
+        return window.location.href
       case 'worker':
         return self.location.href
       case 'node':
-        return __filename
+        return process.cwd()
       default:
         break
     }
     throw new Error()
   }
-
-  static resolve(arg, ...rest) {
-    let separator
-    let root
-    if (Environment.type !== 'node') {
-      separator = '/'
-      root = `${this.self.split('/').slice(0, -2).join('/')}/`
-    } else {
-      separator = path.sep
-      root = ''
-    }
-    let first = arg
-    if (first.startsWith(root)) {
-      first = first.substr(root.length)
-    }
-    const parts = [
-      ...resolveRelativePath(first.split(separator)),
-      ...resolveRelativePath(rest.reduce((parts, part) => {
-        return [...parts, ...part.split(separator)]
-      }, [])),
-    ]
-    return root + parts.join(separator)
-  }
 }
 
-function resolveRelativePath(parts) {
-  return parts.reduce((result, part) => {
-    if (part.length === 0 || part === '.') {
-      return result
-    }
-    if (part === '..') {
-      result.pop()
-      return result
-    }
-    return [...result, part]
-  }, [])
-}
+internal(FilePath).self = FilePath.current

@@ -22,22 +22,53 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import { FilePath } from '../..'
+import path from 'path'
+import babel from 'rollup-plugin-babel'
+import commonjs from 'rollup-plugin-commonjs'
+import nodeResolve from 'rollup-plugin-node-resolve'
 
-const chai = require('chai')
-
-const expect = chai.expect
-
-describe('FilePath', () => {
-  it('returns an absolute path', () => {
-    expect(FilePath.resolve('path')).equal('path')
-  })
-
-  it('joins components', () => {
-    expect(FilePath.resolve('a', 'b', '')).equal('a/b')
-  })
-
-  it('normalizes relative parts but no above root', () => {
-    expect(FilePath.resolve('../a/../b', '../c/d', '../e')).equal('b/c/e')
-  })
-})
+export default {
+  entry: './test/test.js',
+  sourceMap: true,
+  plugins: [
+    nodeResolve({ main: true, module: true, browser: true }),
+    commonjs(),
+    babel({
+      presets: [
+        ['es2015', { modules: false }],
+        'es2016',
+        'es2017',
+        'stage-3',
+      ],
+      plugins: [
+        'external-helpers',
+      ],
+      babelrc: false,
+    }),
+  ],
+  external: [
+    path.resolve('build/planck-core.module.js'),
+    'mocha',
+    'chai',
+    'sinon',
+    'nock',
+  ],
+  globals: {
+    [path.resolve('build/planck-core.module.js')]: 'Planck',
+    'mocha': 'mocha',
+    'chai': 'chai',
+    'sinon': 'sinon',
+    'nock': 'nock',
+  },
+  paths: {
+    'mocha': './node_modules/mocha/mocha.js',
+    'chai': './node_modules/chai/chai.js',
+    'sinon': './node_modules/sinon/pkg/sinon.js',
+  },
+  targets: [
+    {
+      format: 'iife',
+      dest: './build/test.js',
+    },
+  ],
+}

@@ -22,9 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import { AssertionError } from '../..'
+import chai from 'chai'
 
-const chai = require('chai')
+import { AssertionError } from '../..'
 
 const expect = chai.expect
 

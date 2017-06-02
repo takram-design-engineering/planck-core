@@ -22,9 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import { ImplementationError } from '../..'
+import chai from 'chai'
 
-const chai = require('chai')
+import { ImplementationError } from '../..'
 
 const expect = chai.expect
 

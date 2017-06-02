@@ -22,13 +22,15 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+import './runner'
+
 import './core/Aggregate'
 import './core/AggregateFunction'
 import './core/AssertionError'
-import './core/FilePath'
 import './core/Hash'
 import './core/ImplementationError'
 import './core/Namespace'
+import './core/Request'
 import './core/Semaphore'
 import './core/Stride'
 import './core/Transferral'

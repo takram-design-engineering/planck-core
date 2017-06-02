@@ -22,9 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import { Hash } from '../..'
+import chai from 'chai'
 
-const chai = require('chai')
+import { Hash } from '../..'
 
 const expect = chai.expect
 

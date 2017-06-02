@@ -22,9 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import { Semaphore } from '../..'
+import chai from 'chai'
 
-const chai = require('chai')
+import { Semaphore } from '../..'
 
 const expect = chai.expect
 

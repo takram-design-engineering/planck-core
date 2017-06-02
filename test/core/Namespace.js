@@ -22,13 +22,14 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+import chai from 'chai'
+import sinon from 'sinon'
+import sinonChai from 'sinon-chai'
+
 import { Namespace } from '../..'
 
-const chai = require('chai')
-const sinon = require('sinon')
-
 const expect = chai.expect
-chai.use(require('sinon-chai'))
+chai.use(sinonChai)
 
 describe('Namespace', () => {
   it('works', () => {

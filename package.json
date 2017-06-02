@@ -1,6 +1,6 @@
 {
   "name": "planck-core",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "",
   "repository": "takram-design-engineering/planck-core",
   "main": "build/planck-core.js",
@@ -17,41 +17,49 @@
     "src"
   ],
   "scripts": {
-    "build": "gulp build",
-    "lint": "gulp lint",
-    "test": "gulp test"
+    "build": "npm run build-main & npm run build-module",
+    "build-main": "rollup -c",
+    "build-module": "rollup -c rollup.config.module.js",
+    "precompress": "npm run build",
+    "compress": "uglifyjs build/planck-core.js -cm > build/planck-core.min.js",
+    "lint": "eslint src test",
+    "pretest": "npm run build",
+    "test": "mocha --recursive test/core",
+    "pretest-browser": "npm run build",
+    "test-browser": "npm run test-browser-build && npm run test-browser-start",
+    "test-browser-build": "rollup -c rollup.config.test.js",
+    "test-browser-start": "browser-sync start --server . --startPath test"
   },
   "dependencies": {
     "base64-arraybuffer": "^0.1.5",
+    "d3-dsv": "^1.0.5",
     "json-stable-stringify": "^1.0.1",
     "md5": "^2.2.1",
-    "text-encoding": "^0.6.4"
+    "request": "^2.81.0",
+    "text-encoding": "^0.6.4",
+    "url-parse": "^1.1.9"
   },
   "devDependencies": {
+    "babel-core": "^6.24.1",
     "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.4.0",
+    "babel-preset-env": "^1.5.1",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-es2017": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
+    "browser-sync": "^2.18.12",
     "chai": "^3.5.0",
-    "del": "^2.2.2",
+    "chai-as-promised": "^6.0.0",
+    "eslint": "^3.19.0",
     "eslint-config-planck": "github:takram-design-engineering/eslint-config-planck",
-    "gulp": "^3.9.1",
-    "gulp-eslint": "^3.0.1",
-    "gulp-mocha": "^4.3.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-sequence": "^0.4.6",
-    "gulp-sourcemaps": "^2.6.0",
-    "gulp-uglify": "^2.1.2",
+    "mocha": "^3.4.2",
+    "nock": "^9.0.13",
+    "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-stream": "^1.19.0",
-    "sinon": "^2.1.0",
-    "sinon-chai": "^2.9.0",
-    "uglify-js": "^2.8.22",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "sinon": "^2.3.2",
+    "sinon-chai": "^2.10.0",
+    "uglify-js": "^3.0.14"
   }
 }
