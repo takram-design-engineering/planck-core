@@ -44,13 +44,15 @@ describe('Transferral', () => {
 
   describe('#pack', () => {
     it('returns string', () => {
-      expect(typeof Transferral.pack(new ArrayBuffer())).equal('string')
+      const buffer = new ArrayBuffer(8)
+      expect(typeof Transferral.pack(buffer)).equal('string')
     })
   })
 
   describe('#unpack', () => {
     it('returns array buffer', () => {
-      const packed = Transferral.pack(new ArrayBuffer())
+      const buffer = new ArrayBuffer(8)
+      const packed = Transferral.pack(buffer)
       expect(Transferral.unpack(packed)).instanceof(ArrayBuffer)
     })
   })

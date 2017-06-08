@@ -35,10 +35,6 @@ describe('Aggregate', () => {
     }
   }
 
-  it('supports instanceof', () => {
-    expect(Aggregate.new()).instanceof(Aggregate)
-  })
-
   it('throws an error when new operator is used', () => {
     expect(() => {
       // eslint-disable-next-line no-new

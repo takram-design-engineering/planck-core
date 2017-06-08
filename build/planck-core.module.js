@@ -285,9 +285,6 @@ class FilePath {
   static get current() {
     switch (Environment.type) {
       case 'browser':
-        if (document.currentScript.src) {
-          return document.currentScript.src;
-        }
         return window.location.href;
       case 'worker':
         return self.location.href;
