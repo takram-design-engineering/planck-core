@@ -494,9 +494,6 @@ var FilePath = function () {
     get: function get$$1() {
       switch (Environment.type) {
         case 'browser':
-          if (document.currentScript.src) {
-            return document.currentScript.src;
-          }
           return window.location.href;
         case 'worker':
           return self.location.href;

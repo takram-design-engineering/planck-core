@@ -140,10 +140,6 @@ describe('Aggregate', function () {
     return T;
   }();
 
-  it('supports instanceof', function () {
-    expect(___build_planckCore_module_js.Aggregate.new()).instanceof(___build_planckCore_module_js.Aggregate);
-  });
-
   it('throws an error when new operator is used', function () {
     expect(function () {
       // eslint-disable-next-line no-new
@@ -356,10 +352,6 @@ var expect$1 = chai$1.expect;
 chai$1.use(sinonChai);
 
 describe('AggregateFunction', function () {
-  it('supports instanceof', function () {
-    expect$1(___build_planckCore_module_js.AggregateFunction.new()).instanceof(___build_planckCore_module_js.AggregateFunction);
-  });
-
   it('throws an error when new operator is used', function () {
     expect$1(function () {
       // eslint-disable-next-line no-new
@@ -1231,8 +1223,14 @@ if (___build_planckCore_module_js.Environment.type === 'node') {
   global.d3 = d3;
 }
 
+// eslint-disable-next-line func-names
 describe('Request', function () {
-  var host = 'http://localhost:3000';
+  this.timeout(300000);
+
+  var host = 'http://localhost';
+  if (___build_planckCore_module_js.Environment.type !== 'node') {
+    host = window.location.origin;
+  }
 
   describe('#text', function () {
     it('resolves a string when fulfilled', function () {
@@ -1249,7 +1247,7 @@ describe('Request', function () {
     it('rejects with status code other than 200', function () {
       var path = '/test/core/data/404';
       if (___build_planckCore_module_js.Environment.type === 'node') {
-        nock('http://localhost:3000/').get(path).reply(404);
+        nock(host).get(path).reply(404);
       }
       return expect$6(___build_planckCore_module_js.Request.text('' + host + path)).rejected.then(function (error) {
         expect$6(error).equal(404);
@@ -1503,13 +1501,15 @@ describe('Transferral', function () {
 
   describe('#pack', function () {
     it('returns string', function () {
-      expect$9(_typeof(___build_planckCore_module_js.Transferral.pack(new ArrayBuffer()))).equal('string');
+      var buffer = new ArrayBuffer(8);
+      expect$9(_typeof(___build_planckCore_module_js.Transferral.pack(buffer))).equal('string');
     });
   });
 
   describe('#unpack', function () {
     it('returns array buffer', function () {
-      var packed = ___build_planckCore_module_js.Transferral.pack(new ArrayBuffer());
+      var buffer = new ArrayBuffer(8);
+      var packed = ___build_planckCore_module_js.Transferral.pack(buffer);
       expect$9(___build_planckCore_module_js.Transferral.unpack(packed)).instanceof(ArrayBuffer);
     });
   });

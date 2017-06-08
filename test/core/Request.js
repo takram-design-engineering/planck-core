@@ -36,8 +36,14 @@ if (Environment.type === 'node') {
   global.d3 = d3
 }
 
-describe('Request', () => {
-  const host = 'http://localhost:3000'
+// eslint-disable-next-line func-names
+describe('Request', function () {
+  this.timeout(300000)
+
+  let host = 'http://localhost'
+  if (Environment.type !== 'node') {
+    host = window.location.origin
+  }
 
   describe('#text', () => {
     it('resolves a string when fulfilled', () => {
@@ -57,7 +63,7 @@ describe('Request', () => {
     it('rejects with status code other than 200', () => {
       const path = '/test/core/data/404'
       if (Environment.type === 'node') {
-        nock('http://localhost:3000/')
+        nock(host)
           .get(path)
           .reply(404)
       }

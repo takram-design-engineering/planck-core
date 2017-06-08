@@ -32,10 +32,6 @@ const expect = chai.expect
 chai.use(sinonChai)
 
 describe('AggregateFunction', () => {
-  it('supports instanceof', () => {
-    expect(AggregateFunction.new()).instanceof(AggregateFunction)
-  })
-
   it('throws an error when new operator is used', () => {
     expect(() => {
       // eslint-disable-next-line no-new
