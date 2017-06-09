@@ -15,7 +15,7 @@ A collection of classes and functions that are used anywhere in [Planck framewor
 ### Installing
 
 ```sh
-npm install --save github:takram-design-engineering/planck-core
+npm install --save @takram/planck-core
 ```
 
 ## Usage
