@@ -20,11 +20,14 @@
     "build": "npm run build:main & npm run build:module",
     "build:main": "rollup -c",
     "build:module": "rollup -c rollup.config.module.js",
+    "build:test": "rollup -c rollup.config.test.js",
     "precompress": "npm run build",
     "compress": "uglifyjs build/planck-core.js -cm > build/planck-core.min.js",
     "lint": "eslint src test",
-    "pretest": "npm run build && rollup -c rollup.config.test.js",
-    "test": "mocha --recursive test/core test/saucelabs.js"
+    "pretest": "npm run build && npm run build:test",
+    "test": "mocha --recursive test/core test/saucelabs.js",
+    "pretest:local": "npm run build",
+    "test:local": "mocha --recursive test/core"
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",
