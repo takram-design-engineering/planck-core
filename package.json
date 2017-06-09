@@ -56,7 +56,7 @@
     "localtunnel": "^1.8.2",
     "mocha": "^3.4.2",
     "nock": "^9.0.13",
-    "rollup": "^0.41.6",
+    "rollup": "^0.42.0",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
