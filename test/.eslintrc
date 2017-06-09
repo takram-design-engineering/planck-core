@@ -1,5 +1,5 @@
 {
-  'extends': 'planck',
+  'extends': '@takram/planck',
   'globals': {
     'describe': true,
     'expect': true,
