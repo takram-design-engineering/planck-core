@@ -284,17 +284,17 @@ var AggregateFunction = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$$1 = Namespace('Aggregate');
+var internal = Namespace('Aggregate');
 
 var Aggregate = function () {
   // This constructor provides for inheritance only
   function Aggregate(namespace) {
     classCallCheck(this, Aggregate);
 
-    if (namespace !== internal$$1) {
+    if (namespace !== internal) {
       throw new Error();
     }
-    var scope = internal$$1(this);
+    var scope = internal(this);
 
     for (var _len = arguments.length, targets = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
       targets[_key - 1] = arguments[_key];
@@ -306,7 +306,7 @@ var Aggregate = function () {
   createClass(Aggregate, [{
     key: 'set',
     value: function set$$1(target, property, value, receiver) {
-      var scope = internal$$1(this);
+      var scope = internal(this);
       scope.targets.forEach(function (target) {
         Reflect.set(target, property, value);
       });
@@ -315,7 +315,7 @@ var Aggregate = function () {
   }, {
     key: 'get',
     value: function get$$1(target, property, receiver) {
-      var scope = internal$$1(this);
+      var scope = internal(this);
       var aggregative = scope.targets.every(function (target) {
         return typeof Reflect.get(target, property) === 'function';
       });
@@ -338,7 +338,7 @@ var Aggregate = function () {
         args[_key2] = arguments[_key2];
       }
 
-      var instance = new (Function.prototype.bind.apply(this, [null].concat([internal$$1], args)))();
+      var instance = new (Function.prototype.bind.apply(this, [null].concat([internal], args)))();
       return new Proxy({}, instance);
     }
   }]);
@@ -2615,7 +2615,7 @@ var Transferral = function () {
 
   createClass(Transferral, null, [{
     key: 'encode',
-    value: function encode$$1(object) {
+    value: function encode(object) {
       if (typeof TextEncoder !== 'function') {
         throw new Error('TextEncoder is missing');
       }
@@ -2626,7 +2626,7 @@ var Transferral = function () {
     }
   }, {
     key: 'decode',
-    value: function decode$$1(buffer) {
+    value: function decode(buffer) {
       if (typeof TextDecoder !== 'function') {
         throw new Error('TextDecoder is missing');
       }

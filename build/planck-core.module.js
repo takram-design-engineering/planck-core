@@ -109,20 +109,20 @@ class AggregateFunction {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-const internal$$1 = Namespace('Aggregate');
+const internal = Namespace('Aggregate');
 
 class Aggregate {
   // This constructor provides for inheritance only
   constructor(namespace, ...targets) {
-    if (namespace !== internal$$1) {
+    if (namespace !== internal) {
       throw new Error();
     }
-    const scope = internal$$1(this);
+    const scope = internal(this);
     scope.targets = targets;
   }
 
   set(target, property, value, receiver) {
-    const scope = internal$$1(this);
+    const scope = internal(this);
     scope.targets.forEach(target => {
       Reflect.set(target, property, value);
     });
@@ -130,7 +130,7 @@ class Aggregate {
   }
 
   get(target, property, receiver) {
-    const scope = internal$$1(this);
+    const scope = internal(this);
     const aggregative = scope.targets.every(target => {
       return typeof Reflect.get(target, property) === 'function';
     });
@@ -147,7 +147,7 @@ class Aggregate {
   }
 
   static new(...args) {
-    const instance = new this(internal$$1, ...args);
+    const instance = new this(internal, ...args);
     return new Proxy({}, instance);
   }
 }
