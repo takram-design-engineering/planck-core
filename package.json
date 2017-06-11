@@ -25,9 +25,9 @@
     "compress": "uglifyjs build/planck-core.js -cm > build/planck-core.min.js",
     "lint": "eslint src test",
     "pretest": "npm run build && npm run build:test",
-    "test": "mocha --recursive test/core test/saucelabs.js",
+    "test": "mocha --recursive test/unit test/saucelabs.js",
     "pretest:local": "npm run build",
-    "test:local": "mocha --recursive test/core"
+    "test:local": "mocha --recursive test/unit"
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",

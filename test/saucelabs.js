@@ -22,7 +22,6 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-/* globals before after */
 /* eslint-disable no-console */
 
 import chalk from 'chalk'
