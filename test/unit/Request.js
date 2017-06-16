@@ -47,7 +47,7 @@ describe('Request', function () {
 
   describe('#text', () => {
     it('resolves a string when fulfilled', () => {
-      const path = '/test/core/data/text'
+      const path = '/test/unit/data/text'
       const expected = 'response'
       if (Environment.type === 'node') {
         nock(host)
@@ -61,7 +61,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/core/data/404'
+      const path = '/test/unit/data/404'
       if (Environment.type === 'node') {
         nock(host)
           .get(path)
@@ -76,7 +76,7 @@ describe('Request', function () {
 
   describe('#json', () => {
     it('resolves an object when fulfilled', () => {
-      const path = '/test/core/data/json'
+      const path = '/test/unit/data/json'
       const expected = { a: 1, b: 'c' }
       if (Environment.type === 'node') {
         nock(host)
@@ -90,7 +90,7 @@ describe('Request', function () {
     })
 
     it('rejects with error when the response is malformed', () => {
-      const path = '/test/core/data/malformed'
+      const path = '/test/unit/data/malformed'
       if (Environment.type === 'node') {
         nock(host)
           .get(path)
@@ -103,7 +103,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/core/data/404'
+      const path = '/test/unit/data/404'
       if (Environment.type === 'node') {
         nock(host)
           .get(path)
@@ -118,7 +118,7 @@ describe('Request', function () {
 
   describe('#buffer', () => {
     it('resolves a buffer when fulfilled', () => {
-      const path = '/test/core/data/buffer'
+      const path = '/test/unit/data/buffer'
       const expected = new Float32Array([1, 2, 3, 4]).buffer
 
       if (Environment.type === 'node') {
@@ -145,7 +145,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/core/data/404'
+      const path = '/test/unit/data/404'
       if (Environment.type === 'node') {
         nock(host)
           .get(path)
@@ -160,7 +160,7 @@ describe('Request', function () {
 
   describe('#csv', () => {
     it('resolves a string when fulfilled', () => {
-      const path = '/test/core/data/csv'
+      const path = '/test/unit/data/csv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
       if (Environment.type === 'node') {
         nock(host)
@@ -175,7 +175,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/core/data/404'
+      const path = '/test/unit/data/404'
       if (Environment.type === 'node') {
         nock(host)
           .get(path)
@@ -190,7 +190,7 @@ describe('Request', function () {
 
   describe('#tsv', () => {
     it('resolves a string when fulfilled', () => {
-      const path = '/test/core/data/tsv'
+      const path = '/test/unit/data/tsv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
       if (Environment.type === 'node') {
         nock(host)
@@ -205,7 +205,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/core/data/404'
+      const path = '/test/unit/data/404'
       if (Environment.type === 'node') {
         nock(host)
           .get(path)
