@@ -103,4 +103,3 @@ jspm_packages
 !/build
 /build/*.map
 /build/test.js
-/saucelabs.json
