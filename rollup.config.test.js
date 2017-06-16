@@ -50,17 +50,17 @@ export default {
   ],
   external: [
     path.resolve(pkg.module),
-    'mocha',
     'chai',
-    'sinon',
+    'mocha',
     'nock',
+    'sinon',
   ],
   globals: {
     [path.resolve(pkg.module)]: 'Planck',
-    'mocha': 'mocha',
     'chai': 'chai',
-    'sinon': 'sinon',
+    'mocha': 'mocha',
     'nock': 'nock',
+    'sinon': 'sinon',
   },
   targets: [
     {
