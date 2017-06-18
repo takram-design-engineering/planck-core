@@ -22,15 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import './runner'
+import uuid from 'uuid'
 
-import './unit/Aggregate'
-import './unit/AggregateFunction'
-import './unit/AssertionError'
-import './unit/Hash'
-import './unit/ImplementationError'
-import './unit/Namespace'
-import './unit/Request'
-import './unit/Semaphore'
-import './unit/Stride'
-import './unit/Transferral'
+// Just use uuid v4 for now
+export default function UUID() {
+  return uuid.v4()
+}

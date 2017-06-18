@@ -6,6 +6,7 @@ A collection of classes and functions that are used anywhere in [Planck framewor
 [![License](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat
 )](http://mit-license.org)
 [![npm version](https://badge.fury.io/js/%40takram%2Fplanck-core.svg)](http://badge.fury.io/js/%40takram%2Fplanck-core)
+[![Build Status](https://travis-ci.org/takram-design-engineering/planck-core.svg?branch=master)](https://travis-ci.org/takram-design-engineering/planck-core)
 [![Sauce Test Status](https://saucelabs.com/buildstatus/planck-core)](https://saucelabs.com/u/planck-core)
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/planck-core.svg)](https://saucelabs.com/u/planck-core)
@@ -15,7 +16,7 @@ A collection of classes and functions that are used anywhere in [Planck framewor
 ### Installing
 
 ```sh
-npm install --save @takram/planck-core
+npm install @takram/planck-core
 ```
 
 ## Usage
