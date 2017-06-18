@@ -22,19 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export { default as Aggregate } from './core/Aggregate'
-export { default as AggregateFunction } from './core/AggregateFunction'
-export { default as AssertionError } from './core/AssertionError'
-export { default as Environment } from './core/Environment'
-export { default as FilePath } from './core/FilePath'
-export { default as Hash } from './core/Hash'
-export { default as ImplementationError } from './core/ImplementationError'
-export { default as Multiton } from './core/Multiton'
-export { default as Namespace } from './core/Namespace'
-export { default as Request } from './core/Request'
-export { default as Semaphore } from './core/Semaphore'
-export { default as Singleton } from './core/Singleton'
-export { default as Stride } from './core/Stride'
-export { default as Transferral } from './core/Transferral'
-export { default as URL } from './core/URL'
-export { default as UUID } from './core/UUID'
+import uuid from 'uuid'
+
+// Just use url-parse for now
+export default function UUID() {
+  return uuid.v4()
+}
