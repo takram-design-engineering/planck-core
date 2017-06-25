@@ -120,6 +120,186 @@ function load(url) {
 [/* a bunch of urls */].map(url => load(url))
 ```
 
+## API Reference
+
+### Aggregate
+
+<a id="aggregate-class-new" href="#aggregate-class-new">#</a>
+Aggregate.**new**(*target1* [, *target2* [, ...]])
+
+<a id="aggregate-get" href="#aggregate-get">#</a>
+*aggregate*[**property**]
+
+<a id="aggregate-set" href="#aggregate-set">#</a>
+*aggregate*[**property**] = *value*
+
+### AggregateFunction
+
+<a id="aggregatefunction-class-new" href="#aggregatefunction-class-new">#</a>
+AggregateFunction.**new**(*target1* [, *target2* [, ...]])
+
+<a id="aggregatefunction-apply" href="#aggregatefunction-apply">#</a>
+*aggregateFunction*([*arg1* [, *arg2* [, ...]]])
+
+### AssertionError
+
+<a id="new-assertionerror" href="#new-assertionerror">#</a>
+new **AssertionError**(*message*)
+
+### Environment
+
+<a id="environment-class-type" href="#environment-class-type">#</a>
+Environment.**type**
+
+<a id="environment-class-self" href="#environment-class-self">#</a>
+Environment.**self**
+
+### FilePath
+
+<a id="filepath-class-self" href="#filepath-class-self">#</a>
+FilePath.**self**
+
+<a id="filepath-class-current" href="#filepath-class-current">#</a>
+FilePath.**current**
+
+### Hash
+
+<a id="hash-function-apply" href="#hash-function-apply">#</a>
+**Hash**(*object*)
+
+### ImplementationError
+
+<a id="new-implementationerror" href="#new-implementationerror">#</a>
+new **ImplementationError**(*message*)
+
+### Multiton
+
+<a id="multiton-class-has" href="#multiton-class-has">#</a>
+Multiton.**has**(*key*)
+
+<a id="multiton-class-for" href="#multiton-class-for">#</a>
+Multiton.**for**(*key*, [*arg1* [, *arg2* [, ...]]])
+
+<a id="multiton-class-coercemultitonkey" href="#multiton-class-coercemultitonkey">#</a>
+Multiton.**coerceMultitonKey**(*key*)
+
+<a id="multiton-class-new" href="#multiton-class-new">#</a>
+Multiton.**new**([*arg1* [, *arg2* [, ...]]])
+
+### Namespace
+
+<a id="namespace-function-apply" href="#namespace-function-apply">#</a>
+**Namespace**([*name*])
+
+<a id="namespace-apply" href="#namespace-apply">#</a>
+*namespace*(*object* [, *init*])
+
+### Request
+
+<a id="request-text-1" href="#request-text-1">#</a>
+Request.**text**(*url* [, *options*])<br>
+<a id="request-text-2" href="#request-text-2">#</a>
+Request.**text**(*options*)
+
+<a id="request-json-1" href="#request-json-1">#</a>
+Request.**json**(*url* [, *options*])<br>
+<a id="request-json-2" href="#request-json-2">#</a>
+Request.**json**(*options*)
+
+<a id="request-buffer-1" href="#request-buffer-1">#</a>
+Request.**buffer**(*url* [, *options*])<br>
+<a id="request-buffer-2" href="#request-buffer-2">#</a>
+Request.**buffer**(*options*)
+
+<a id="request-csv-1" href="#request-csv-1">#</a>
+Request.**csv**(*url* [, *options*])<br>
+<a id="request-csv-2" href="#request-csv-2">#</a>
+Request.**csv**(*options*)
+
+<a id="request-tsv-1" href="#request-tsv-1">#</a>
+Request.**tsv**(*url* [, *options*])<br>
+<a id="request-tsv-2" href="#request-tsv-2">#</a>
+Request.**tsv**(*options*)
+
+### Semaphore
+
+<a id="new-semaphore" href="#new-semaphore">#</a>
+new **Semaphore**(*capacity*)
+
+<a id="semaphore-wait" href="#semaphore-wait">#</a>
+*semaphore*.**wait**(*callback*)
+
+<a id="semaphore-signal" href="#semaphore-signal">#</a>
+*semaphore*.**signal**()
+
+<a id="semaphore-capacity" href="#semaphore-capacity">#</a>
+*semaphore*.**capacity**
+
+<a id="semaphore-available" href="#semaphore-available">#</a>
+*semaphore*.**available**
+
+### Singleton
+
+<a id="singleton-class-get" href="#singleton-class-get">#</a>
+Singleton.**get**()
+
+<a id="singleton-class-new" href="#singleton-class-new">#</a>
+Singleton.**new**([*arg1* [, *arg2* [, ...]]])
+
+### URL
+
+<a id="new-url-1" href="#new-url-1">#</a>
+new **URL**(*url* [, *parser*])<br>
+<a id="new-url-2" href="#new-url-2">#</a>
+new **URL**(*url*, *baseUrl* [, *parser*])
+
+<a id="url-protocol" href="#url-protocol">#</a>
+*url*.**protocol**
+
+<a id="url-slashes" href="#url-slashes">#</a>
+*url*.**slashes**
+
+<a id="url-auth" href="#url-auth">#</a>
+*url*.**auth**
+
+<a id="url-username" href="#url-username">#</a>
+*url*.**username**
+
+<a id="url-password" href="#url-password">#</a>
+*url*.**password**
+
+<a id="url-host" href="#url-host">#</a>
+*url*.**host**
+
+<a id="url-hostname" href="#url-hostname">#</a>
+*url*.**hostname**
+
+<a id="url-port" href="#url-port">#</a>
+*url*.**port**
+
+<a id="url-pathname" href="#url-pathname">#</a>
+*url*.**pathname**
+
+<a id="url-query" href="#url-query">#</a>
+*url*.**query**
+
+<a id="url-hash" href="#url-hash">#</a>
+*url*.**hash**
+
+<a id="url-href" href="#url-href">#</a>
+*url*.**href**
+
+<a id="url-origin" href="#url-origin">#</a>
+*url*.**origin**
+
+<a id="url-toString" href="#url-toString">#</a>
+*url*.**toString**()
+
+### UUID
+
+<a id="uuid-function-apply" href="#uuid-function-apply">#</a>
+**UUID**()
+
 ## License
 
 The MIT License
