@@ -89,7 +89,7 @@ function nodeRequest(url, options) {
         reject(error)
         return
       }
-      if (request.statusCode < 200 || request.statusCode >= 300) {
+      if (response.statusCode < 200 || response.statusCode >= 300) {
         reject(response.statusCode)
       }
       resolve(response.body)
