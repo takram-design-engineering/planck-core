@@ -28,7 +28,7 @@ npm install @takram/planck-core
 #### Example
 
 ```js
-import { Namespace } from 'planck-core'
+import { Namespace } from '@takram/planck-core'
 
 // Human-readable name is optional. 'T' should be displayed in the inspector of
 // your browser as a property of the instance.
@@ -56,7 +56,7 @@ Getting a property from an aggregate returns the properties of the first target.
 #### Example
 
 ```js
-import { Aggregate } from 'planck-core'
+import { Aggregate } from '@takram/planck-core'
 
 const a = { value: 'a', func() { return 'a' } }
 const b = { value: 'b', func() { return 'b' } }
@@ -76,7 +76,7 @@ console.log(aggregate.func())  // ['a', 'b']
 #### Example
 
 ```js
-import { Environment } from 'planck-core'
+import { Environment } from '@takram/planck-core'
 
 if (Environment.type === 'node') {
   Environment.self.module = require('module')
@@ -95,7 +95,7 @@ The example below limits simultaneous requests by the function `load` to 10.
 #### Example
 
 ```js
-import { Semaphore } from 'planck-core'
+import { Semaphore } from '@takram/planck-core'
 
 const semaphore = new Semaphore(10)
 
