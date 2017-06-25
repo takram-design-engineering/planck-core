@@ -144,7 +144,7 @@ AggregateFunction.**new**(*target1* [, *target2* [, ...]])
 ### AssertionError
 
 <a id="new-assertionerror" href="#new-assertionerror">#</a>
-new **AssertionError**(*message*)
+new **AssertionError**([*message*])
 
 ### Environment
 
@@ -170,7 +170,7 @@ FilePath.**current**
 ### ImplementationError
 
 <a id="new-implementationerror" href="#new-implementationerror">#</a>
-new **ImplementationError**(*message*)
+new **ImplementationError**([*message*])
 
 ### Multiton
 
@@ -182,9 +182,6 @@ Multiton.**for**(*key*, [*arg1* [, *arg2* [, ...]]])
 
 <a id="multiton-class-coercemultitonkey" href="#multiton-class-coercemultitonkey">#</a>
 Multiton.**coerceMultitonKey**(*key*)
-
-<a id="multiton-class-new" href="#multiton-class-new">#</a>
-Multiton.**new**([*arg1* [, *arg2* [, ...]]])
 
 ### Namespace
 
@@ -242,9 +239,6 @@ new **Semaphore**(*capacity*)
 
 <a id="singleton-class-get" href="#singleton-class-get">#</a>
 Singleton.**get**()
-
-<a id="singleton-class-new" href="#singleton-class-new">#</a>
-Singleton.**new**([*arg1* [, *arg2* [, ...]]])
 
 ### URL
 
