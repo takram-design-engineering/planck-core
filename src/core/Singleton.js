@@ -36,12 +36,8 @@ export default class Singleton {
   static get(...args) {
     const scope = internal(this)
     if (scope.instance === undefined) {
-      scope.instance = this.new(...args)
+      scope.instance = new this(...args)
     }
     return scope.instance
-  }
-
-  static new(...args) {
-    return new this(...args)
   }
 }

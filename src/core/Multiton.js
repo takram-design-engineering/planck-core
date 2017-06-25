@@ -51,13 +51,9 @@ export default class Multiton {
     if (scope.instances.has(coercedKey)) {
       return scope.instances.get(coercedKey)
     }
-    const instance = this.new(coercedKey, ...args)
+    const instance = new this(coercedKey, ...args)
     scope.instances.set(coercedKey, instance)
     return instance
-  }
-
-  static new(...args) {
-    return new this(...args)
   }
 
   static coerceMultitonKey(key) {
