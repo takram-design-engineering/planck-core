@@ -148,7 +148,7 @@ function stopTests(tests) {
 
 // eslint-disable-next-line func-names
 describe('', function () {
-  this.timeout(300000)
+  this.timeout(1200000)
 
   const { framework, platforms } = pkg.saucelabs
 
