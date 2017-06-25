@@ -52,7 +52,7 @@ function browserRequest(url, options) {
     }
     request.responseType = options.type
     request.addEventListener('loadend', event => {
-      if (request.status !== 200) {
+      if (request.status < 200 || request.status >= 300) {
         reject(request.status)
         return
       }
@@ -89,7 +89,7 @@ function nodeRequest(url, options) {
         reject(error)
         return
       }
-      if (response.statusCode !== 200) {
+      if (request.statusCode < 200 || request.statusCode >= 300) {
         reject(response.statusCode)
       }
       resolve(response.body)
