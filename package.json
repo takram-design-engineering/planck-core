@@ -17,17 +17,17 @@
     "src"
   ],
   "scripts": {
-    "build": "npm run compress & npm run build:module; wait",
-    "build:main": "rollup -c",
-    "build:module": "rollup -c rollup.config.module.js",
-    "build:test": "rollup -c rollup.config.test.js",
-    "precompress": "npm run build:main",
-    "compress": "uglifyjs build/planck-core.js -cm > build/planck-core.min.js",
-    "lint": "eslint src test",
-    "pretest": "npm run build; npm run build:test",
-    "test": "npm run lint && mocha --recursive test/unit test/setup.js",
-    "pretest:local": "npm run build",
-    "test:local": "mocha --recursive test/unit"
+    "build": "npm-run-all --parallel build:main build:module",
+    "build:main": "npm-run-all main:compile main:uglify",
+    "build:module": "npm-run-all module:compile",
+    "main:compile": "rollup -c",
+    "main:uglify": "uglifyjs --compress --mangle --output build/planck-core.min.js build/planck-core.js",
+    "module:compile": "rollup -c rollup.config.module.js",
+    "test": "npm-run-all lint test:compile test:local test:cloud",
+    "test:compile": "rollup -c rollup.config.test.js",
+    "test:local": "mocha --recursive test/unit",
+    "test:cloud": "mocha test/setup.js",
+    "lint": "eslint src test"
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",
@@ -56,6 +56,7 @@
     "express": "^4.15.3",
     "mocha": "^3.4.2",
     "nock": "^9.0.13",
+    "npm-run-all": "^4.0.2",
     "rollup": "^0.43.0",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
