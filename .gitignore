@@ -100,6 +100,6 @@ jspm_packages
 .yarn-integrity
 
 # Project
-!/build
-/build/*.map
-/build/test.js
+!/dist
+/dist/*.map
+/dist/test.js

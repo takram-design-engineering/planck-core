@@ -65,7 +65,7 @@ export default {
   targets: [
     {
       format: 'iife',
-      dest: './build/test.js',
+      dest: './dist/test.js',
     },
   ],
 }

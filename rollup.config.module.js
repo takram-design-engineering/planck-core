@@ -44,7 +44,7 @@ export default {
   targets: [
     {
       format: 'es',
-      dest: './build/planck-core.module.js',
+      dest: './dist/planck-core.module.js',
     },
   ],
 }
