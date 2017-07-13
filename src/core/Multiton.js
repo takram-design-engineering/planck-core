@@ -38,7 +38,7 @@ export default class Multiton {
     if (scope.instances === undefined) {
       return false
     }
-    const coercedKey = this.coerceMultitonKey(key)
+    const coercedKey = this.coerceKey(key)
     return scope.instances[coercedKey] !== undefined
   }
 
@@ -47,16 +47,20 @@ export default class Multiton {
     if (!scope.instances) {
       scope.instances = new Map()
     }
-    const coercedKey = this.coerceMultitonKey(key)
+    const coercedKey = this.coerceKey(key)
     if (scope.instances.has(coercedKey)) {
       return scope.instances.get(coercedKey)
     }
-    const instance = new this(coercedKey, ...args)
+    const instance = this.new(coercedKey, ...args)
     scope.instances.set(coercedKey, instance)
     return instance
   }
 
-  static coerceMultitonKey(key) {
+  static new(key, ...args) {
+    return new this(key, ...args)
+  }
+
+  static coerceKey(key) {
     return key
   }
 }
