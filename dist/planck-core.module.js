@@ -1210,7 +1210,7 @@ class Multiton {
     if (scope.instances === undefined) {
       return false;
     }
-    const coercedKey = this.coerceMultitonKey(key);
+    const coercedKey = this.coerceKey(key);
     return scope.instances[coercedKey] !== undefined;
   }
 
@@ -1219,16 +1219,20 @@ class Multiton {
     if (!scope.instances) {
       scope.instances = new Map();
     }
-    const coercedKey = this.coerceMultitonKey(key);
+    const coercedKey = this.coerceKey(key);
     if (scope.instances.has(coercedKey)) {
       return scope.instances.get(coercedKey);
     }
-    const instance = new this(coercedKey, ...args);
+    const instance = this.new(coercedKey, ...args);
     scope.instances.set(coercedKey, instance);
     return instance;
   }
 
-  static coerceMultitonKey(key) {
+  static new(key, ...args) {
+    return new this(key, ...args);
+  }
+
+  static coerceKey(key) {
     return key;
   }
 }
@@ -2068,9 +2072,13 @@ class Singleton {
   static get(...args) {
     const scope = internal$7(this);
     if (scope.instance === undefined) {
-      scope.instance = new this(...args);
+      scope.instance = this.new(...args);
     }
     return scope.instance;
+  }
+
+  static new(...args) {
+    return new this(...args);
   }
 }
 
