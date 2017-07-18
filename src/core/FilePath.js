@@ -25,6 +25,8 @@
 import Environment from '../core/Environment'
 import Namespace from '../core/Namespace'
 
+import currentExecutingScript from 'current-executing-script'
+
 export const internal = Namespace('FilePath')
 
 export default class FilePath {
