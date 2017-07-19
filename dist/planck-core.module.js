@@ -992,3 +992,4 @@ function UUID() {
 //
 
 export { Aggregate, AggregateFunction, AssertionError, Environment, FilePath, Hash, ImplementationError, Multiton, Namespace, Request, Semaphore, Singleton, Stride, Transferral, URL, UUID };
+//# sourceMappingURL=planck-core.module.js.map

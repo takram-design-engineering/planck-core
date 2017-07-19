@@ -29,6 +29,7 @@ const dependencies = Object.keys(require('./package.json').dependencies)
 
 export default {
   entry: './src/main.js',
+  sourceMap: true,
   plugins: [
     babel({
       presets: [
