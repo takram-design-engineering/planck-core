@@ -60,7 +60,7 @@
     "eslint": "^3.19.0",
     "express": "^4.15.3",
     "mocha": "^3.4.2",
-    "nock": "^9.0.13",
+    "nock": "^9.0.14",
     "nodemon": "^1.11.0",
     "npm-run-all": "^4.0.2",
     "rollup": "^0.45.2",
@@ -69,9 +69,9 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "sauce-connect-launcher": "^1.2.2",
     "saucelabs": "^1.4.0",
-    "sinon": "^2.3.7",
-    "sinon-chai": "^2.11.0",
-    "uglify-js": "^3.0.24"
+    "sinon": "^2.3.8",
+    "sinon-chai": "^2.12.0",
+    "uglify-js": "^3.0.25"
   },
   "saucelabs": {
     "framework": "mocha",
