@@ -49,6 +49,7 @@
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-es2017": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
+    "builtin-modules": "^1.1.1",
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
     "chalk": "^2.0.1",

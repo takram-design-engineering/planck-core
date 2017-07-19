@@ -23,14 +23,13 @@
 //
 
 import babel from 'rollup-plugin-babel'
-import commonjs from 'rollup-plugin-commonjs'
-import nodeResolve from 'rollup-plugin-node-resolve'
+import builtins from 'builtin-modules'
+
+const dependencies = Object.keys(require('./package.json').dependencies)
 
 export default {
   entry: './src/main.js',
   plugins: [
-    nodeResolve({ main: true, module: true, browser: true }),
-    commonjs(),
     babel({
       presets: [
         'es2017',
@@ -40,6 +39,10 @@ export default {
         'external-helpers',
       ],
     }),
+  ],
+  external: [
+    ...builtins,
+    ...dependencies,
   ],
   targets: [
     {
