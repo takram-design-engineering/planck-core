@@ -30,7 +30,7 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 const pkg = require('./package.json')
 
 export default {
-  entry: './test/test.js',
+  entry: './test/unit.js',
   sourceMap: true,
   plugins: [
     nodeResolve({ main: true, module: true, browser: true }),
@@ -65,7 +65,7 @@ export default {
   targets: [
     {
       format: 'iife',
-      dest: './dist/test.js',
+      dest: './dist/test/unit.js',
     },
   ],
 }

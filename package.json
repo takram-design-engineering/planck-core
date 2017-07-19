@@ -24,10 +24,14 @@
     "main:uglify": "uglifyjs --compress --mangle --output dist/planck-core.min.js dist/planck-core.js",
     "module:compile": "rollup -c rollup.config.module.js",
     "test": "npm-run-all lint test:compile test:local test:cloud",
-    "test:compile": "rollup -c rollup.config.test.js",
+    "test:compile": "rollup -c rollup.config.unit.js",
     "test:local": "mocha --recursive test/unit",
     "test:cloud": "mocha test/setup.js",
-    "lint": "eslint src test"
+    "lint": "eslint src test",
+    "watch": "npm-run-all --parallel watch:main watch:test serve",
+    "watch:main": "nodemon --watch src --exec 'npm run main:compile'",
+    "watch:test": "nodemon --watch test --exec 'npm run test:compile'",
+    "serve": "browser-sync start --server . --files dist --startPath test --no-notify"
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",
@@ -57,6 +61,7 @@
     "express": "^4.15.3",
     "mocha": "^3.4.2",
     "nock": "^9.0.13",
+    "nodemon": "^1.11.0",
     "npm-run-all": "^4.0.2",
     "rollup": "^0.45.2",
     "rollup-plugin-babel": "^2.7.1",

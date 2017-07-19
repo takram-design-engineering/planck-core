@@ -102,4 +102,4 @@ jspm_packages
 # Project
 !/dist
 /dist/*.map
-/dist/test.js
+/dist/test
