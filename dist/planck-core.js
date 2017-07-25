@@ -1434,7 +1434,7 @@ var Multiton = function () {
       if (scope.instances === undefined) {
         return false;
       }
-      var coercedKey = this.coerceMultitonKey(key);
+      var coercedKey = this.coerceKey(key);
       return scope.instances[coercedKey] !== undefined;
     }
   }, {
@@ -1444,7 +1444,7 @@ var Multiton = function () {
       if (!scope.instances) {
         scope.instances = new Map();
       }
-      var coercedKey = this.coerceMultitonKey(key);
+      var coercedKey = this.coerceKey(key);
       if (scope.instances.has(coercedKey)) {
         return scope.instances.get(coercedKey);
       }
@@ -1453,13 +1453,22 @@ var Multiton = function () {
         args[_key - 1] = arguments[_key];
       }
 
-      var instance = new (Function.prototype.bind.apply(this, [null].concat([coercedKey], args)))();
+      var instance = this.new.apply(this, [coercedKey].concat(args));
       scope.instances.set(coercedKey, instance);
       return instance;
     }
   }, {
-    key: 'coerceMultitonKey',
-    value: function coerceMultitonKey(key) {
+    key: 'new',
+    value: function _new(key) {
+      for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        args[_key2 - 1] = arguments[_key2];
+      }
+
+      return new (Function.prototype.bind.apply(this, [null].concat([key], args)))();
+    }
+  }, {
+    key: 'coerceKey',
+    value: function coerceKey(key) {
       return key;
     }
   }]);
@@ -2370,13 +2379,18 @@ var Singleton = function () {
     value: function get$$1() {
       var scope = internal$7(this);
       if (scope.instance === undefined) {
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
-
-        scope.instance = new (Function.prototype.bind.apply(this, [null].concat(args)))();
+        scope.instance = this.new.apply(this, arguments);
       }
       return scope.instance;
+    }
+  }, {
+    key: 'new',
+    value: function _new() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return new (Function.prototype.bind.apply(this, [null].concat(args)))();
     }
   }]);
   return Singleton;

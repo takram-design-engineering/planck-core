@@ -180,8 +180,11 @@ Multiton.**has**(*key*)
 <a id="multiton-class-for" href="#multiton-class-for">#</a>
 Multiton.**for**(*key*, [*arg1* [, *arg2* [, ...]]])
 
-<a id="multiton-class-coercemultitonkey" href="#multiton-class-coercemultitonkey">#</a>
-Multiton.**coerceMultitonKey**(*key*)
+<a id="multiton-class-new" href="#multiton-class-new">#</a>
+Multiton.**new**(*key*, [*arg1* [, *arg2* [, ...]]])
+
+<a id="multiton-class-coercekey" href="#multiton-class-coercekey">#</a>
+Multiton.**coerceKey**(*key*)
 
 ### Namespace
 
@@ -239,6 +242,9 @@ new **Semaphore**(*capacity*)
 
 <a id="singleton-class-get" href="#singleton-class-get">#</a>
 Singleton.**get**()
+
+<a id="singleton-class-new" href="#singleton-class-new">#</a>
+Singleton.**new**([*arg1* [, *arg2* [, ...]]])
 
 ### URL
 
