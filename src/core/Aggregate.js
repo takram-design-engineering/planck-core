@@ -22,8 +22,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import AggregateFunction from '../core/AggregateFunction'
-import Namespace from '../core/Namespace'
+import AggregateFunction from './AggregateFunction'
+import Namespace from './Namespace'
 
 export const internal = Namespace('Aggregate')
 

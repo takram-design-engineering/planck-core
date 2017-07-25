@@ -22,9 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Environment from '../core/Environment'
-import Namespace from '../core/Namespace'
-import URL from '../core/URL'
+import Environment from './Environment'
+import Namespace from './Namespace'
+import URL from './URL'
 
 /* eslint-disable global-require */
 let readFile

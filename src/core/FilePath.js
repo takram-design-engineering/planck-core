@@ -22,8 +22,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Environment from '../core/Environment'
-import Namespace from '../core/Namespace'
+import Environment from './Environment'
+import Namespace from './Namespace'
 
 export const internal = Namespace('FilePath')
 
