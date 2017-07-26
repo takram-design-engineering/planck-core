@@ -291,11 +291,18 @@ class FilePath {
   static get current() {
     switch (Environment.type) {
       case 'browser':
-        return window.location.href;
+        {
+          // eslint-disable-next-line no-underscore-dangle
+          const currentScript = document.currentScript || document._currentScript;
+          if (!currentScript) {
+            return null;
+          }
+          return currentScript.src;
+        }
       case 'worker':
         return self.location.href;
       case 'node':
-        return process.cwd();
+        return __filename;
       default:
         break;
     }
@@ -710,8 +717,6 @@ class Semaphore {
     }
   }
 
-  // Properties
-
   get capacity() {
     const scope = internal$6(this);
     return scope.capacity;
@@ -794,28 +799,13 @@ class Singleton {
 //
 
 class Stride {
-  static transform(array, stride, callback) {
-    const values = [];
-    array.forEach((value, index) => {
-      const modulo = index % stride;
-      values[modulo] = value;
-      if (modulo === stride - 1) {
-        const transformed = callback(...values, Math.floor(index / stride));
-        for (let offset = 0; offset < stride; ++offset) {
-          array[index - (stride - offset - 1)] = transformed[offset];
-        }
-      }
-    });
-    return array;
-  }
-
   static forEach(array, stride, callback) {
     const values = [];
     array.forEach((value, index) => {
       const modulo = index % stride;
       values[modulo] = value;
       if (modulo === stride - 1) {
-        callback(...values, Math.floor(index / stride));
+        callback(values, Math.floor(index / stride));
       }
     });
   }
@@ -826,7 +816,7 @@ class Stride {
       const modulo = index % stride;
       values[modulo] = value;
       if (modulo === stride - 1) {
-        return callback(...values, Math.floor(index / stride));
+        return callback(values, Math.floor(index / stride));
       }
       return false;
     });
@@ -838,7 +828,7 @@ class Stride {
       const modulo = index % stride;
       values[modulo] = value;
       if (modulo === stride - 1) {
-        return callback(...values, Math.floor(index / stride));
+        return callback(values, Math.floor(index / stride));
       }
       return true;
     });
@@ -850,10 +840,25 @@ class Stride {
       const modulo = index % stride;
       values[modulo] = value;
       if (modulo === stride - 1) {
-        return callback(result, ...values, Math.floor(index / stride));
+        return callback(result, values, Math.floor(index / stride));
       }
       return result;
     }, initial);
+  }
+
+  static transform(array, stride, callback) {
+    const values = [];
+    array.forEach((value, index) => {
+      const modulo = index % stride;
+      values[modulo] = value;
+      if (modulo === stride - 1) {
+        const transformed = callback(values, Math.floor(index / stride));
+        for (let offset = 0; offset < stride; ++offset) {
+          array[index - (stride - offset - 1)] = transformed[offset];
+        }
+      }
+    });
+    return array;
   }
 }
 

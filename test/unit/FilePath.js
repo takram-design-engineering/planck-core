@@ -23,35 +23,28 @@
 //
 
 import chai from 'chai'
-import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
 
-import { Namespace } from '../..'
+import { Environment, FilePath, URL } from '../..'
 
 const expect = chai.expect
-chai.use(sinonChai)
+const current = FilePath.current
 
-describe('Namespace', () => {
-  it('stores value', () => {
-    const namespace = Namespace()
-    const object = {}
-    const scope = namespace(object)
-    expect(scope.a).undefined
-    scope.a = 'a'
-    expect(scope.a).equal('a')
+describe('FilePath', () => {
+  describe('#self', () => {
+    it('matches the original script url', () => {
+      const url = new URL(FilePath.self)
+      if (Environment.type !== 'node') {
+        expect(url.pathname).equal('/dist/planck-core.js')
+      }
+    })
   })
 
-  it('accepts init and is called once', () => {
-    const init = sinon.stub().returns({
-      a: 'a',
+  describe('#current', () => {
+    it('matches the current script url', () => {
+      const url = new URL(current)
+      if (Environment.type !== 'node') {
+        expect(url.pathname).equal('/dist/test/unit.js')
+      }
     })
-    const namespace = Namespace()
-    const object = {}
-    namespace(object, init)
-    namespace(object, init)
-    expect(init).calledOnce
-    const scope = namespace(object)
-    scope.a = 'a'
-    expect(scope.a).equal('a')
   })
 })

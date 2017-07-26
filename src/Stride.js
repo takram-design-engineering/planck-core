@@ -23,28 +23,13 @@
 //
 
 export default class Stride {
-  static transform(array, stride, callback) {
-    const values = []
-    array.forEach((value, index) => {
-      const modulo = index % stride
-      values[modulo] = value
-      if (modulo === stride - 1) {
-        const transformed = callback(...values, Math.floor(index / stride))
-        for (let offset = 0; offset < stride; ++offset) {
-          array[index - (stride - offset - 1)] = transformed[offset]
-        }
-      }
-    })
-    return array
-  }
-
   static forEach(array, stride, callback) {
     const values = []
     array.forEach((value, index) => {
       const modulo = index % stride
       values[modulo] = value
       if (modulo === stride - 1) {
-        callback(...values, Math.floor(index / stride))
+        callback(values, Math.floor(index / stride))
       }
     })
   }
@@ -55,7 +40,7 @@ export default class Stride {
       const modulo = index % stride
       values[modulo] = value
       if (modulo === stride - 1) {
-        return callback(...values, Math.floor(index / stride))
+        return callback(values, Math.floor(index / stride))
       }
       return false
     })
@@ -67,7 +52,7 @@ export default class Stride {
       const modulo = index % stride
       values[modulo] = value
       if (modulo === stride - 1) {
-        return callback(...values, Math.floor(index / stride))
+        return callback(values, Math.floor(index / stride))
       }
       return true
     })
@@ -79,9 +64,24 @@ export default class Stride {
       const modulo = index % stride
       values[modulo] = value
       if (modulo === stride - 1) {
-        return callback(result, ...values, Math.floor(index / stride))
+        return callback(result, values, Math.floor(index / stride))
       }
       return result
     }, initial)
+  }
+
+  static transform(array, stride, callback) {
+    const values = []
+    array.forEach((value, index) => {
+      const modulo = index % stride
+      values[modulo] = value
+      if (modulo === stride - 1) {
+        const transformed = callback(values, Math.floor(index / stride))
+        for (let offset = 0; offset < stride; ++offset) {
+          array[index - (stride - offset - 1)] = transformed[offset]
+        }
+      }
+    })
+    return array
   }
 }

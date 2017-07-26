@@ -494,11 +494,18 @@ var FilePath = function () {
     get: function get$$1() {
       switch (Environment.type) {
         case 'browser':
-          return window.location.href;
+          {
+            // eslint-disable-next-line no-underscore-dangle
+            var currentScript = document.currentScript || document._currentScript;
+            if (!currentScript) {
+              return null;
+            }
+            return currentScript.src;
+          }
         case 'worker':
           return self.location.href;
         case 'node':
-          return process.cwd();
+          return __filename;
         default:
           break;
       }
@@ -2320,9 +2327,6 @@ var Semaphore = function () {
         scope.queue.shift().let();
       }
     }
-
-    // Properties
-
   }, {
     key: 'capacity',
     get: function get$$1() {
@@ -2426,22 +2430,6 @@ var Stride = function () {
   }
 
   createClass(Stride, null, [{
-    key: "transform",
-    value: function transform(array, stride, callback) {
-      var values = [];
-      array.forEach(function (value, index) {
-        var modulo = index % stride;
-        values[modulo] = value;
-        if (modulo === stride - 1) {
-          var transformed = callback.apply(undefined, values.concat([Math.floor(index / stride)]));
-          for (var offset = 0; offset < stride; ++offset) {
-            array[index - (stride - offset - 1)] = transformed[offset];
-          }
-        }
-      });
-      return array;
-    }
-  }, {
     key: "forEach",
     value: function forEach(array, stride, callback) {
       var values = [];
@@ -2449,7 +2437,7 @@ var Stride = function () {
         var modulo = index % stride;
         values[modulo] = value;
         if (modulo === stride - 1) {
-          callback.apply(undefined, values.concat([Math.floor(index / stride)]));
+          callback(values, Math.floor(index / stride));
         }
       });
     }
@@ -2461,7 +2449,7 @@ var Stride = function () {
         var modulo = index % stride;
         values[modulo] = value;
         if (modulo === stride - 1) {
-          return callback.apply(undefined, values.concat([Math.floor(index / stride)]));
+          return callback(values, Math.floor(index / stride));
         }
         return false;
       });
@@ -2474,7 +2462,7 @@ var Stride = function () {
         var modulo = index % stride;
         values[modulo] = value;
         if (modulo === stride - 1) {
-          return callback.apply(undefined, values.concat([Math.floor(index / stride)]));
+          return callback(values, Math.floor(index / stride));
         }
         return true;
       });
@@ -2487,10 +2475,26 @@ var Stride = function () {
         var modulo = index % stride;
         values[modulo] = value;
         if (modulo === stride - 1) {
-          return callback.apply(undefined, [result].concat(values, [Math.floor(index / stride)]));
+          return callback(result, values, Math.floor(index / stride));
         }
         return result;
       }, initial);
+    }
+  }, {
+    key: "transform",
+    value: function transform(array, stride, callback) {
+      var values = [];
+      array.forEach(function (value, index) {
+        var modulo = index % stride;
+        values[modulo] = value;
+        if (modulo === stride - 1) {
+          var transformed = callback(values, Math.floor(index / stride));
+          for (var offset = 0; offset < stride; ++offset) {
+            array[index - (stride - offset - 1)] = transformed[offset];
+          }
+        }
+      });
+      return array;
     }
   }]);
   return Stride;
