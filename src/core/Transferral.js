@@ -24,7 +24,7 @@
 
 import base64 from 'base64-arraybuffer'
 
-import Environment from '../core/Environment'
+import Environment from './Environment'
 
 if (Environment.type === 'node') {
   // eslint-disable-next-line global-require

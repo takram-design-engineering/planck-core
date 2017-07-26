@@ -22,7 +22,7 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Namespace from '../core/Namespace'
+import Namespace from './Namespace'
 
 export const internal = Namespace('Singleton')
 
