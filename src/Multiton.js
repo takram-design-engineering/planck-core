@@ -22,19 +22,45 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export { default as Aggregate } from './core/Aggregate'
-export { default as AggregateFunction } from './core/AggregateFunction'
-export { default as AssertionError } from './core/AssertionError'
-export { default as Environment } from './core/Environment'
-export { default as FilePath } from './core/FilePath'
-export { default as Hash } from './core/Hash'
-export { default as ImplementationError } from './core/ImplementationError'
-export { default as Multiton } from './core/Multiton'
-export { default as Namespace } from './core/Namespace'
-export { default as Request } from './core/Request'
-export { default as Semaphore } from './core/Semaphore'
-export { default as Singleton } from './core/Singleton'
-export { default as Stride } from './core/Stride'
-export { default as Transferral } from './core/Transferral'
-export { default as URL } from './core/URL'
-export { default as UUID } from './core/UUID'
+import Namespace from './Namespace'
+
+export const internal = Namespace('Multiton')
+
+export default class Multiton {
+  constructor(key) {
+    if (this.constructor.has(key)) {
+      throw new Error(`Attempt to create multiple instances for key "${key}"`)
+    }
+  }
+
+  static has(key) {
+    const scope = internal(this)
+    if (scope.instances === undefined) {
+      return false
+    }
+    const coercedKey = this.coerceKey(key)
+    return scope.instances[coercedKey] !== undefined
+  }
+
+  static for(key, ...args) {
+    const scope = internal(this)
+    if (!scope.instances) {
+      scope.instances = new Map()
+    }
+    const coercedKey = this.coerceKey(key)
+    if (scope.instances.has(coercedKey)) {
+      return scope.instances.get(coercedKey)
+    }
+    const instance = this.new(coercedKey, ...args)
+    scope.instances.set(coercedKey, instance)
+    return instance
+  }
+
+  static new(key, ...args) {
+    return new this(key, ...args)
+  }
+
+  static coerceKey(key) {
+    return key
+  }
+}

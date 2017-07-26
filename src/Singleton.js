@@ -22,45 +22,26 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Namespace from '../core/Namespace'
+import Namespace from './Namespace'
 
-export const internal = Namespace('Multiton')
+export const internal = Namespace('Singleton')
 
-export default class Multiton {
-  constructor(key) {
-    if (this.constructor.has(key)) {
-      throw new Error(`Attempt to create multiple instances for key "${key}"`)
+export default class Singleton {
+  constructor() {
+    if (internal(this.constructor).instance !== undefined) {
+      throw new Error('Attempt to create multiple instances for singleton')
     }
   }
 
-  static has(key) {
+  static get(...args) {
     const scope = internal(this)
-    if (scope.instances === undefined) {
-      return false
+    if (scope.instance === undefined) {
+      scope.instance = this.new(...args)
     }
-    const coercedKey = this.coerceKey(key)
-    return scope.instances[coercedKey] !== undefined
+    return scope.instance
   }
 
-  static for(key, ...args) {
-    const scope = internal(this)
-    if (!scope.instances) {
-      scope.instances = new Map()
-    }
-    const coercedKey = this.coerceKey(key)
-    if (scope.instances.has(coercedKey)) {
-      return scope.instances.get(coercedKey)
-    }
-    const instance = this.new(coercedKey, ...args)
-    scope.instances.set(coercedKey, instance)
-    return instance
-  }
-
-  static new(key, ...args) {
-    return new this(key, ...args)
-  }
-
-  static coerceKey(key) {
-    return key
+  static new(...args) {
+    return new this(...args)
   }
 }

@@ -22,30 +22,33 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Environment from '../core/Environment'
-import Namespace from '../core/Namespace'
+import Namespace from './Namespace'
 
-export const internal = Namespace('FilePath')
+export const internal = Namespace('AggregateFunction')
 
-export default class FilePath {
-  static get self() {
+export default class AggregateFunction {
+  // This constructor provides for inheritance only
+  constructor(namespace, ...targets) {
+    if (namespace !== internal) {
+      throw new Error()
+    }
     const scope = internal(this)
-    return scope.self
+    scope.targets = targets
   }
 
-  static get current() {
-    switch (Environment.type) {
-      case 'browser':
-        return window.location.href
-      case 'worker':
-        return self.location.href
-      case 'node':
-        return process.cwd()
-      default:
-        break
-    }
-    throw new Error()
+  apply(target, bound, args) {
+    const scope = internal(this)
+    return scope.targets.map(target => {
+      return Reflect.apply(target, bound, args)
+    })
+  }
+
+  getPrototypeOf(target) {
+    return this.constructor.prototype
+  }
+
+  static new(...args) {
+    const instance = new this(internal, ...args)
+    return new Proxy(() => {}, instance)
   }
 }
-
-internal(FilePath).self = FilePath.current

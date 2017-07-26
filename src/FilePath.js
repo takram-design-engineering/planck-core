@@ -22,33 +22,36 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import babel from 'rollup-plugin-babel'
-import builtins from 'builtin-modules'
+import Environment from './Environment'
+import Namespace from './Namespace'
 
-const dependencies = Object.keys(require('./package.json').dependencies)
+export const internal = Namespace('FilePath')
 
-export default {
-  entry: './src/main.js',
-  sourceMap: true,
-  plugins: [
-    babel({
-      presets: [
-        'es2017',
-        'stage-3',
-      ],
-      plugins: [
-        'external-helpers',
-      ],
-    }),
-  ],
-  external: [
-    ...builtins,
-    ...dependencies,
-  ],
-  targets: [
-    {
-      format: 'es',
-      dest: './dist/planck-core.module.js',
-    },
-  ],
+export default class FilePath {
+  static get self() {
+    const scope = internal(this)
+    return scope.self
+  }
+
+  static get current() {
+    switch (Environment.type) {
+      case 'browser': {
+        // eslint-disable-next-line no-underscore-dangle
+        const currentScript = document.currentScript || document._currentScript
+        if (!currentScript) {
+          return null
+        }
+        return currentScript.src
+      }
+      case 'worker':
+        return self.location.href
+      case 'node':
+        return __filename
+      default:
+        break
+    }
+    throw new Error()
+  }
 }
+
+internal(FilePath).self = FilePath.current

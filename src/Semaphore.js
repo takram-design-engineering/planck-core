@@ -22,48 +22,70 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import AggregateFunction from '../core/AggregateFunction'
-import Namespace from '../core/Namespace'
+import Namespace from './Namespace'
 
-export const internal = Namespace('Aggregate')
+export const internal = Namespace('Semaphore')
 
-export default class Aggregate {
-  // This constructor provides for inheritance only
-  constructor(namespace, ...targets) {
-    if (namespace !== internal) {
-      throw new Error()
+class Task {
+  constructor(semaphore, callback) {
+    const promises = [
+      new Promise((resolve, reject) => {
+        this.resolve = resolve
+        this.reject = reject
+      }),
+      new Promise(resolve => {
+        this.let = resolve
+      }).then(() => {
+        callback(this.resolve, this.reject)
+      }),
+    ]
+    this.promise = Promise.all(promises)
+      .then(values => {
+        semaphore.signal()
+        return values[0]
+      }, reason => {
+        semaphore.signal()
+        return Promise.reject(reason)
+      })
+  }
+}
+
+export default class Semaphore {
+  constructor(capacity) {
+    const scope = internal(this)
+    scope.capacity = capacity
+    scope.available = capacity
+    scope.queue = []
+  }
+
+  wait(callback) {
+    const scope = internal(this)
+    const task = new Task(this, callback)
+    if (scope.available === 0) {
+      scope.queue.push(task)
+    } else {
+      --scope.available
+      task.let()
     }
-    const scope = internal(this)
-    scope.targets = targets
+    return task.promise
   }
 
-  set(target, property, value, receiver) {
+  signal() {
     const scope = internal(this)
-    scope.targets.forEach(target => {
-      Reflect.set(target, property, value)
-    })
-    return Reflect.set(target, property, value, receiver)
-  }
-
-  get(target, property, receiver) {
-    const scope = internal(this)
-    const aggregative = scope.targets.every(target => {
-      return typeof Reflect.get(target, property) === 'function'
-    })
-    if (aggregative) {
-      return AggregateFunction.new(...scope.targets.map(target => {
-        return Reflect.get(target, property).bind(target)
-      }))
+    if (scope.queue.length === 0) {
+      ++scope.available
+    } else {
+      scope.queue.shift().let()
     }
-    return Reflect.get(scope.targets[0], property, receiver)
   }
 
-  getPrototypeOf(target) {
-    return this.constructor.prototype
+  get capacity() {
+    const scope = internal(this)
+    return scope.capacity
   }
 
-  static new(...args) {
-    const instance = new this(internal, ...args)
-    return new Proxy({}, instance)
+  get available() {
+    const scope = internal(this)
+    return scope.available
   }
 }

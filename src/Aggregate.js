@@ -22,11 +22,12 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Namespace from '../core/Namespace'
+import AggregateFunction from './AggregateFunction'
+import Namespace from './Namespace'
 
-export const internal = Namespace('AggregateFunction')
+export const internal = Namespace('Aggregate')
 
-export default class AggregateFunction {
+export default class Aggregate {
   // This constructor provides for inheritance only
   constructor(namespace, ...targets) {
     if (namespace !== internal) {
@@ -36,11 +37,25 @@ export default class AggregateFunction {
     scope.targets = targets
   }
 
-  apply(target, bound, args) {
+  set(target, property, value, receiver) {
     const scope = internal(this)
-    return scope.targets.map(target => {
-      return Reflect.apply(target, bound, args)
+    scope.targets.forEach(target => {
+      Reflect.set(target, property, value)
     })
+    return Reflect.set(target, property, value, receiver)
+  }
+
+  get(target, property, receiver) {
+    const scope = internal(this)
+    const aggregative = scope.targets.every(target => {
+      return typeof Reflect.get(target, property) === 'function'
+    })
+    if (aggregative) {
+      return AggregateFunction.new(...scope.targets.map(target => {
+        return Reflect.get(target, property).bind(target)
+      }))
+    }
+    return Reflect.get(scope.targets[0], property, receiver)
   }
 
   getPrototypeOf(target) {
@@ -49,6 +64,6 @@ export default class AggregateFunction {
 
   static new(...args) {
     const instance = new this(internal, ...args)
-    return new Proxy(() => {}, instance)
+    return new Proxy({}, instance)
   }
 }

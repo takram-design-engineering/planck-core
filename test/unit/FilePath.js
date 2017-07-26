@@ -22,26 +22,29 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Namespace from '../core/Namespace'
+import chai from 'chai'
 
-export const internal = Namespace('Singleton')
+import { Environment, FilePath, URL } from '../..'
 
-export default class Singleton {
-  constructor() {
-    if (internal(this.constructor).instance !== undefined) {
-      throw new Error('Attempt to create multiple instances for singleton')
-    }
-  }
+const expect = chai.expect
+const current = FilePath.current
 
-  static get(...args) {
-    const scope = internal(this)
-    if (scope.instance === undefined) {
-      scope.instance = this.new(...args)
-    }
-    return scope.instance
-  }
+describe('FilePath', () => {
+  describe('#self', () => {
+    it('matches the original script url', () => {
+      const url = new URL(FilePath.self)
+      if (Environment.type !== 'node') {
+        expect(url.pathname).equal('/dist/planck-core.js')
+      }
+    })
+  })
 
-  static new(...args) {
-    return new this(...args)
-  }
-}
+  describe('#current', () => {
+    it('matches the current script url', () => {
+      const url = new URL(current)
+      if (Environment.type !== 'node') {
+        expect(url.pathname).equal('/dist/test/unit.js')
+      }
+    })
+  })
+})

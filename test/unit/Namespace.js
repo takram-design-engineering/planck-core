@@ -32,7 +32,7 @@ const expect = chai.expect
 chai.use(sinonChai)
 
 describe('Namespace', () => {
-  it('works', () => {
+  it('stores value', () => {
     const namespace = Namespace()
     const object = {}
     const scope = namespace(object)
