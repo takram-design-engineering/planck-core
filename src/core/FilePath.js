@@ -35,12 +35,18 @@ export default class FilePath {
 
   static get current() {
     switch (Environment.type) {
-      case 'browser':
-        return window.location.href
+      case 'browser': {
+        // eslint-disable-next-line no-underscore-dangle
+        const currentScript = document.currentScript || document._currentScript
+        if (!currentScript) {
+          return null
+        }
+        return currentScript.src
+      }
       case 'worker':
         return self.location.href
       case 'node':
-        return process.cwd()
+        return __filename
       default:
         break
     }

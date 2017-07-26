@@ -79,8 +79,6 @@ export default class Semaphore {
     }
   }
 
-  // Properties
-
   get capacity() {
     const scope = internal(this)
     return scope.capacity
