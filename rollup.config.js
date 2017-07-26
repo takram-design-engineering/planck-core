@@ -27,7 +27,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
 
 export default {
-  entry: './src/main.js',
+  entry: './dist/planck-core.module.js',
   sourceMap: true,
   plugins: [
     nodeResolve({ main: true, module: true, browser: true }),

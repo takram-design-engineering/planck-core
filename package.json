@@ -17,12 +17,9 @@
     "src"
   ],
   "scripts": {
-    "build": "npm-run-all --parallel build:main build:module",
-    "build:main": "npm-run-all main:compile main:uglify",
-    "build:module": "npm-run-all module:compile",
+    "build": "npm-run-all main:compile main:uglify",
     "main:compile": "rollup -c",
     "main:uglify": "uglifyjs --compress --mangle --output dist/planck-core.min.js dist/planck-core.js",
-    "module:compile": "rollup -c rollup.config.module.js",
     "test": "npm-run-all lint test:compile test:local test:cloud",
     "test:compile": "rollup -c rollup.config.unit.js",
     "test:local": "mocha --recursive test/unit",
