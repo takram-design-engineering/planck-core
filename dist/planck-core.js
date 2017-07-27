@@ -2510,13 +2510,21 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
 
 var Transferral = {
   encode: function encode(object) {
-    var encoder = new (Environment.self.TextEncoder || encoding.TextEncoder)();
+    var TextEncoder = Environment.self.TextEncoder || encoding.TextEncoder;
+    if (TextEncoder === undefined) {
+      throw new Error('TextEncoder is missing');
+    }
+    var encoder = new TextEncoder();
     var text = JSON.stringify(object);
     var array = encoder.encode(text);
     return array.buffer;
   },
   decode: function decode(buffer) {
-    var decoder = new (Environment.self.TextDecoder || encoding.TextDecoder)();
+    var TextDecoder = Environment.self.TextDecoder || encoding.TextDecoder;
+    if (TextDecoder === undefined) {
+      throw new Error('TextDecoder is missing');
+    }
+    var decoder = new TextDecoder();
     var view = new DataView(buffer);
     var text = decoder.decode(view);
     return JSON.parse(text);

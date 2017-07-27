@@ -29,14 +29,22 @@ import Environment from './Environment'
 
 export default {
   encode(object) {
-    const encoder = new (Environment.self.TextEncoder || encoding.TextEncoder)()
+    const TextEncoder = Environment.self.TextEncoder || encoding.TextEncoder
+    if (TextEncoder === undefined) {
+      throw new Error('TextEncoder is missing')
+    }
+    const encoder = new TextEncoder()
     const text = JSON.stringify(object)
     const array = encoder.encode(text)
     return array.buffer
   },
 
   decode(buffer) {
-    const decoder = new (Environment.self.TextDecoder || encoding.TextDecoder)()
+    const TextDecoder = Environment.self.TextDecoder || encoding.TextDecoder
+    if (TextDecoder === undefined) {
+      throw new Error('TextDecoder is missing')
+    }
+    const decoder = new TextDecoder()
     const view = new DataView(buffer)
     const text = decoder.decode(view)
     return JSON.parse(text)
