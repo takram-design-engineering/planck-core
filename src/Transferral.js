@@ -27,29 +27,16 @@ import encoding from 'text-encoding'
 
 import Environment from './Environment'
 
-if (Environment.self.TextEncoder === undefined) {
-  Environment.self.TextEncoder = encoding.TextEncoder
-}
-if (Environment.self.TextDecoder === undefined) {
-  Environment.self.TextDecoder = encoding.TextDecoder
-}
-
 export default {
   encode(object) {
-    if (TextEncoder === undefined) {
-      throw new Error('TextEncoder is missing')
-    }
-    const encoder = new TextEncoder()
+    const encoder = new (Environment.self.TextEncoder || encoding.TextEncoder)()
     const text = JSON.stringify(object)
     const array = encoder.encode(text)
     return array.buffer
   },
 
   decode(buffer) {
-    if (TextDecoder === undefined) {
-      throw new Error('TextDecoder is missing')
-    }
-    const decoder = new TextDecoder()
+    const decoder = new (Environment.self.TextDecoder || encoding.TextDecoder)()
     const view = new DataView(buffer)
     const text = decoder.decode(view)
     return JSON.parse(text)

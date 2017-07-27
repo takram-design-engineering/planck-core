@@ -2508,28 +2508,15 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-if (Environment.self.TextEncoder === undefined) {
-  Environment.self.TextEncoder = encoding.TextEncoder;
-}
-if (Environment.self.TextDecoder === undefined) {
-  Environment.self.TextDecoder = encoding.TextDecoder;
-}
-
 var Transferral = {
   encode: function encode(object) {
-    if (TextEncoder === undefined) {
-      throw new Error('TextEncoder is missing');
-    }
-    var encoder = new TextEncoder();
+    var encoder = new (Environment.self.TextEncoder || encoding.TextEncoder)();
     var text = JSON.stringify(object);
     var array = encoder.encode(text);
     return array.buffer;
   },
   decode: function decode(buffer) {
-    if (TextDecoder === undefined) {
-      throw new Error('TextDecoder is missing');
-    }
-    var decoder = new TextDecoder();
+    var decoder = new (Environment.self.TextDecoder || encoding.TextDecoder)();
     var view = new DataView(buffer);
     var text = decoder.decode(view);
     return JSON.parse(text);
