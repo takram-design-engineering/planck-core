@@ -1,8 +1,11 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.Planck = {})));
-}(this, (function (exports) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('fs'), require('request'), require('text-encoding')) :
+	typeof define === 'function' && define.amd ? define(['exports', 'fs', 'request', 'text-encoding'], factory) :
+	(factory((global.Planck = {}),global.fs,global.request,global.encoding));
+}(this, (function (exports,fs,request,encoding) { 'use strict';
+
+request = request && request.hasOwnProperty('default') ? request['default'] : request;
+encoding = encoding && encoding.hasOwnProperty('default') ? encoding['default'] : encoding;
 
 //
 //  The MIT License
@@ -92,21 +95,6 @@ var createClass = function () {
 
 
 
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
 
 
 
@@ -118,13 +106,8 @@ var inherits = function (subClass, superClass) {
 
 
 
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
 
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
+
 
 
 
@@ -1628,9 +1611,9 @@ function lolcation(loc) {
       key;
 
   if ('blob:' === loc.protocol) {
-    finaldestination = new URL$2(unescape(loc.pathname), {});
+    finaldestination = new URL$1(unescape(loc.pathname), {});
   } else if ('string' === type) {
-    finaldestination = new URL$2(loc, {});
+    finaldestination = new URL$1(loc, {});
     for (key in ignore) {
       delete finaldestination[key];
     }
@@ -1718,9 +1701,9 @@ function resolve(relative, base) {
  * @param {Boolean|Function} parser Parser for the query string.
  * @api public
  */
-function URL$2(address, location, parser) {
-  if (!(this instanceof URL$2)) {
-    return new URL$2(address, location, parser);
+function URL$1(address, location, parser) {
+  if (!(this instanceof URL$1)) {
+    return new URL$1(address, location, parser);
   }
 
   var relative,
@@ -1961,54 +1944,17 @@ function toString(stringify) {
   return result;
 }
 
-URL$2.prototype = { set: set$1, toString: toString };
+URL$1.prototype = { set: set$1, toString: toString };
 
 //
 // Expose the URL parser and some additional properties that might be useful for
 // others or testing.
 //
-URL$2.extractProtocol = extractProtocol;
-URL$2.location = lolcation;
-URL$2.qs = index$8;
+URL$1.extractProtocol = extractProtocol;
+URL$1.location = lolcation;
+URL$1.qs = index$8;
 
-var index$5 = URL$2;
-
-//
-//  The MIT License
-//
-//  Copyright (C) 2016-Present Shota Matsuda
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
-
-// Just use url-parse for now
-
-var URL = function (_urlParse) {
-  inherits(URL, _urlParse);
-
-  function URL() {
-    classCallCheck(this, URL);
-    return possibleConstructorReturn(this, (URL.__proto__ || Object.getPrototypeOf(URL)).apply(this, arguments));
-  }
-
-  return URL;
-}(index$5);
+var index$5 = URL$1;
 
 //
 //  The MIT License
@@ -2034,53 +1980,65 @@ var URL = function (_urlParse) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint-disable global-require */
-var readFile = void 0;
-var request = void 0;
-if (Environment.type === 'node') {
-  var _require = require('fs');
-
-  readFile = _require.readFile;
-
-  request = require('request');
-}
-/* eslint-enable global-require */
+//
+//  The MIT License
+//
+//  Copyright (C) 2016-Present Shota Matsuda
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
 
 
 
 function browserRequest(url, options) {
   return new Promise(function (resolve, reject) {
-    var parsed = new URL(url, true);
+    var parsed = new index$5(url, true);
     if (options.query) {
       parsed.set('query', Object.assign({}, parsed.query, options.query));
     }
-    var request = new XMLHttpRequest();
-    request.open('get', parsed.toString(), true);
+    var request$$1 = new XMLHttpRequest();
+    request$$1.open('get', parsed.toString(), true);
     if (options.headers) {
       Object.entries(options.headers).forEach(function (header) {
-        request.setRequestHeader.apply(request, toConsumableArray(header));
+        request$$1.setRequestHeader.apply(request$$1, toConsumableArray(header));
       });
     }
-    request.responseType = options.type;
-    request.addEventListener('loadend', function (event) {
-      if (request.status < 200 || request.status >= 300) {
-        reject(request.status);
+    request$$1.responseType = options.type;
+    request$$1.addEventListener('loadend', function (event) {
+      if (request$$1.status < 200 || request$$1.status >= 300) {
+        reject(request$$1.status);
         return;
       }
-      if (request.response === null && options.type === 'json') {
+      if (request$$1.response === null && options.type === 'json') {
         reject(new Error('Could not parse JSON'));
         return;
       }
-      resolve(request.response);
+      resolve(request$$1.response);
     }, false);
-    request.send();
+    request$$1.send();
   });
 }
 
 function nodeRequest(url, options) {
   if (options.local) {
     return new Promise(function (resolve, reject) {
-      readFile(url, options.encoding, function (error, response) {
+      fs.readFile(url, options.encoding, function (error, response) {
         if (error) {
           reject(error);
           return;
@@ -2550,20 +2508,16 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-if (Environment.type === 'node') {
-  // eslint-disable-next-line global-require
-  var encoding = require('text-encoding');
-  if (Environment.self.TextEncoder === undefined) {
-    Environment.self.TextEncoder = encoding.TextEncoder;
-  }
-  if (Environment.self.TextDecoder === undefined) {
-    Environment.self.TextDecoder = encoding.TextDecoder;
-  }
+if (Environment.self.TextEncoder === undefined) {
+  Environment.self.TextEncoder = encoding.TextEncoder;
+}
+if (Environment.self.TextDecoder === undefined) {
+  Environment.self.TextDecoder = encoding.TextDecoder;
 }
 
 var Transferral = {
   encode: function encode(object) {
-    if (typeof TextEncoder !== 'function') {
+    if (TextEncoder === undefined) {
       throw new Error('TextEncoder is missing');
     }
     var encoder = new TextEncoder();
@@ -2572,7 +2526,7 @@ var Transferral = {
     return array.buffer;
   },
   decode: function decode(buffer) {
-    if (typeof TextDecoder !== 'function') {
+    if (TextDecoder === undefined) {
       throw new Error('TextDecoder is missing');
     }
     var decoder = new TextDecoder();
@@ -2853,7 +2807,7 @@ exports.Semaphore = Semaphore;
 exports.Singleton = Singleton;
 exports.Stride = Stride;
 exports.Transferral = Transferral;
-exports.URL = URL;
+exports.URL = index$5;
 exports.UUID = UUID;
 
 Object.defineProperty(exports, '__esModule', { value: true });
