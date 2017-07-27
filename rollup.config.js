@@ -28,8 +28,6 @@ import camelcase from 'camelcase'
 import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
 
-const pkg = require('./package.json')
-const dependencies = Object.keys(pkg.dependencies)
 const globals = builtins.reduce((globals, builtin) => {
   return Object.assign(globals, { [builtin]: camelcase(builtin) })
 }, {})
@@ -64,6 +62,7 @@ export default {
   targets: [
     {
       format: 'umd',
+      extend: true,
       moduleName: 'Planck',
       dest: './dist/planck-core.js',
     },
