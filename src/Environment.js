@@ -22,8 +22,6 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Namespace from './Namespace'
-
 export default {
   get type() {
     try {
