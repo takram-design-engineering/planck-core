@@ -22,7 +22,7 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import urlParse from 'url-parse'
+import URL from 'url-parse'
 
 // Just use url-parse for now
-export default class URL extends urlParse {}
+export default URL
