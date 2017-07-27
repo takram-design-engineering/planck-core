@@ -24,10 +24,8 @@
 
 import Namespace from './Namespace'
 
-export const internal = Namespace('Environment')
-
-export default class Environment {
-  static get type() {
+export default {
+  get type() {
     try {
       // eslint-disable-next-line no-new-func
       if (new Function('return this === window')()) {
@@ -47,9 +45,9 @@ export default class Environment {
       }
     } catch (error) {}
     throw new Error()
-  }
+  },
 
-  static get self() {
+  get self() {
     switch (this.type) {
       case 'browser':
         return window
@@ -61,5 +59,5 @@ export default class Environment {
         break
     }
     throw new Error()
-  }
+  },
 }

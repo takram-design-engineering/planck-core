@@ -37,8 +37,8 @@ if (Environment.type === 'node') {
   }
 }
 
-export default class Transferral {
-  static encode(object) {
+export default {
+  encode(object) {
     if (typeof TextEncoder !== 'function') {
       throw new Error('TextEncoder is missing')
     }
@@ -46,9 +46,9 @@ export default class Transferral {
     const text = JSON.stringify(object)
     const array = encoder.encode(text)
     return array.buffer
-  }
+  },
 
-  static decode(buffer) {
+  decode(buffer) {
     if (typeof TextDecoder !== 'function') {
       throw new Error('TextDecoder is missing')
     }
@@ -56,29 +56,29 @@ export default class Transferral {
     const view = new DataView(buffer)
     const text = decoder.decode(view)
     return JSON.parse(text)
-  }
+  },
 
-  static pack(buffer) {
+  pack(buffer) {
     return base64.encode(buffer)
-  }
+  },
 
-  static unpack(string) {
+  unpack(string) {
     return base64.decode(string)
-  }
+  },
 
-  static packBufferGeometry(geometry) {
+  packBufferGeometry(geometry) {
     Object.values(geometry.data.attributes).forEach(attribute => {
       const constructor = Environment.self[attribute.type]
       const buffer = new constructor(attribute.array).buffer
       attribute.array = this.pack(buffer)
     })
-  }
+  },
 
-  static unpackBufferGeometry(geometry) {
+  unpackBufferGeometry(geometry) {
     Object.values(geometry.data.attributes).forEach(attribute => {
       const constructor = Environment.self[attribute.type]
       const buffer = this.unpack(attribute.array)
       attribute.array = Array.from(new constructor(buffer))
     })
-  }
+  },
 }

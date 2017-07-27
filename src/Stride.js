@@ -22,8 +22,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export default class Stride {
-  static forEach(array, stride, callback) {
+export default {
+  forEach(array, stride, callback) {
     const values = []
     array.forEach((value, index) => {
       const modulo = index % stride
@@ -32,9 +32,9 @@ export default class Stride {
         callback(values, Math.floor(index / stride))
       }
     })
-  }
+  },
 
-  static some(array, stride, callback) {
+  some(array, stride, callback) {
     const values = []
     return array.some((value, index) => {
       const modulo = index % stride
@@ -44,9 +44,9 @@ export default class Stride {
       }
       return false
     })
-  }
+  },
 
-  static every(array, stride, callback) {
+  every(array, stride, callback) {
     const values = []
     return array.every((value, index) => {
       const modulo = index % stride
@@ -56,9 +56,9 @@ export default class Stride {
       }
       return true
     })
-  }
+  },
 
-  static reduce(array, stride, callback, initial) {
+  reduce(array, stride, callback, initial) {
     const values = []
     return array.reduce((result, value, index) => {
       const modulo = index % stride
@@ -68,9 +68,9 @@ export default class Stride {
       }
       return result
     }, initial)
-  }
+  },
 
-  static transform(array, stride, callback) {
+  transform(array, stride, callback) {
     const values = []
     array.forEach((value, index) => {
       const modulo = index % stride
@@ -83,5 +83,5 @@ export default class Stride {
       }
     })
     return array
-  }
+  },
 }
