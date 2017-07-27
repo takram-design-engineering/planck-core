@@ -23,8 +23,16 @@
 //
 
 import babel from 'rollup-plugin-babel'
+import builtins from 'builtin-modules'
+import camelcase from 'camelcase'
 import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
+
+const pkg = require('./package.json')
+const dependencies = Object.keys(pkg.dependencies)
+const globals = builtins.reduce((globals, builtin) => {
+  return Object.assign(globals, { [builtin]: camelcase(builtin) })
+}, {})
 
 export default {
   entry: './dist/planck-core.module.js',
@@ -44,6 +52,15 @@ export default {
       ],
     }),
   ],
+  external: [
+    ...builtins,
+    'request',
+    'text-encoding',
+  ],
+  globals: Object.assign(globals, {
+    'request': 'request',
+    'text-encoding': 'encoding',
+  }),
   targets: [
     {
       format: 'umd',

@@ -23,62 +23,59 @@
 //
 
 import base64 from 'base64-arraybuffer'
+import encoding from 'text-encoding'
 
 import Environment from './Environment'
 
-if (Environment.type === 'node') {
-  // eslint-disable-next-line global-require
-  const encoding = require('text-encoding')
-  if (Environment.self.TextEncoder === undefined) {
-    Environment.self.TextEncoder = encoding.TextEncoder
-  }
-  if (Environment.self.TextDecoder === undefined) {
-    Environment.self.TextDecoder = encoding.TextDecoder
-  }
+if (Environment.self.TextEncoder === undefined) {
+  Environment.self.TextEncoder = encoding.TextEncoder
+}
+if (Environment.self.TextDecoder === undefined) {
+  Environment.self.TextDecoder = encoding.TextDecoder
 }
 
-export default class Transferral {
-  static encode(object) {
-    if (typeof TextEncoder !== 'function') {
+export default {
+  encode(object) {
+    if (TextEncoder === undefined) {
       throw new Error('TextEncoder is missing')
     }
     const encoder = new TextEncoder()
     const text = JSON.stringify(object)
     const array = encoder.encode(text)
     return array.buffer
-  }
+  },
 
-  static decode(buffer) {
-    if (typeof TextDecoder !== 'function') {
+  decode(buffer) {
+    if (TextDecoder === undefined) {
       throw new Error('TextDecoder is missing')
     }
     const decoder = new TextDecoder()
     const view = new DataView(buffer)
     const text = decoder.decode(view)
     return JSON.parse(text)
-  }
+  },
 
-  static pack(buffer) {
+  pack(buffer) {
     return base64.encode(buffer)
-  }
+  },
 
-  static unpack(string) {
+  unpack(string) {
     return base64.decode(string)
-  }
+  },
 
-  static packBufferGeometry(geometry) {
+  packBufferGeometry(geometry) {
     Object.values(geometry.data.attributes).forEach(attribute => {
       const constructor = Environment.self[attribute.type]
       const buffer = new constructor(attribute.array).buffer
       attribute.array = this.pack(buffer)
     })
-  }
+  },
 
-  static unpackBufferGeometry(geometry) {
+  unpackBufferGeometry(geometry) {
     Object.values(geometry.data.attributes).forEach(attribute => {
       const constructor = Environment.self[attribute.type]
       const buffer = this.unpack(attribute.array)
       attribute.array = Array.from(new constructor(buffer))
     })
-  }
+  },
 }

@@ -22,7 +22,30 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import URL from 'url-parse'
+export default {
+  min(array, transform = value => value) {
+    let result
+    let min = Number.POSITIVE_INFINITY
+    array.forEach((value, index) => {
+      const transformed = transform(value, index)
+      if (min > transformed) {
+        min = transformed
+        result = value
+      }
+    })
+    return result
+  },
 
-// Just use url-parse for now
-export default URL
+  max(array, transform = value => value) {
+    let result
+    let max = Number.NEGATIVE_INFINITY
+    array.forEach((value, index) => {
+      const transformed = transform(value, index)
+      if (max < transformed) {
+        max = transformed
+        result = value
+      }
+    })
+    return result
+  },
+}

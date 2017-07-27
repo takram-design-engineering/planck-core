@@ -22,18 +22,12 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+import { readFile } from 'fs'
+import request from 'request'
+
 import Environment from './Environment'
 import Namespace from './Namespace'
 import URL from './URL'
-
-/* eslint-disable global-require */
-let readFile
-let request
-if (Environment.type === 'node') {
-  ({ readFile } = require('fs'))
-  request = require('request')
-}
-/* eslint-enable global-require */
 
 export const internal = Namespace('Request')
 
@@ -143,37 +137,37 @@ function parseArguments(...args) {
   return [url, options]
 }
 
-export default class Request {
-  static text(...args) {
+export default {
+  text(...args) {
     const [url, options] = parseArguments(...args)
     options.type = 'text'
     return performRequest(url, options)
-  }
+  },
 
-  static json(...args) {
+  json(...args) {
     const [url, options] = parseArguments(...args)
     options.type = 'json'
     return performRequest(url, options)
-  }
+  },
 
-  static buffer(...args) {
+  buffer(...args) {
     const [url, options] = parseArguments(...args)
     options.type = 'arraybuffer'
     options.encoding = null
     return performRequest(url, options)
-  }
+  },
 
-  static csv(...args) {
+  csv(...args) {
     const [url, options] = parseArguments(...args)
     return this.text(url, options).then(response => {
       return Environment.self.d3.csvParse(response, options.row)
     })
-  }
+  },
 
-  static tsv(...args) {
+  tsv(...args) {
     const [url, options] = parseArguments(...args)
     return this.text(url, options).then(response => {
       return Environment.self.d3.tsvParse(response, options.row)
     })
-  }
+  },
 }

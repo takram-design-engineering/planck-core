@@ -1,8 +1,11 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.Planck = {})));
-}(this, (function (exports) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('fs'), require('request'), require('text-encoding')) :
+	typeof define === 'function' && define.amd ? define(['exports', 'fs', 'request', 'text-encoding'], factory) :
+	(factory((global.Planck = {}),global.fs,global.request,global.encoding));
+}(this, (function (exports,fs,request,encoding) { 'use strict';
+
+request = request && request.hasOwnProperty('default') ? request['default'] : request;
+encoding = encoding && encoding.hasOwnProperty('default') ? encoding['default'] : encoding;
 
 //
 //  The MIT License
@@ -92,21 +95,6 @@ var createClass = function () {
 
 
 
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
 
 
 
@@ -118,13 +106,8 @@ var inherits = function (subClass, superClass) {
 
 
 
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
 
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
+
 
 
 
@@ -403,54 +386,43 @@ AssertionError.prototype.constructor = AssertionError;
 //  DEALINGS IN THE SOFTWARE.
 //
 
-
-
-var Environment = function () {
-  function Environment() {
-    classCallCheck(this, Environment);
-  }
-
-  createClass(Environment, null, [{
-    key: 'type',
-    get: function get$$1() {
-      try {
-        // eslint-disable-next-line no-new-func
-        if (new Function('return this === window')()) {
-          return 'browser';
-        }
-      } catch (error) {}
-      try {
-        // eslint-disable-next-line no-new-func
-        if (new Function('return this === self')()) {
-          return 'worker';
-        }
-      } catch (error) {}
-      try {
-        // eslint-disable-next-line no-new-func
-        if (new Function('return this === global')()) {
-          return 'node';
-        }
-      } catch (error) {}
-      throw new Error();
-    }
-  }, {
-    key: 'self',
-    get: function get$$1() {
-      switch (this.type) {
-        case 'browser':
-          return window;
-        case 'worker':
-          return self;
-        case 'node':
-          return global;
-        default:
-          break;
+var Environment = {
+  get type() {
+    try {
+      // eslint-disable-next-line no-new-func
+      if (new Function('return this === window')()) {
+        return 'browser';
       }
-      throw new Error();
+    } catch (error) {}
+    try {
+      // eslint-disable-next-line no-new-func
+      if (new Function('return this === self')()) {
+        return 'worker';
+      }
+    } catch (error) {}
+    try {
+      // eslint-disable-next-line no-new-func
+      if (new Function('return this === global')()) {
+        return 'node';
+      }
+    } catch (error) {}
+    throw new Error();
+  },
+
+  get self() {
+    switch (this.type) {
+      case 'browser':
+        return window;
+      case 'worker':
+        return self;
+      case 'node':
+        return global;
+      default:
+        break;
     }
-  }]);
-  return Environment;
-}();
+    throw new Error();
+  }
+};
 
 //
 //  The MIT License
@@ -476,46 +448,38 @@ var Environment = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$3 = Namespace('FilePath');
-
-var FilePath = function () {
-  function FilePath() {
-    classCallCheck(this, FilePath);
-  }
-
-  createClass(FilePath, null, [{
-    key: 'self',
-    get: function get$$1() {
-      var scope = internal$3(this);
-      return scope.self;
-    }
-  }, {
-    key: 'current',
-    get: function get$$1() {
-      switch (Environment.type) {
-        case 'browser':
-          {
-            // eslint-disable-next-line no-underscore-dangle
-            var currentScript = document.currentScript || document._currentScript;
-            if (!currentScript) {
-              return null;
-            }
-            return currentScript.src;
-          }
-        case 'worker':
-          return self.location.href;
-        case 'node':
-          return __filename;
-        default:
-          break;
+function currentScriptPath() {
+  switch (Environment.type) {
+    case 'browser':
+      {
+        // eslint-disable-next-line no-underscore-dangle
+        var currentScript = document.currentScript || document._currentScript;
+        if (!currentScript) {
+          return null;
+        }
+        return currentScript.src;
       }
-      throw new Error();
-    }
-  }]);
-  return FilePath;
-}();
+    case 'worker':
+      return self.location.href;
+    case 'node':
+      return __filename;
+    default:
+      break;
+  }
+  throw new Error();
+}
 
-internal$3(FilePath).self = FilePath.current;
+var initialScriptPath = currentScriptPath();
+
+var FilePath = {
+  get self() {
+    return initialScriptPath;
+  },
+
+  get current() {
+    return currentScriptPath();
+  }
+};
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1423,7 +1387,7 @@ ImplementationError.prototype.constructor = ImplementationError;
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$4 = Namespace('Multiton');
+var internal$2 = Namespace('Multiton');
 
 var Multiton = function () {
   function Multiton(key) {
@@ -1437,7 +1401,7 @@ var Multiton = function () {
   createClass(Multiton, null, [{
     key: 'has',
     value: function has(key) {
-      var scope = internal$4(this);
+      var scope = internal$2(this);
       if (scope.instances === undefined) {
         return false;
       }
@@ -1447,7 +1411,7 @@ var Multiton = function () {
   }, {
     key: 'for',
     value: function _for(key) {
-      var scope = internal$4(this);
+      var scope = internal$2(this);
       if (!scope.instances) {
         scope.instances = new Map();
       }
@@ -1647,9 +1611,9 @@ function lolcation(loc) {
       key;
 
   if ('blob:' === loc.protocol) {
-    finaldestination = new URL$2(unescape(loc.pathname), {});
+    finaldestination = new URL$1(unescape(loc.pathname), {});
   } else if ('string' === type) {
-    finaldestination = new URL$2(loc, {});
+    finaldestination = new URL$1(loc, {});
     for (key in ignore) {
       delete finaldestination[key];
     }
@@ -1737,9 +1701,9 @@ function resolve(relative, base) {
  * @param {Boolean|Function} parser Parser for the query string.
  * @api public
  */
-function URL$2(address, location, parser) {
-  if (!(this instanceof URL$2)) {
-    return new URL$2(address, location, parser);
+function URL$1(address, location, parser) {
+  if (!(this instanceof URL$1)) {
+    return new URL$1(address, location, parser);
   }
 
   var relative,
@@ -1980,54 +1944,17 @@ function toString(stringify) {
   return result;
 }
 
-URL$2.prototype = { set: set$1, toString: toString };
+URL$1.prototype = { set: set$1, toString: toString };
 
 //
 // Expose the URL parser and some additional properties that might be useful for
 // others or testing.
 //
-URL$2.extractProtocol = extractProtocol;
-URL$2.location = lolcation;
-URL$2.qs = index$8;
+URL$1.extractProtocol = extractProtocol;
+URL$1.location = lolcation;
+URL$1.qs = index$8;
 
-var index$5 = URL$2;
-
-//
-//  The MIT License
-//
-//  Copyright (C) 2016-Present Shota Matsuda
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
-
-// Just use url-parse for now
-
-var URL = function (_urlParse) {
-  inherits(URL, _urlParse);
-
-  function URL() {
-    classCallCheck(this, URL);
-    return possibleConstructorReturn(this, (URL.__proto__ || Object.getPrototypeOf(URL)).apply(this, arguments));
-  }
-
-  return URL;
-}(index$5);
+var index$5 = URL$1;
 
 //
 //  The MIT License
@@ -2053,53 +1980,65 @@ var URL = function (_urlParse) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint-disable global-require */
-var readFile = void 0;
-var request = void 0;
-if (Environment.type === 'node') {
-  var _require = require('fs');
-
-  readFile = _require.readFile;
-
-  request = require('request');
-}
-/* eslint-enable global-require */
+//
+//  The MIT License
+//
+//  Copyright (C) 2016-Present Shota Matsuda
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
 
 
 
 function browserRequest(url, options) {
   return new Promise(function (resolve, reject) {
-    var parsed = new URL(url, true);
+    var parsed = new index$5(url, true);
     if (options.query) {
       parsed.set('query', Object.assign({}, parsed.query, options.query));
     }
-    var request = new XMLHttpRequest();
-    request.open('get', parsed.toString(), true);
+    var request$$1 = new XMLHttpRequest();
+    request$$1.open('get', parsed.toString(), true);
     if (options.headers) {
       Object.entries(options.headers).forEach(function (header) {
-        request.setRequestHeader.apply(request, toConsumableArray(header));
+        request$$1.setRequestHeader.apply(request$$1, toConsumableArray(header));
       });
     }
-    request.responseType = options.type;
-    request.addEventListener('loadend', function (event) {
-      if (request.status < 200 || request.status >= 300) {
-        reject(request.status);
+    request$$1.responseType = options.type;
+    request$$1.addEventListener('loadend', function (event) {
+      if (request$$1.status < 200 || request$$1.status >= 300) {
+        reject(request$$1.status);
         return;
       }
-      if (request.response === null && options.type === 'json') {
+      if (request$$1.response === null && options.type === 'json') {
         reject(new Error('Could not parse JSON'));
         return;
       }
-      resolve(request.response);
+      resolve(request$$1.response);
     }, false);
-    request.send();
+    request$$1.send();
   });
 }
 
 function nodeRequest(url, options) {
   if (options.local) {
     return new Promise(function (resolve, reject) {
-      readFile(url, options.encoding, function (error, response) {
+      fs.readFile(url, options.encoding, function (error, response) {
         if (error) {
           reject(error);
           return;
@@ -2179,72 +2118,56 @@ function parseArguments() {
   return [url, options];
 }
 
-var Request = function () {
-  function Request() {
-    classCallCheck(this, Request);
+var Request = {
+  text: function text() {
+    var _parseArguments = parseArguments.apply(undefined, arguments),
+        _parseArguments2 = slicedToArray(_parseArguments, 2),
+        url = _parseArguments2[0],
+        options = _parseArguments2[1];
+
+    options.type = 'text';
+    return performRequest(url, options);
+  },
+  json: function json() {
+    var _parseArguments3 = parseArguments.apply(undefined, arguments),
+        _parseArguments4 = slicedToArray(_parseArguments3, 2),
+        url = _parseArguments4[0],
+        options = _parseArguments4[1];
+
+    options.type = 'json';
+    return performRequest(url, options);
+  },
+  buffer: function buffer() {
+    var _parseArguments5 = parseArguments.apply(undefined, arguments),
+        _parseArguments6 = slicedToArray(_parseArguments5, 2),
+        url = _parseArguments6[0],
+        options = _parseArguments6[1];
+
+    options.type = 'arraybuffer';
+    options.encoding = null;
+    return performRequest(url, options);
+  },
+  csv: function csv() {
+    var _parseArguments7 = parseArguments.apply(undefined, arguments),
+        _parseArguments8 = slicedToArray(_parseArguments7, 2),
+        url = _parseArguments8[0],
+        options = _parseArguments8[1];
+
+    return this.text(url, options).then(function (response) {
+      return Environment.self.d3.csvParse(response, options.row);
+    });
+  },
+  tsv: function tsv() {
+    var _parseArguments9 = parseArguments.apply(undefined, arguments),
+        _parseArguments10 = slicedToArray(_parseArguments9, 2),
+        url = _parseArguments10[0],
+        options = _parseArguments10[1];
+
+    return this.text(url, options).then(function (response) {
+      return Environment.self.d3.tsvParse(response, options.row);
+    });
   }
-
-  createClass(Request, null, [{
-    key: 'text',
-    value: function text() {
-      var _parseArguments = parseArguments.apply(undefined, arguments),
-          _parseArguments2 = slicedToArray(_parseArguments, 2),
-          url = _parseArguments2[0],
-          options = _parseArguments2[1];
-
-      options.type = 'text';
-      return performRequest(url, options);
-    }
-  }, {
-    key: 'json',
-    value: function json() {
-      var _parseArguments3 = parseArguments.apply(undefined, arguments),
-          _parseArguments4 = slicedToArray(_parseArguments3, 2),
-          url = _parseArguments4[0],
-          options = _parseArguments4[1];
-
-      options.type = 'json';
-      return performRequest(url, options);
-    }
-  }, {
-    key: 'buffer',
-    value: function buffer() {
-      var _parseArguments5 = parseArguments.apply(undefined, arguments),
-          _parseArguments6 = slicedToArray(_parseArguments5, 2),
-          url = _parseArguments6[0],
-          options = _parseArguments6[1];
-
-      options.type = 'arraybuffer';
-      options.encoding = null;
-      return performRequest(url, options);
-    }
-  }, {
-    key: 'csv',
-    value: function csv() {
-      var _parseArguments7 = parseArguments.apply(undefined, arguments),
-          _parseArguments8 = slicedToArray(_parseArguments7, 2),
-          url = _parseArguments8[0],
-          options = _parseArguments8[1];
-
-      return this.text(url, options).then(function (response) {
-        return Environment.self.d3.csvParse(response, options.row);
-      });
-    }
-  }, {
-    key: 'tsv',
-    value: function tsv() {
-      var _parseArguments9 = parseArguments.apply(undefined, arguments),
-          _parseArguments10 = slicedToArray(_parseArguments9, 2),
-          url = _parseArguments10[0],
-          options = _parseArguments10[1];
-
-      return this.text(url, options).then(function (response) {
-        return Environment.self.d3.tsvParse(response, options.row);
-      });
-    }
-  }]);
-  return Request;
-}();
+};
 
 //
 //  The MIT License
@@ -2270,7 +2193,7 @@ var Request = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$6 = Namespace('Semaphore');
+var internal$4 = Namespace('Semaphore');
 
 var Task = function Task(semaphore, callback) {
   var _this = this;
@@ -2298,7 +2221,7 @@ var Semaphore = function () {
   function Semaphore(capacity) {
     classCallCheck(this, Semaphore);
 
-    var scope = internal$6(this);
+    var scope = internal$4(this);
     scope.capacity = capacity;
     scope.available = capacity;
     scope.queue = [];
@@ -2307,7 +2230,7 @@ var Semaphore = function () {
   createClass(Semaphore, [{
     key: 'wait',
     value: function wait(callback) {
-      var scope = internal$6(this);
+      var scope = internal$4(this);
       var task = new Task(this, callback);
       if (scope.available === 0) {
         scope.queue.push(task);
@@ -2320,7 +2243,7 @@ var Semaphore = function () {
   }, {
     key: 'signal',
     value: function signal() {
-      var scope = internal$6(this);
+      var scope = internal$4(this);
       if (scope.queue.length === 0) {
         ++scope.available;
       } else {
@@ -2330,13 +2253,13 @@ var Semaphore = function () {
   }, {
     key: 'capacity',
     get: function get$$1() {
-      var scope = internal$6(this);
+      var scope = internal$4(this);
       return scope.capacity;
     }
   }, {
     key: 'available',
     get: function get$$1() {
-      var scope = internal$6(this);
+      var scope = internal$4(this);
       return scope.available;
     }
   }]);
@@ -2367,13 +2290,13 @@ var Semaphore = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$7 = Namespace('Singleton');
+var internal$5 = Namespace('Singleton');
 
 var Singleton = function () {
   function Singleton() {
     classCallCheck(this, Singleton);
 
-    if (internal$7(this.constructor).instance !== undefined) {
+    if (internal$5(this.constructor).instance !== undefined) {
       throw new Error('Attempt to create multiple instances for singleton');
     }
   }
@@ -2381,7 +2304,7 @@ var Singleton = function () {
   createClass(Singleton, null, [{
     key: 'get',
     value: function get$$1() {
-      var scope = internal$7(this);
+      var scope = internal$5(this);
       if (scope.instance === undefined) {
         scope.instance = this.new.apply(this, arguments);
       }
@@ -2424,81 +2347,65 @@ var Singleton = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var Stride = function () {
-  function Stride() {
-    classCallCheck(this, Stride);
+var Stride = {
+  forEach: function forEach(array, stride, callback) {
+    var values = [];
+    array.forEach(function (value, index) {
+      var modulo = index % stride;
+      values[modulo] = value;
+      if (modulo === stride - 1) {
+        callback(values, Math.floor(index / stride));
+      }
+    });
+  },
+  some: function some(array, stride, callback) {
+    var values = [];
+    return array.some(function (value, index) {
+      var modulo = index % stride;
+      values[modulo] = value;
+      if (modulo === stride - 1) {
+        return callback(values, Math.floor(index / stride));
+      }
+      return false;
+    });
+  },
+  every: function every(array, stride, callback) {
+    var values = [];
+    return array.every(function (value, index) {
+      var modulo = index % stride;
+      values[modulo] = value;
+      if (modulo === stride - 1) {
+        return callback(values, Math.floor(index / stride));
+      }
+      return true;
+    });
+  },
+  reduce: function reduce(array, stride, callback, initial) {
+    var values = [];
+    return array.reduce(function (result, value, index) {
+      var modulo = index % stride;
+      values[modulo] = value;
+      if (modulo === stride - 1) {
+        return callback(result, values, Math.floor(index / stride));
+      }
+      return result;
+    }, initial);
+  },
+  transform: function transform(array, stride, callback) {
+    var values = [];
+    array.forEach(function (value, index) {
+      var modulo = index % stride;
+      values[modulo] = value;
+      if (modulo === stride - 1) {
+        var transformed = callback(values, Math.floor(index / stride));
+        for (var offset = 0; offset < stride; ++offset) {
+          array[index - (stride - offset - 1)] = transformed[offset];
+        }
+      }
+    });
+    return array;
   }
-
-  createClass(Stride, null, [{
-    key: "forEach",
-    value: function forEach(array, stride, callback) {
-      var values = [];
-      array.forEach(function (value, index) {
-        var modulo = index % stride;
-        values[modulo] = value;
-        if (modulo === stride - 1) {
-          callback(values, Math.floor(index / stride));
-        }
-      });
-    }
-  }, {
-    key: "some",
-    value: function some(array, stride, callback) {
-      var values = [];
-      return array.some(function (value, index) {
-        var modulo = index % stride;
-        values[modulo] = value;
-        if (modulo === stride - 1) {
-          return callback(values, Math.floor(index / stride));
-        }
-        return false;
-      });
-    }
-  }, {
-    key: "every",
-    value: function every(array, stride, callback) {
-      var values = [];
-      return array.every(function (value, index) {
-        var modulo = index % stride;
-        values[modulo] = value;
-        if (modulo === stride - 1) {
-          return callback(values, Math.floor(index / stride));
-        }
-        return true;
-      });
-    }
-  }, {
-    key: "reduce",
-    value: function reduce(array, stride, callback, initial) {
-      var values = [];
-      return array.reduce(function (result, value, index) {
-        var modulo = index % stride;
-        values[modulo] = value;
-        if (modulo === stride - 1) {
-          return callback(result, values, Math.floor(index / stride));
-        }
-        return result;
-      }, initial);
-    }
-  }, {
-    key: "transform",
-    value: function transform(array, stride, callback) {
-      var values = [];
-      array.forEach(function (value, index) {
-        var modulo = index % stride;
-        values[modulo] = value;
-        if (modulo === stride - 1) {
-          var transformed = callback(values, Math.floor(index / stride));
-          for (var offset = 0; offset < stride; ++offset) {
-            array[index - (stride - offset - 1)] = transformed[offset];
-          }
-        }
-      });
-      return array;
-    }
-  }]);
-  return Stride;
-}();
+};
 
 var base64Arraybuffer = createCommonjsModule(function (module, exports) {
   /*
@@ -2601,79 +2508,57 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-if (Environment.type === 'node') {
-  // eslint-disable-next-line global-require
-  var encoding = require('text-encoding');
-  if (Environment.self.TextEncoder === undefined) {
-    Environment.self.TextEncoder = encoding.TextEncoder;
-  }
-  if (Environment.self.TextDecoder === undefined) {
-    Environment.self.TextDecoder = encoding.TextDecoder;
-  }
+if (Environment.self.TextEncoder === undefined) {
+  Environment.self.TextEncoder = encoding.TextEncoder;
+}
+if (Environment.self.TextDecoder === undefined) {
+  Environment.self.TextDecoder = encoding.TextDecoder;
 }
 
-var Transferral = function () {
-  function Transferral() {
-    classCallCheck(this, Transferral);
+var Transferral = {
+  encode: function encode(object) {
+    if (TextEncoder === undefined) {
+      throw new Error('TextEncoder is missing');
+    }
+    var encoder = new TextEncoder();
+    var text = JSON.stringify(object);
+    var array = encoder.encode(text);
+    return array.buffer;
+  },
+  decode: function decode(buffer) {
+    if (TextDecoder === undefined) {
+      throw new Error('TextDecoder is missing');
+    }
+    var decoder = new TextDecoder();
+    var view = new DataView(buffer);
+    var text = decoder.decode(view);
+    return JSON.parse(text);
+  },
+  pack: function pack(buffer) {
+    return base64Arraybuffer.encode(buffer);
+  },
+  unpack: function unpack(string) {
+    return base64Arraybuffer.decode(string);
+  },
+  packBufferGeometry: function packBufferGeometry(geometry) {
+    var _this = this;
+
+    Object.values(geometry.data.attributes).forEach(function (attribute) {
+      var constructor = Environment.self[attribute.type];
+      var buffer = new constructor(attribute.array).buffer;
+      attribute.array = _this.pack(buffer);
+    });
+  },
+  unpackBufferGeometry: function unpackBufferGeometry(geometry) {
+    var _this2 = this;
+
+    Object.values(geometry.data.attributes).forEach(function (attribute) {
+      var constructor = Environment.self[attribute.type];
+      var buffer = _this2.unpack(attribute.array);
+      attribute.array = Array.from(new constructor(buffer));
+    });
   }
-
-  createClass(Transferral, null, [{
-    key: 'encode',
-    value: function encode(object) {
-      if (typeof TextEncoder !== 'function') {
-        throw new Error('TextEncoder is missing');
-      }
-      var encoder = new TextEncoder();
-      var text = JSON.stringify(object);
-      var array = encoder.encode(text);
-      return array.buffer;
-    }
-  }, {
-    key: 'decode',
-    value: function decode(buffer) {
-      if (typeof TextDecoder !== 'function') {
-        throw new Error('TextDecoder is missing');
-      }
-      var decoder = new TextDecoder();
-      var view = new DataView(buffer);
-      var text = decoder.decode(view);
-      return JSON.parse(text);
-    }
-  }, {
-    key: 'pack',
-    value: function pack(buffer) {
-      return base64Arraybuffer.encode(buffer);
-    }
-  }, {
-    key: 'unpack',
-    value: function unpack(string) {
-      return base64Arraybuffer.decode(string);
-    }
-  }, {
-    key: 'packBufferGeometry',
-    value: function packBufferGeometry(geometry) {
-      var _this = this;
-
-      Object.values(geometry.data.attributes).forEach(function (attribute) {
-        var constructor = Environment.self[attribute.type];
-        var buffer = new constructor(attribute.array).buffer;
-        attribute.array = _this.pack(buffer);
-      });
-    }
-  }, {
-    key: 'unpackBufferGeometry',
-    value: function unpackBufferGeometry(geometry) {
-      var _this2 = this;
-
-      Object.values(geometry.data.attributes).forEach(function (attribute) {
-        var constructor = Environment.self[attribute.type];
-        var buffer = _this2.unpack(attribute.array);
-        attribute.array = Array.from(new constructor(buffer));
-      });
-    }
-  }]);
-  return Transferral;
-}();
+};
 
 // Unique ID creation requires a high quality random # generator.  In the
 // browser this is a little complicated due to unknown quality of Math.random()
@@ -2922,7 +2807,7 @@ exports.Semaphore = Semaphore;
 exports.Singleton = Singleton;
 exports.Stride = Stride;
 exports.Transferral = Transferral;
-exports.URL = URL;
+exports.URL = index$5;
 exports.UUID = UUID;
 
 Object.defineProperty(exports, '__esModule', { value: true });
