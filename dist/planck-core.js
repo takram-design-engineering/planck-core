@@ -465,46 +465,38 @@ var Environment = {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$2 = Namespace('FilePath');
-
-var FilePath = function () {
-  function FilePath() {
-    classCallCheck(this, FilePath);
-  }
-
-  createClass(FilePath, null, [{
-    key: 'self',
-    get: function get$$1() {
-      var scope = internal$2(this);
-      return scope.self;
-    }
-  }, {
-    key: 'current',
-    get: function get$$1() {
-      switch (Environment.type) {
-        case 'browser':
-          {
-            // eslint-disable-next-line no-underscore-dangle
-            var currentScript = document.currentScript || document._currentScript;
-            if (!currentScript) {
-              return null;
-            }
-            return currentScript.src;
-          }
-        case 'worker':
-          return self.location.href;
-        case 'node':
-          return __filename;
-        default:
-          break;
+function currentScriptPath() {
+  switch (Environment.type) {
+    case 'browser':
+      {
+        // eslint-disable-next-line no-underscore-dangle
+        var currentScript = document.currentScript || document._currentScript;
+        if (!currentScript) {
+          return null;
+        }
+        return currentScript.src;
       }
-      throw new Error();
-    }
-  }]);
-  return FilePath;
-}();
+    case 'worker':
+      return self.location.href;
+    case 'node':
+      return __filename;
+    default:
+      break;
+  }
+  throw new Error();
+}
 
-internal$2(FilePath).self = FilePath.current;
+var initialScriptPath = currentScriptPath();
+
+var FilePath = {
+  get self() {
+    return initialScriptPath;
+  },
+
+  get current() {
+    return currentScriptPath();
+  }
+};
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1412,7 +1404,7 @@ ImplementationError.prototype.constructor = ImplementationError;
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$3 = Namespace('Multiton');
+var internal$2 = Namespace('Multiton');
 
 var Multiton = function () {
   function Multiton(key) {
@@ -1426,7 +1418,7 @@ var Multiton = function () {
   createClass(Multiton, null, [{
     key: 'has',
     value: function has(key) {
-      var scope = internal$3(this);
+      var scope = internal$2(this);
       if (scope.instances === undefined) {
         return false;
       }
@@ -1436,7 +1428,7 @@ var Multiton = function () {
   }, {
     key: 'for',
     value: function _for(key) {
-      var scope = internal$3(this);
+      var scope = internal$2(this);
       if (!scope.instances) {
         scope.instances = new Map();
       }
@@ -2243,7 +2235,7 @@ var Request = {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$5 = Namespace('Semaphore');
+var internal$4 = Namespace('Semaphore');
 
 var Task = function Task(semaphore, callback) {
   var _this = this;
@@ -2271,7 +2263,7 @@ var Semaphore = function () {
   function Semaphore(capacity) {
     classCallCheck(this, Semaphore);
 
-    var scope = internal$5(this);
+    var scope = internal$4(this);
     scope.capacity = capacity;
     scope.available = capacity;
     scope.queue = [];
@@ -2280,7 +2272,7 @@ var Semaphore = function () {
   createClass(Semaphore, [{
     key: 'wait',
     value: function wait(callback) {
-      var scope = internal$5(this);
+      var scope = internal$4(this);
       var task = new Task(this, callback);
       if (scope.available === 0) {
         scope.queue.push(task);
@@ -2293,7 +2285,7 @@ var Semaphore = function () {
   }, {
     key: 'signal',
     value: function signal() {
-      var scope = internal$5(this);
+      var scope = internal$4(this);
       if (scope.queue.length === 0) {
         ++scope.available;
       } else {
@@ -2303,13 +2295,13 @@ var Semaphore = function () {
   }, {
     key: 'capacity',
     get: function get$$1() {
-      var scope = internal$5(this);
+      var scope = internal$4(this);
       return scope.capacity;
     }
   }, {
     key: 'available',
     get: function get$$1() {
-      var scope = internal$5(this);
+      var scope = internal$4(this);
       return scope.available;
     }
   }]);
@@ -2340,13 +2332,13 @@ var Semaphore = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$6 = Namespace('Singleton');
+var internal$5 = Namespace('Singleton');
 
 var Singleton = function () {
   function Singleton() {
     classCallCheck(this, Singleton);
 
-    if (internal$6(this.constructor).instance !== undefined) {
+    if (internal$5(this.constructor).instance !== undefined) {
       throw new Error('Attempt to create multiple instances for singleton');
     }
   }
@@ -2354,7 +2346,7 @@ var Singleton = function () {
   createClass(Singleton, null, [{
     key: 'get',
     value: function get$$1() {
-      var scope = internal$6(this);
+      var scope = internal$5(this);
       if (scope.instance === undefined) {
         scope.instance = this.new.apply(this, arguments);
       }
