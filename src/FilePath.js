@@ -23,35 +23,35 @@
 //
 
 import Environment from './Environment'
-import Namespace from './Namespace'
 
-export const internal = Namespace('FilePath')
-
-export default class FilePath {
-  static get self() {
-    const scope = internal(this)
-    return scope.self
-  }
-
-  static get current() {
-    switch (Environment.type) {
-      case 'browser': {
-        // eslint-disable-next-line no-underscore-dangle
-        const currentScript = document.currentScript || document._currentScript
-        if (!currentScript) {
-          return null
-        }
-        return currentScript.src
+function currentScriptPath() {
+  switch (Environment.type) {
+    case 'browser': {
+      // eslint-disable-next-line no-underscore-dangle
+      const currentScript = document.currentScript || document._currentScript
+      if (!currentScript) {
+        return null
       }
-      case 'worker':
-        return self.location.href
-      case 'node':
-        return __filename
-      default:
-        break
+      return currentScript.src
     }
-    throw new Error()
+    case 'worker':
+      return self.location.href
+    case 'node':
+      return __filename
+    default:
+      break
   }
+  throw new Error()
 }
 
-internal(FilePath).self = FilePath.current
+const initialScriptPath = currentScriptPath()
+
+export default {
+  get self() {
+    return initialScriptPath
+  },
+
+  get current() {
+    return currentScriptPath()
+  },
+}
