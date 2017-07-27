@@ -30,7 +30,6 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import path from 'path'
 
 const pkg = require('./package.json')
-const dependencies = Object.keys(pkg.dependencies)
 const globals = builtins.reduce((globals, builtin) => {
   return Object.assign(globals, { [builtin]: camelcase(builtin) })
 }, {})

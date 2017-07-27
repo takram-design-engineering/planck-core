@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('fs'), require('request'), require('text-encoding')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'fs', 'request', 'text-encoding'], factory) :
-	(factory((global.Planck = {}),global.fs,global.request,global.encoding));
+	(factory((global.Planck = global.Planck || {}),global.fs,global.request,global.encoding));
 }(this, (function (exports,fs,request,encoding) { 'use strict';
 
 request = request && request.hasOwnProperty('default') ? request['default'] : request;
