@@ -3,3 +3,6 @@ script:
 language: node_js
 node_js:
   - 8.1
+notifications:
+  slack:
+    secure: d+0hcaEOY99nHRAEcL0b2cFRuR5ZU/IAtEGEsRK5thelh+ck0gVe6NX49GAnYAfEdFJEap+4bHLzK9zqnwMGsA991JNvm91gfWhz6r/AhSnlrabXmGwcsWHnHxiHfsfMrLOZdun+HthPi924dzeT2oDlLb45//K/nE5/td+3R6togcz1243ogurWsD1xhlaRhFmbOedH5g6yVhGxeX//RTb3HZnam15WuMRv2QpDaSlKDHxIxVpF9WQahJ52DqsXkQZE9JpxYIguePJR1m3HnOi9d++w5hC1xVjk83wpPVJrucuiUq9YPHDPtdJstAdLn+bPQR3djEuB7GamxIZYYQY2ECKpdrp8k38MNyRmF2Eaqu0kRmeOcEe/yz5SOMqupma+4H5uydgW7duSqBhOb843eQcy1aC1eEv/igGpeGy+c2G91Hk8+ABpgrJvV2YkMpmhqGLlwZl2dpp8rEmV+yoINq+uighDJrTZB/jJjKAh3UoAKJx3IhWi1knWB+hLdDsai03F20br9UkT+HHFEbAMkwPcIDi8aWl4CmelSH/NrEuK7DXaXlKhjmmKUl+Z3cS+XNFuOkISMf0J+K6oCgULBaH4dWuK/R0Yq1dbHRmpU2iHy1mBlwTDs4NB3GtuUIeX4H/pdUpA30+jla6qZ+3VAp2mrCtDqQTFLwYOnn4=

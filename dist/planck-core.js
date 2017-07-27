@@ -2508,15 +2508,9 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-if (Environment.self.TextEncoder === undefined) {
-  Environment.self.TextEncoder = encoding.TextEncoder;
-}
-if (Environment.self.TextDecoder === undefined) {
-  Environment.self.TextDecoder = encoding.TextDecoder;
-}
-
 var Transferral = {
   encode: function encode(object) {
+    var TextEncoder = Environment.self.TextEncoder || encoding.TextEncoder;
     if (TextEncoder === undefined) {
       throw new Error('TextEncoder is missing');
     }
@@ -2526,6 +2520,7 @@ var Transferral = {
     return array.buffer;
   },
   decode: function decode(buffer) {
+    var TextDecoder = Environment.self.TextDecoder || encoding.TextDecoder;
     if (TextDecoder === undefined) {
       throw new Error('TextDecoder is missing');
     }

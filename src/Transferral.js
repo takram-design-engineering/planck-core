@@ -27,15 +27,9 @@ import encoding from 'text-encoding'
 
 import Environment from './Environment'
 
-if (Environment.self.TextEncoder === undefined) {
-  Environment.self.TextEncoder = encoding.TextEncoder
-}
-if (Environment.self.TextDecoder === undefined) {
-  Environment.self.TextDecoder = encoding.TextDecoder
-}
-
 export default {
   encode(object) {
+    const TextEncoder = Environment.self.TextEncoder || encoding.TextEncoder
     if (TextEncoder === undefined) {
       throw new Error('TextEncoder is missing')
     }
@@ -46,6 +40,7 @@ export default {
   },
 
   decode(buffer) {
+    const TextDecoder = Environment.self.TextDecoder || encoding.TextDecoder
     if (TextDecoder === undefined) {
       throw new Error('TextDecoder is missing')
     }
