@@ -23,23 +23,20 @@
 //
 
 import base64 from 'base64-arraybuffer'
+import encoding from 'text-encoding'
 
 import Environment from './Environment'
 
-if (Environment.type === 'node') {
-  // eslint-disable-next-line global-require
-  const encoding = require('text-encoding')
-  if (Environment.self.TextEncoder === undefined) {
-    Environment.self.TextEncoder = encoding.TextEncoder
-  }
-  if (Environment.self.TextDecoder === undefined) {
-    Environment.self.TextDecoder = encoding.TextDecoder
-  }
+if (Environment.self.TextEncoder === undefined) {
+  Environment.self.TextEncoder = encoding.TextEncoder
+}
+if (Environment.self.TextDecoder === undefined) {
+  Environment.self.TextDecoder = encoding.TextDecoder
 }
 
 export default {
   encode(object) {
-    if (typeof TextEncoder !== 'function') {
+    if (TextEncoder === undefined) {
       throw new Error('TextEncoder is missing')
     }
     const encoder = new TextEncoder()
@@ -49,7 +46,7 @@ export default {
   },
 
   decode(buffer) {
-    if (typeof TextDecoder !== 'function') {
+    if (TextDecoder === undefined) {
       throw new Error('TextDecoder is missing')
     }
     const decoder = new TextDecoder()

@@ -22,18 +22,12 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+import { readFile } from 'fs'
+import request from 'request'
+
 import Environment from './Environment'
 import Namespace from './Namespace'
 import URL from './URL'
-
-/* eslint-disable global-require */
-let readFile
-let request
-if (Environment.type === 'node') {
-  ({ readFile } = require('fs'))
-  request = require('request')
-}
-/* eslint-enable global-require */
 
 export const internal = Namespace('Request')
 
