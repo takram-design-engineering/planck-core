@@ -1415,7 +1415,8 @@ function LazyInstance(target) {
   return {
     get shared() {
       if (instance === undefined) {
-        instance = target.new && target.new.apply(target, args) || new (Function.prototype.bind.apply(target, [null].concat(args)))();
+        instance = target.new && target.new.apply(target, args) || new (Function.prototype.bind.apply(target, [null].concat(args)))() // eslint-disable-line new-cap
+        ;
       }
       return instance;
     }
