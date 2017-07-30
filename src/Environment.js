@@ -62,11 +62,13 @@ export default {
   external(id) {
     if (PLANCK_BRANCH_EXTERNALS) {
       return {}
+    // eslint-disable-next-line no-else-return
     } else {
       if (this.type !== 'node') {
         return {}
       }
+      // eslint-disable-next-line global-require, import/no-dynamic-require
       return require(id)
     }
-  }
+  },
 }
