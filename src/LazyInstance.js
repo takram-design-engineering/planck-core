@@ -22,18 +22,17 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import './runner'
-
-import './unit/Aggregate'
-import './unit/AggregateFunction'
-import './unit/AssertionError'
-import './unit/FilePath'
-import './unit/Hash'
-import './unit/ImplementationError'
-import './unit/LazyInstance'
-import './unit/LazyInstanceMap'
-import './unit/Namespace'
-import './unit/Request'
-import './unit/Semaphore'
-import './unit/Stride'
-import './unit/Transferral'
+export default function LazyInstance(target, ...args) {
+  let instance
+  return {
+    get shared() {
+      if (instance === undefined) {
+        instance = (
+          (target.new && target.new(...args)) ||
+          new target(...args)
+        )
+      }
+      return instance
+    },
+  }
+}
