@@ -1382,6 +1382,93 @@ ImplementationError.prototype.name = 'ImplementationError';
 ImplementationError.prototype.message = '';
 ImplementationError.prototype.constructor = ImplementationError;
 
+//
+//  The MIT License
+//
+//  Copyright (C) 2016-Present Shota Matsuda
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
+
+function LazyInstance(target) {
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  var instance = void 0;
+  return {
+    get shared() {
+      if (instance === undefined) {
+        instance = target.new && target.new.apply(target, args) || new (Function.prototype.bind.apply(target, [null].concat(args)))();
+      }
+      return instance;
+    }
+  };
+}
+
+//
+//  The MIT License
+//
+//  Copyright (C) 2016-Present Shota Matsuda
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
+
+function LazyInstanceMap(target) {
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  var instances = new Map();
+  return {
+    for: function _for(key) {
+      var coercedKey = target.coerceKey && target.coerceKey(key) || key;
+      if (instances.has(coercedKey)) {
+        return instances.get(coercedKey);
+      }
+      var instance = target.new && target.new.apply(target, args) || new (Function.prototype.bind.apply(target, [null].concat(args)))();
+      instances.set(coercedKey, instance);
+      return instance;
+    },
+    has: function has(key) {
+      var coercedKey = target.coerceKey && target.coerceKey(key) || key;
+      return instances.has(coercedKey);
+    }
+  };
+}
+
 /**
  * Check if we're required to add a port number.
  *
@@ -2681,6 +2768,8 @@ exports.Environment = Environment;
 exports.FilePath = FilePath;
 exports.Hash = Hash;
 exports.ImplementationError = ImplementationError;
+exports.LazyInstance = LazyInstance;
+exports.LazyInstanceMap = LazyInstanceMap;
 exports.Namespace = Namespace;
 exports.Request = Request;
 exports.Semaphore = Semaphore;
