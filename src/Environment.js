@@ -58,4 +58,15 @@ export default {
     }
     throw new Error()
   },
+
+  external(id) {
+    if (PLANCK_BRANCH_EXTERNALS) {
+      return {}
+    } else {
+      if (this.type !== 'node') {
+        return {}
+      }
+      return require(id)
+    }
+  }
 }
