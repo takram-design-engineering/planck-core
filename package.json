@@ -1,6 +1,6 @@
 {
   "name": "@takram/planck-core",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "",
   "repository": "takram-design-engineering/planck-core",
   "main": "dist/planck-core.js",
@@ -51,8 +51,6 @@
     "babel-preset-es2017": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
     "browser-sync": "^2.18.13",
-    "builtin-modules": "^1.1.1",
-    "camelcase": "^4.1.0",
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
     "chalk": "^2.0.1",
@@ -70,7 +68,7 @@
     "saucelabs": "^1.4.0",
     "sinon": "^2.4.1",
     "sinon-chai": "^2.12.0",
-    "uglify-js": "^3.0.26"
+    "uglify-js": "^3.0.27"
   },
   "saucelabs": {
     "framework": "mocha",

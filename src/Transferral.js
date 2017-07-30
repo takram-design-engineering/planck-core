@@ -23,9 +23,10 @@
 //
 
 import base64 from 'base64-arraybuffer'
-import encoding from 'text-encoding'
 
 import Environment from './Environment'
+
+const encoding = Environment.external('text-encoding')
 
 export default {
   encode(object) {

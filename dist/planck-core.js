@@ -1,11 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('fs'), require('request'), require('text-encoding')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'fs', 'request', 'text-encoding'], factory) :
-	(factory((global.Planck = global.Planck || {}),global.fs,global.request,global.encoding));
-}(this, (function (exports,fs,request,encoding) { 'use strict';
-
-request = request && request.hasOwnProperty('default') ? request['default'] : request;
-encoding = encoding && encoding.hasOwnProperty('default') ? encoding['default'] : encoding;
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.Planck = global.Planck || {})));
+}(this, (function (exports) { 'use strict';
 
 //
 //  The MIT License
@@ -386,6 +383,19 @@ AssertionError.prototype.constructor = AssertionError;
 //  DEALINGS IN THE SOFTWARE.
 //
 
+function _external(id) {
+  if (process.browser) {
+    return {};
+    // eslint-disable-next-line no-else-return
+  } else {
+    if (Environment.type !== 'node') {
+      return {};
+    }
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    return require(id);
+  }
+}
+
 var Environment = {
   get type() {
     try {
@@ -421,6 +431,15 @@ var Environment = {
         break;
     }
     throw new Error();
+  },
+
+  external: function external(id) {
+    try {
+      return _external(id);
+    } catch (e) {
+      Environment.self.process = { browser: true };
+    }
+    return _external(id);
   }
 };
 
@@ -2004,6 +2023,11 @@ var index$5 = URL$1;
 //  DEALINGS IN THE SOFTWARE.
 //
 
+var _Environment$external = Environment.external('fs');
+var readFile = _Environment$external.readFile;
+
+var request = Environment.external('request');
+
 
 
 function browserRequest(url, options) {
@@ -2012,33 +2036,33 @@ function browserRequest(url, options) {
     if (options.query) {
       parsed.set('query', Object.assign({}, parsed.query, options.query));
     }
-    var request$$1 = new XMLHttpRequest();
-    request$$1.open('get', parsed.toString(), true);
+    var request = new XMLHttpRequest();
+    request.open('get', parsed.toString(), true);
     if (options.headers) {
       Object.entries(options.headers).forEach(function (header) {
-        request$$1.setRequestHeader.apply(request$$1, toConsumableArray(header));
+        request.setRequestHeader.apply(request, toConsumableArray(header));
       });
     }
-    request$$1.responseType = options.type;
-    request$$1.addEventListener('loadend', function (event) {
-      if (request$$1.status < 200 || request$$1.status >= 300) {
-        reject(request$$1.status);
+    request.responseType = options.type;
+    request.addEventListener('loadend', function (event) {
+      if (request.status < 200 || request.status >= 300) {
+        reject(request.status);
         return;
       }
-      if (request$$1.response === null && options.type === 'json') {
+      if (request.response === null && options.type === 'json') {
         reject(new Error('Could not parse JSON'));
         return;
       }
-      resolve(request$$1.response);
+      resolve(request.response);
     }, false);
-    request$$1.send();
+    request.send();
   });
 }
 
 function nodeRequest(url, options) {
   if (options.local) {
     return new Promise(function (resolve, reject) {
-      fs.readFile(url, options.encoding, function (error, response) {
+      readFile(url, options.encoding, function (error, response) {
         if (error) {
           reject(error);
           return;
@@ -2507,6 +2531,8 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
 //
+
+var encoding = Environment.external('text-encoding');
 
 var Transferral = {
   encode: function encode(object) {
