@@ -22,7 +22,20 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export default {
+function external(id) {
+  if (process.browser) {
+    return {}
+  // eslint-disable-next-line no-else-return
+  } else {
+    if (Environment.type !== 'node') {
+      return {}
+    }
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    return require(id)
+  }
+}
+
+const Environment = {
   get type() {
     try {
       // eslint-disable-next-line no-new-func
@@ -60,15 +73,13 @@ export default {
   },
 
   external(id) {
-    if (PLANCK_BRANCH_EXTERNALS) {
-      return {}
-    // eslint-disable-next-line no-else-return
-    } else {
-      if (this.type !== 'node') {
-        return {}
-      }
-      // eslint-disable-next-line global-require, import/no-dynamic-require
-      return require(id)
+    try {
+      return external(id)
+    } catch (e) {
+      Environment.self.process = { browser: true }
     }
+    return external(id)
   },
 }
+
+export default Environment
