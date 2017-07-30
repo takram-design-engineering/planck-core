@@ -22,18 +22,25 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import './runner'
+export default function LazyInstanceMap(target, ...args) {
+  let instances = new Map()
+  return {
+    for(key) {
+      const coercedKey = (target.coerceKey && target.coerceKey(key)) || key
+      if (instances.has(coercedKey)) {
+        return instances.get(coercedKey)
+      }
+      const instance = (
+        (target.new && target.new(...args)) ||
+        new target(...args)
+      )
+      instances.set(coercedKey, instance)
+      return instance
+    },
 
-import './unit/Aggregate'
-import './unit/AggregateFunction'
-import './unit/AssertionError'
-import './unit/FilePath'
-import './unit/Hash'
-import './unit/ImplementationError'
-import './unit/LazyInstance'
-import './unit/LazyInstanceMap'
-import './unit/Namespace'
-import './unit/Request'
-import './unit/Semaphore'
-import './unit/Stride'
-import './unit/Transferral'
+    has(key) {
+      const coercedKey = (target.coerceKey && target.coerceKey(key)) || key
+      return instances.has(coercedKey)
+    },
+  }
+}

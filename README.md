@@ -172,6 +172,25 @@ FilePath.**current**
 <a id="new-implementationerror" href="#new-implementationerror">#</a>
 new **ImplementationError**([*message*])
 
+### LazyInstance
+
+<a id="lazyinstance-function-apply" href="#lazyinstance-function-apply">#</a>
+**LazyInstance**(*target* [, *arg1* [, *arg2* [, ...]]])
+
+<a id="lazyinstance-shared" href="#lazyinstance-shared">#</a>
+lazyInstance.**shared**
+
+### LazyInstanceMap
+
+<a id="lazyinstancemap-function-apply" href="#lazyinstancemap-function-apply">#</a>
+**LazyInstanceMap**(*target* [, *arg1* [, *arg2* [, ...]]])
+
+<a id="lazyinstancemap-for" href="#lazyinstance-for">#</a>
+lazyInstance.**for**(*key*)
+
+<a id="lazyinstancemap-has" href="#lazyinstance-has">#</a>
+lazyInstance.**has**(*key*)
+
 ### Namespace
 
 <a id="namespace-function-apply" href="#namespace-function-apply">#</a>
