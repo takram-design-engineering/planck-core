@@ -23,7 +23,7 @@
 //
 
 export default function LazyInstanceMap(target, ...args) {
-  let instances = new Map()
+  const instances = new Map()
   return {
     for(key) {
       const coercedKey = (target.coerceKey && target.coerceKey(key)) || key
@@ -32,7 +32,7 @@ export default function LazyInstanceMap(target, ...args) {
       }
       const instance = (
         (target.new && target.new(...args)) ||
-        new target(...args)
+        new target(...args)  // eslint-disable-line new-cap
       )
       instances.set(coercedKey, instance)
       return instance
