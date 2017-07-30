@@ -22,26 +22,25 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Namespace from './Namespace'
+export default function LazyInstanceMap(target, ...args) {
+  const instances = new Map()
+  return {
+    for(key) {
+      const coercedKey = (target.coerceKey && target.coerceKey(key)) || key
+      if (instances.has(coercedKey)) {
+        return instances.get(coercedKey)
+      }
+      const instance = (
+        (target.new && target.new(...args)) ||
+        new target(...args)  // eslint-disable-line new-cap
+      )
+      instances.set(coercedKey, instance)
+      return instance
+    },
 
-export const internal = Namespace('Singleton')
-
-export default class Singleton {
-  constructor() {
-    if (internal(this.constructor).instance !== undefined) {
-      throw new Error('Attempt to create multiple instances for singleton')
-    }
-  }
-
-  static get(...args) {
-    const scope = internal(this)
-    if (scope.instance === undefined) {
-      scope.instance = this.new(...args)
-    }
-    return scope.instance
-  }
-
-  static new(...args) {
-    return new this(...args)
+    has(key) {
+      const coercedKey = (target.coerceKey && target.coerceKey(key)) || key
+      return instances.has(coercedKey)
+    },
   }
 }
