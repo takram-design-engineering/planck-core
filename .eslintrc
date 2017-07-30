@@ -3,7 +3,4 @@
   'env': {
     'browser': true,
   },
-  'globals': {
-    'PLANCK_BRANCH_EXTERNALS': true,
-  },
 }
