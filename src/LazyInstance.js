@@ -29,7 +29,7 @@ export default function LazyInstance(target, ...args) {
       if (instance === undefined) {
         instance = (
           (target.new && target.new(...args)) ||
-          new target(...args)
+          new target(...args)  // eslint-disable-line new-cap
         )
       }
       return instance
