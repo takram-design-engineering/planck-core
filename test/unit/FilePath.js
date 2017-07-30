@@ -34,7 +34,12 @@ describe('FilePath', () => {
     it('matches the original script url', () => {
       const url = new URL(FilePath.self)
       if (Environment.type !== 'node') {
-        expect(url.pathname).equal('/dist/planck-core.js')
+        if (BUNDLER === 'rollup') {
+          expect(url.pathname).equal('/dist/planck-core.js')
+        }
+        if (BUNDLER === 'webpack') {
+          expect(url.pathname).equal('/dist/test/unit/webpack.js')
+        }
       }
     })
   })
@@ -43,7 +48,7 @@ describe('FilePath', () => {
     it('matches the current script url', () => {
       const url = new URL(current)
       if (Environment.type !== 'node') {
-        expect(url.pathname).equal('/dist/test/unit.js')
+        expect(url.pathname).equal(`/dist/test/unit/${BUNDLER}.js`)
       }
     })
   })

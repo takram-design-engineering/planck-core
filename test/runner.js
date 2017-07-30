@@ -24,31 +24,33 @@
 
 import mocha from 'mocha'
 
-mocha.setup('bdd')
+if (BUNDLER !== 'webpack') {
+  mocha.setup('bdd')
 
-window.addEventListener('load', event => {
-  const runner = mocha.run()
-  const results = []
+  window.addEventListener('load', event => {
+    const runner = mocha.run()
+    const results = []
 
-  runner.on('end', () => {
-    window.mochaResults = runner.stats
-    window.mochaResults.reports = results
-  })
-
-  runner.on('fail', (test, error) => {
-    const titles = []
-    let current = test
-    while (current.parent.title) {
-      titles.push(current.parent.title)
-      current = current.parent
-    }
-    titles.reverse()
-    results.push({
-      name: test.title,
-      results: false,
-      message: error.message,
-      stack: error.stack,
-      titles,
+    runner.on('end', () => {
+      window.mochaResults = runner.stats
+      window.mochaResults.reports = results
     })
-  })
-}, false)
+
+    runner.on('fail', (test, error) => {
+      const titles = []
+      let current = test
+      while (current.parent.title) {
+        titles.push(current.parent.title)
+        current = current.parent
+      }
+      titles.reverse()
+      results.push({
+        name: test.title,
+        results: false,
+        message: error.message,
+        stack: error.stack,
+        titles,
+      })
+    })
+  }, false)
+}

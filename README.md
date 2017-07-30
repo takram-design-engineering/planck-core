@@ -172,19 +172,24 @@ FilePath.**current**
 <a id="new-implementationerror" href="#new-implementationerror">#</a>
 new **ImplementationError**([*message*])
 
-### Multiton
+### LazyInstance
 
-<a id="multiton-class-has" href="#multiton-class-has">#</a>
-Multiton.**has**(*key*)
+<a id="lazyinstance-function-apply" href="#lazyinstance-function-apply">#</a>
+**LazyInstance**(*target* [, *arg1* [, *arg2* [, ...]]])
 
-<a id="multiton-class-for" href="#multiton-class-for">#</a>
-Multiton.**for**(*key*, [*arg1* [, *arg2* [, ...]]])
+<a id="lazyinstance-shared" href="#lazyinstance-shared">#</a>
+lazyInstance.**shared**
 
-<a id="multiton-class-new" href="#multiton-class-new">#</a>
-Multiton.**new**(*key*, [*arg1* [, *arg2* [, ...]]])
+### LazyInstanceMap
 
-<a id="multiton-class-coercekey" href="#multiton-class-coercekey">#</a>
-Multiton.**coerceKey**(*key*)
+<a id="lazyinstancemap-function-apply" href="#lazyinstancemap-function-apply">#</a>
+**LazyInstanceMap**(*target* [, *arg1* [, *arg2* [, ...]]])
+
+<a id="lazyinstancemap-for" href="#lazyinstance-for">#</a>
+lazyInstance.**for**(*key*)
+
+<a id="lazyinstancemap-has" href="#lazyinstance-has">#</a>
+lazyInstance.**has**(*key*)
 
 ### Namespace
 
@@ -237,14 +242,6 @@ new **Semaphore**(*capacity*)
 
 <a id="semaphore-available" href="#semaphore-available">#</a>
 *semaphore*.**available**
-
-### Singleton
-
-<a id="singleton-class-get" href="#singleton-class-get">#</a>
-Singleton.**get**()
-
-<a id="singleton-class-new" href="#singleton-class-new">#</a>
-Singleton.**new**([*arg1* [, *arg2* [, ...]]])
 
 ### URL
 

@@ -22,45 +22,17 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Namespace from './Namespace'
-
-export const internal = Namespace('Multiton')
-
-export default class Multiton {
-  constructor(key) {
-    if (this.constructor.has(key)) {
-      throw new Error(`Attempt to create multiple instances for key "${key}"`)
-    }
-  }
-
-  static has(key) {
-    const scope = internal(this)
-    if (scope.instances === undefined) {
-      return false
-    }
-    const coercedKey = this.coerceKey(key)
-    return scope.instances[coercedKey] !== undefined
-  }
-
-  static for(key, ...args) {
-    const scope = internal(this)
-    if (!scope.instances) {
-      scope.instances = new Map()
-    }
-    const coercedKey = this.coerceKey(key)
-    if (scope.instances.has(coercedKey)) {
-      return scope.instances.get(coercedKey)
-    }
-    const instance = this.new(coercedKey, ...args)
-    scope.instances.set(coercedKey, instance)
-    return instance
-  }
-
-  static new(key, ...args) {
-    return new this(key, ...args)
-  }
-
-  static coerceKey(key) {
-    return key
+export default function LazyInstance(target, ...args) {
+  let instance
+  return {
+    get shared() {
+      if (instance === undefined) {
+        instance = (
+          (target.new && target.new(...args)) ||
+          new target(...args)  // eslint-disable-line new-cap
+        )
+      }
+      return instance
+    },
   }
 }

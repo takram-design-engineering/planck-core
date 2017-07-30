@@ -8,6 +8,7 @@
     'describe': true,
     'expect': true,
     'it': true,
+    'BUNDLER': true,
   },
   'rules': {
     'no-unused-expressions': 0,
