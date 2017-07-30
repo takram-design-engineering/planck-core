@@ -1382,89 +1382,6 @@ ImplementationError.prototype.name = 'ImplementationError';
 ImplementationError.prototype.message = '';
 ImplementationError.prototype.constructor = ImplementationError;
 
-//
-//  The MIT License
-//
-//  Copyright (C) 2016-Present Shota Matsuda
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
-
-var internal$2 = Namespace('Multiton');
-
-var Multiton = function () {
-  function Multiton(key) {
-    classCallCheck(this, Multiton);
-
-    if (this.constructor.has(key)) {
-      throw new Error('Attempt to create multiple instances for key "' + key + '"');
-    }
-  }
-
-  createClass(Multiton, null, [{
-    key: 'has',
-    value: function has(key) {
-      var scope = internal$2(this);
-      if (scope.instances === undefined) {
-        return false;
-      }
-      var coercedKey = this.coerceKey(key);
-      return scope.instances[coercedKey] !== undefined;
-    }
-  }, {
-    key: 'for',
-    value: function _for(key) {
-      var scope = internal$2(this);
-      if (!scope.instances) {
-        scope.instances = new Map();
-      }
-      var coercedKey = this.coerceKey(key);
-      if (scope.instances.has(coercedKey)) {
-        return scope.instances.get(coercedKey);
-      }
-
-      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        args[_key - 1] = arguments[_key];
-      }
-
-      var instance = this.new.apply(this, [coercedKey].concat(args));
-      scope.instances.set(coercedKey, instance);
-      return instance;
-    }
-  }, {
-    key: 'new',
-    value: function _new(key) {
-      for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-        args[_key2 - 1] = arguments[_key2];
-      }
-
-      return new (Function.prototype.bind.apply(this, [null].concat([key], args)))();
-    }
-  }, {
-    key: 'coerceKey',
-    value: function coerceKey(key) {
-      return key;
-    }
-  }]);
-  return Multiton;
-}();
-
 /**
  * Check if we're required to add a port number.
  *
@@ -2217,7 +2134,7 @@ var Request = {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$4 = Namespace('Semaphore');
+var internal$3 = Namespace('Semaphore');
 
 var Task = function Task(semaphore, callback) {
   var _this = this;
@@ -2245,7 +2162,7 @@ var Semaphore = function () {
   function Semaphore(capacity) {
     classCallCheck(this, Semaphore);
 
-    var scope = internal$4(this);
+    var scope = internal$3(this);
     scope.capacity = capacity;
     scope.available = capacity;
     scope.queue = [];
@@ -2254,7 +2171,7 @@ var Semaphore = function () {
   createClass(Semaphore, [{
     key: 'wait',
     value: function wait(callback) {
-      var scope = internal$4(this);
+      var scope = internal$3(this);
       var task = new Task(this, callback);
       if (scope.available === 0) {
         scope.queue.push(task);
@@ -2267,7 +2184,7 @@ var Semaphore = function () {
   }, {
     key: 'signal',
     value: function signal() {
-      var scope = internal$4(this);
+      var scope = internal$3(this);
       if (scope.queue.length === 0) {
         ++scope.available;
       } else {
@@ -2277,74 +2194,17 @@ var Semaphore = function () {
   }, {
     key: 'capacity',
     get: function get$$1() {
-      var scope = internal$4(this);
+      var scope = internal$3(this);
       return scope.capacity;
     }
   }, {
     key: 'available',
     get: function get$$1() {
-      var scope = internal$4(this);
+      var scope = internal$3(this);
       return scope.available;
     }
   }]);
   return Semaphore;
-}();
-
-//
-//  The MIT License
-//
-//  Copyright (C) 2016-Present Shota Matsuda
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
-
-var internal$5 = Namespace('Singleton');
-
-var Singleton = function () {
-  function Singleton() {
-    classCallCheck(this, Singleton);
-
-    if (internal$5(this.constructor).instance !== undefined) {
-      throw new Error('Attempt to create multiple instances for singleton');
-    }
-  }
-
-  createClass(Singleton, null, [{
-    key: 'get',
-    value: function get$$1() {
-      var scope = internal$5(this);
-      if (scope.instance === undefined) {
-        scope.instance = this.new.apply(this, arguments);
-      }
-      return scope.instance;
-    }
-  }, {
-    key: 'new',
-    value: function _new() {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return new (Function.prototype.bind.apply(this, [null].concat(args)))();
-    }
-  }]);
-  return Singleton;
 }();
 
 //
@@ -2821,11 +2681,9 @@ exports.Environment = Environment;
 exports.FilePath = FilePath;
 exports.Hash = Hash;
 exports.ImplementationError = ImplementationError;
-exports.Multiton = Multiton;
 exports.Namespace = Namespace;
 exports.Request = Request;
 exports.Semaphore = Semaphore;
-exports.Singleton = Singleton;
 exports.Stride = Stride;
 exports.Transferral = Transferral;
 exports.URL = index$5;
