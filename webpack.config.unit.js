@@ -40,7 +40,6 @@ module.exports = {
   },
   devtool: 'source-map',
   externals: {
-    './runner': true,
     'chai': 'chai',
     'mocha': 'mocha',
     'nock': 'nock',
