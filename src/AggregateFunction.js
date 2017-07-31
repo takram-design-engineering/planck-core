@@ -43,10 +43,6 @@ export default class AggregateFunction {
     })
   }
 
-  getPrototypeOf(target) {
-    return this.constructor.prototype
-  }
-
   static new(...args) {
     const instance = new this(internal, ...args)
     return new Proxy(() => {}, instance)

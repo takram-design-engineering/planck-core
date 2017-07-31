@@ -43,12 +43,5 @@ export default function LazyInstance(factory, ...args) {
       }
       return Reflect.get(instance, property, receiver)
     },
-
-    getPrototypeOf(target) {
-      if (instance === undefined) {
-        instance = instantiate(factory, ...args)
-      }
-      return instance.constructor.prototype
-    },
   })
 }
