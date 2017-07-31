@@ -38,7 +38,6 @@ describe('LazyInstance', () => {
       get b() { return 'b' }
     }
     const instance = LazyInstance(T)
-    expect(instance).instanceof(T)
     expect(instance.a()).equal('a')
     expect(instance.b).equal('b')
   })
@@ -53,7 +52,6 @@ describe('LazyInstance', () => {
     }
     const args = [1, 'a']
     const instance = LazyInstance(T, ...args)
-    expect(instance).instanceof(T)
     expect(instance.a()).equal('a')
     expect(instance.b).equal('b')
     expect(instance.args).deep.equal(args)
@@ -72,7 +70,6 @@ describe('LazyInstance', () => {
     const newStub = sinon.spy(factory, 'new')
     const instance = LazyInstance(factory)
     expect(newStub).not.called
-    expect(instance).instanceof(T)
     expect(instance.a()).equal('a')
     expect(instance.b).equal('b')
     expect(newStub).calledOnce
@@ -95,7 +92,6 @@ describe('LazyInstance', () => {
     const newStub = sinon.spy(factory, 'new')
     const instance = LazyInstance(factory, ...args)
     expect(newStub).not.called
-    expect(instance).instanceof(T)
     expect(instance.a()).equal('a')
     expect(instance.b).equal('b')
     expect(instance.args).deep.equal(args)
