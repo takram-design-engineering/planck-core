@@ -42,6 +42,7 @@ function currentScriptPath() {
     default:
       break
   }
+  return undefined
 }
 
 const initialScriptPath = currentScriptPath()

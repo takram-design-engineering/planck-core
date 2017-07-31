@@ -41,6 +41,7 @@ const environmentType = (() => {
       return 'node'
     }
   } catch (error) {}
+  return undefined
 })()
 
 let environmentSelf
