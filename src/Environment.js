@@ -22,12 +22,48 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+const environmentType = (() => {
+  try {
+    // eslint-disable-next-line no-new-func
+    if (new Function('return this === window')()) {
+      return 'browser'
+    }
+  } catch (error) {}
+  try {
+    // eslint-disable-next-line no-new-func
+    if (new Function('return this === self')()) {
+      return 'worker'
+    }
+  } catch (error) {}
+  try {
+    // eslint-disable-next-line no-new-func
+    if (new Function('return this === global')()) {
+      return 'node'
+    }
+  } catch (error) {}
+})()
+
+let environmentSelf
+switch (environmentType) {
+  case 'browser':
+    environmentSelf = window
+    break
+  case 'worker':
+    environmentSelf = self
+    break
+  case 'node':
+    environmentSelf = global
+    break
+  default:
+    break
+}
+
 function external(id) {
   if (process.browser) {
     return {}
   // eslint-disable-next-line no-else-return
   } else {
-    if (Environment.type !== 'node') {
+    if (environmentType !== 'node') {
       return {}
     }
     // eslint-disable-next-line global-require, import/no-dynamic-require
@@ -35,51 +71,16 @@ function external(id) {
   }
 }
 
-const Environment = {
-  get type() {
-    try {
-      // eslint-disable-next-line no-new-func
-      if (new Function('return this === window')()) {
-        return 'browser'
-      }
-    } catch (error) {}
-    try {
-      // eslint-disable-next-line no-new-func
-      if (new Function('return this === self')()) {
-        return 'worker'
-      }
-    } catch (error) {}
-    try {
-      // eslint-disable-next-line no-new-func
-      if (new Function('return this === global')()) {
-        return 'node'
-      }
-    } catch (error) {}
-    throw new Error()
-  },
-
-  get self() {
-    switch (this.type) {
-      case 'browser':
-        return window
-      case 'worker':
-        return self
-      case 'node':
-        return global
-      default:
-        break
-    }
-    throw new Error()
-  },
+export default {
+  type: environmentType,
+  self: environmentSelf,
 
   external(id) {
     try {
       return external(id)
     } catch (e) {
-      Environment.self.process = { browser: true }
+      environmentSelf.process = { browser: true }
     }
     return external(id)
   },
 }
-
-export default Environment
