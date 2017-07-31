@@ -162,6 +162,33 @@ FilePath.**self**
 <a id="filepath-class-current" href="#filepath-class-current">#</a>
 FilePath.**current**
 
+<a id="filepath-class-resolve" href="#filepath-class-resolve">#</a>
+FilePath.**resolve**([*path1* [, *path2* [, ...]]])
+
+<a id="filepath-class-normalize" href="#filepath-class-normalize">#</a>
+FilePath.**normalize**(*path*)
+
+<a id="filepath-class-join" href="#filepath-class-join">#</a>
+FilePath.**join**([*path1* [, *path2* [, ...]]])
+
+<a id="filepath-class-relative" href="#filepath-class-relative">#</a>
+FilePath.**relative**(*from*, *to*)
+
+<a id="filepath-class-dirname" href="#filepath-class-dirname">#</a>
+FilePath.**dirname**(*path*)
+
+<a id="filepath-class-basename" href="#filepath-class-basename">#</a>
+FilePath.**basename**(*path* [, *ext*])
+
+<a id="filepath-class-extname" href="#filepath-class-extname">#</a>
+FilePath.**extname**(*path*)
+
+<a id="filepath-class-separator" href="#filepath-class-separator">#</a>
+FilePath.**separator**
+
+<a id="filepath-class-delimiter" href="#filepath-class-delimiter">#</a>
+FilePath.**delimiter**
+
 ### Hash
 
 <a id="hash-function-apply" href="#hash-function-apply">#</a>
