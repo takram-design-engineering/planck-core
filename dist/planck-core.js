@@ -1406,21 +1406,41 @@ ImplementationError.prototype.constructor = ImplementationError;
 //  DEALINGS IN THE SOFTWARE.
 //
 
-function LazyInstance(target) {
+function instantiate(factory) {
   for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     args[_key - 1] = arguments[_key];
   }
 
+  // eslint-disable-next-line new-cap
+  return factory.new && factory.new.apply(factory, args) || new (Function.prototype.bind.apply(factory, [null].concat(args)))();
+}
+
+function LazyInstance(factory) {
+  for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    args[_key2 - 1] = arguments[_key2];
+  }
+
   var instance = void 0;
-  return {
-    get shared() {
+  return new Proxy({}, {
+    set: function set(target, property, value, receiver) {
       if (instance === undefined) {
-        instance = target.new && target.new.apply(target, args) || new (Function.prototype.bind.apply(target, [null].concat(args)))() // eslint-disable-line new-cap
-        ;
+        instance = instantiate.apply(undefined, [factory].concat(args));
       }
-      return instance;
+      return Reflect.set(instance, property, value, receiver);
+    },
+    get: function get(target, property, receiver) {
+      if (instance === undefined) {
+        instance = instantiate.apply(undefined, [factory].concat(args));
+      }
+      return Reflect.get(instance, property, receiver);
+    },
+    getPrototypeOf: function getPrototypeOf(target) {
+      if (instance === undefined) {
+        instance = instantiate.apply(undefined, [factory].concat(args));
+      }
+      return instance.constructor.prototype;
     }
-  };
+  });
 }
 
 //
@@ -1447,28 +1467,64 @@ function LazyInstance(target) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-function LazyInstanceMap(target) {
-  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
+var internal$2 = Namespace('Multiton');
+
+var Multiton = function () {
+  function Multiton(key) {
+    classCallCheck(this, Multiton);
+
+    if (this.constructor.has(key)) {
+      throw new Error('Attempt to create multiple instances for key "' + key + '"');
+    }
+    var scope = internal$2(this.constructor);
+    scope.instances.set(key, this);
   }
 
-  var instances = new Map();
-  return {
-    for: function _for(key) {
-      var coercedKey = target.coerceKey && target.coerceKey(key) || key;
-      if (instances.has(coercedKey)) {
-        return instances.get(coercedKey);
+  createClass(Multiton, null, [{
+    key: 'has',
+    value: function has(key) {
+      var scope = internal$2(this);
+      if (scope.instances === undefined) {
+        return false;
       }
-      var instance = target.new && target.new.apply(target, args) || new (Function.prototype.bind.apply(target, [null].concat(args)))();
-      instances.set(coercedKey, instance);
-      return instance;
-    },
-    has: function has(key) {
-      var coercedKey = target.coerceKey && target.coerceKey(key) || key;
-      return instances.has(coercedKey);
+      var coercedKey = this.coerceKey(key);
+      return scope.instances[coercedKey] !== undefined;
     }
-  };
-}
+  }, {
+    key: 'for',
+    value: function _for(key) {
+      var scope = internal$2(this);
+      if (!scope.instances) {
+        scope.instances = new Map();
+      }
+      var coercedKey = this.coerceKey(key);
+      if (scope.instances.has(coercedKey)) {
+        return scope.instances.get(coercedKey);
+      }
+
+      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      return this.new.apply(this, [coercedKey].concat(args));
+    }
+  }, {
+    key: 'new',
+    value: function _new(key) {
+      for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        args[_key2 - 1] = arguments[_key2];
+      }
+
+      return new (Function.prototype.bind.apply(this, [null].concat([key], args)))();
+    }
+  }, {
+    key: 'coerceKey',
+    value: function coerceKey(key) {
+      return key;
+    }
+  }]);
+  return Multiton;
+}();
 
 /**
  * Check if we're required to add a port number.
@@ -2222,7 +2278,7 @@ var Request = {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$3 = Namespace('Semaphore');
+var internal$4 = Namespace('Semaphore');
 
 var Task = function Task(semaphore, callback) {
   var _this = this;
@@ -2250,7 +2306,7 @@ var Semaphore = function () {
   function Semaphore(capacity) {
     classCallCheck(this, Semaphore);
 
-    var scope = internal$3(this);
+    var scope = internal$4(this);
     scope.capacity = capacity;
     scope.available = capacity;
     scope.queue = [];
@@ -2259,7 +2315,7 @@ var Semaphore = function () {
   createClass(Semaphore, [{
     key: 'wait',
     value: function wait(callback) {
-      var scope = internal$3(this);
+      var scope = internal$4(this);
       var task = new Task(this, callback);
       if (scope.available === 0) {
         scope.queue.push(task);
@@ -2272,7 +2328,7 @@ var Semaphore = function () {
   }, {
     key: 'signal',
     value: function signal() {
-      var scope = internal$3(this);
+      var scope = internal$4(this);
       if (scope.queue.length === 0) {
         ++scope.available;
       } else {
@@ -2282,13 +2338,13 @@ var Semaphore = function () {
   }, {
     key: 'capacity',
     get: function get$$1() {
-      var scope = internal$3(this);
+      var scope = internal$4(this);
       return scope.capacity;
     }
   }, {
     key: 'available',
     get: function get$$1() {
-      var scope = internal$3(this);
+      var scope = internal$4(this);
       return scope.available;
     }
   }]);
@@ -2770,7 +2826,7 @@ exports.FilePath = FilePath;
 exports.Hash = Hash;
 exports.ImplementationError = ImplementationError;
 exports.LazyInstance = LazyInstance;
-exports.LazyInstanceMap = LazyInstanceMap;
+exports.Multiton = Multiton;
 exports.Namespace = Namespace;
 exports.Request = Request;
 exports.Semaphore = Semaphore;
