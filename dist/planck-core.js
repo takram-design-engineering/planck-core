@@ -90,6 +90,20 @@ var createClass = function () {
 
 
 
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
 
 
 
@@ -221,11 +235,6 @@ var AggregateFunction = function () {
         return Reflect.apply(target, bound, args);
       });
     }
-  }, {
-    key: 'getPrototypeOf',
-    value: function getPrototypeOf(target) {
-      return this.constructor.prototype;
-    }
   }], [{
     key: 'new',
     value: function _new() {
@@ -306,11 +315,6 @@ var Aggregate = function () {
       }
       return Reflect.get(scope.targets[0], property, receiver);
     }
-  }, {
-    key: 'getPrototypeOf',
-    value: function getPrototypeOf(target) {
-      return this.constructor.prototype;
-    }
   }], [{
     key: 'new',
     value: function _new() {
@@ -383,12 +387,48 @@ AssertionError.prototype.constructor = AssertionError;
 //  DEALINGS IN THE SOFTWARE.
 //
 
+var environmentType = function () {
+  try {
+    // eslint-disable-next-line no-new-func
+    if (new Function('return this === window')()) {
+      return 'browser';
+    }
+  } catch (error) {}
+  try {
+    // eslint-disable-next-line no-new-func
+    if (new Function('return this === self')()) {
+      return 'worker';
+    }
+  } catch (error) {}
+  try {
+    // eslint-disable-next-line no-new-func
+    if (new Function('return this === global')()) {
+      return 'node';
+    }
+  } catch (error) {}
+}();
+
+var environmentSelf = void 0;
+switch (environmentType) {
+  case 'browser':
+    environmentSelf = window;
+    break;
+  case 'worker':
+    environmentSelf = self;
+    break;
+  case 'node':
+    environmentSelf = global;
+    break;
+  default:
+    break;
+}
+
 function _external(id) {
   if (process.browser) {
     return {};
     // eslint-disable-next-line no-else-return
   } else {
-    if (Environment.type !== 'node') {
+    if (environmentType !== 'node') {
       return {};
     }
     // eslint-disable-next-line global-require, import/no-dynamic-require
@@ -397,51 +437,250 @@ function _external(id) {
 }
 
 var Environment = {
-  get type() {
-    try {
-      // eslint-disable-next-line no-new-func
-      if (new Function('return this === window')()) {
-        return 'browser';
-      }
-    } catch (error) {}
-    try {
-      // eslint-disable-next-line no-new-func
-      if (new Function('return this === self')()) {
-        return 'worker';
-      }
-    } catch (error) {}
-    try {
-      // eslint-disable-next-line no-new-func
-      if (new Function('return this === global')()) {
-        return 'node';
-      }
-    } catch (error) {}
-    throw new Error();
-  },
-
-  get self() {
-    switch (this.type) {
-      case 'browser':
-        return window;
-      case 'worker':
-        return self;
-      case 'node':
-        return global;
-      default:
-        break;
-    }
-    throw new Error();
-  },
+  type: environmentType,
+  self: environmentSelf,
 
   external: function external(id) {
     try {
       return _external(id);
     } catch (e) {
-      Environment.self.process = { browser: true };
+      environmentSelf.process = { browser: true };
     }
     return _external(id);
   }
 };
+
+var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+
+
+
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var index = createCommonjsModule(function (module, exports) {
+  // Copyright Joyent, Inc. and other Node contributors.
+  //
+  // Permission is hereby granted, free of charge, to any person obtaining a
+  // copy of this software and associated documentation files (the
+  // "Software"), to deal in the Software without restriction, including
+  // without limitation the rights to use, copy, modify, merge, publish,
+  // distribute, sublicense, and/or sell copies of the Software, and to permit
+  // persons to whom the Software is furnished to do so, subject to the
+  // following conditions:
+  //
+  // The above copyright notice and this permission notice shall be included
+  // in all copies or substantial portions of the Software.
+  //
+  // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+  // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+  // NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+  // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+  // USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  // resolves . and .. elements in a path array with directory names there
+  // must be no slashes, empty elements, or device names (c:\) in the array
+  // (so also no leading and trailing slashes - it does not distinguish
+  // relative and absolute paths)
+  function normalizeArray(parts, allowAboveRoot) {
+    // if the path tries to go above the root, `up` ends up > 0
+    var up = 0;
+    for (var i = parts.length - 1; i >= 0; i--) {
+      var last = parts[i];
+      if (last === '.') {
+        parts.splice(i, 1);
+      } else if (last === '..') {
+        parts.splice(i, 1);
+        up++;
+      } else if (up) {
+        parts.splice(i, 1);
+        up--;
+      }
+    }
+
+    // if the path is allowed to go above the root, restore leading ..s
+    if (allowAboveRoot) {
+      for (; up--; up) {
+        parts.unshift('..');
+      }
+    }
+
+    return parts;
+  }
+
+  // Split a filename into [root, dir, basename, ext], unix version
+  // 'root' is just a slash, or nothing.
+  var splitPathRe = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
+  var splitPath = function splitPath(filename) {
+    return splitPathRe.exec(filename).slice(1);
+  };
+
+  // path.resolve([from ...], to)
+  // posix version
+  exports.resolve = function () {
+    var resolvedPath = '',
+        resolvedAbsolute = false;
+
+    for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+      var path = i >= 0 ? arguments[i] : process.cwd();
+
+      // Skip empty and invalid entries
+      if (typeof path !== 'string') {
+        throw new TypeError('Arguments to path.resolve must be strings');
+      } else if (!path) {
+        continue;
+      }
+
+      resolvedPath = path + '/' + resolvedPath;
+      resolvedAbsolute = path.charAt(0) === '/';
+    }
+
+    // At this point the path should be resolved to a full absolute path, but
+    // handle relative paths to be safe (might happen when process.cwd() fails)
+
+    // Normalize the path
+    resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function (p) {
+      return !!p;
+    }), !resolvedAbsolute).join('/');
+
+    return (resolvedAbsolute ? '/' : '') + resolvedPath || '.';
+  };
+
+  // path.normalize(path)
+  // posix version
+  exports.normalize = function (path) {
+    var isAbsolute = exports.isAbsolute(path),
+        trailingSlash = substr(path, -1) === '/';
+
+    // Normalize the path
+    path = normalizeArray(filter(path.split('/'), function (p) {
+      return !!p;
+    }), !isAbsolute).join('/');
+
+    if (!path && !isAbsolute) {
+      path = '.';
+    }
+    if (path && trailingSlash) {
+      path += '/';
+    }
+
+    return (isAbsolute ? '/' : '') + path;
+  };
+
+  // posix version
+  exports.isAbsolute = function (path) {
+    return path.charAt(0) === '/';
+  };
+
+  // posix version
+  exports.join = function () {
+    var paths = Array.prototype.slice.call(arguments, 0);
+    return exports.normalize(filter(paths, function (p, index) {
+      if (typeof p !== 'string') {
+        throw new TypeError('Arguments to path.join must be strings');
+      }
+      return p;
+    }).join('/'));
+  };
+
+  // path.relative(from, to)
+  // posix version
+  exports.relative = function (from, to) {
+    from = exports.resolve(from).substr(1);
+    to = exports.resolve(to).substr(1);
+
+    function trim(arr) {
+      var start = 0;
+      for (; start < arr.length; start++) {
+        if (arr[start] !== '') break;
+      }
+
+      var end = arr.length - 1;
+      for (; end >= 0; end--) {
+        if (arr[end] !== '') break;
+      }
+
+      if (start > end) return [];
+      return arr.slice(start, end - start + 1);
+    }
+
+    var fromParts = trim(from.split('/'));
+    var toParts = trim(to.split('/'));
+
+    var length = Math.min(fromParts.length, toParts.length);
+    var samePartsLength = length;
+    for (var i = 0; i < length; i++) {
+      if (fromParts[i] !== toParts[i]) {
+        samePartsLength = i;
+        break;
+      }
+    }
+
+    var outputParts = [];
+    for (var i = samePartsLength; i < fromParts.length; i++) {
+      outputParts.push('..');
+    }
+
+    outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+    return outputParts.join('/');
+  };
+
+  exports.sep = '/';
+  exports.delimiter = ':';
+
+  exports.dirname = function (path) {
+    var result = splitPath(path),
+        root = result[0],
+        dir = result[1];
+
+    if (!root && !dir) {
+      // No dirname whatsoever
+      return '.';
+    }
+
+    if (dir) {
+      // It has a dirname, strip trailing slash
+      dir = dir.substr(0, dir.length - 1);
+    }
+
+    return root + dir;
+  };
+
+  exports.basename = function (path, ext) {
+    var f = splitPath(path)[2];
+    // TODO: make this comparison case-insensitive on windows?
+    if (ext && f.substr(-1 * ext.length) === ext) {
+      f = f.substr(0, f.length - ext.length);
+    }
+    return f;
+  };
+
+  exports.extname = function (path) {
+    return splitPath(path)[3];
+  };
+
+  function filter(xs, f) {
+    if (xs.filter) return xs.filter(f);
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+      if (f(xs[i], i, xs)) res.push(xs[i]);
+    }
+    return res;
+  }
+
+  // String.prototype.substr - negative index don't work in IE8
+  var substr = 'ab'.substr(-1) === 'b' ? function (str, start, len) {
+    return str.substr(start, len);
+  } : function (str, start, len) {
+    if (start < 0) start = str.length + start;
+    return str.substr(start, len);
+  };
+});
 
 //
 //  The MIT License
@@ -467,16 +706,15 @@ var Environment = {
 //  DEALINGS IN THE SOFTWARE.
 //
 
+var nodePath = Environment.external('path');
+
 function currentScriptPath() {
   switch (Environment.type) {
     case 'browser':
       {
         // eslint-disable-next-line no-underscore-dangle
         var currentScript = document.currentScript || document._currentScript;
-        if (!currentScript) {
-          return null;
-        }
-        return currentScript.src;
+        return currentScript && currentScript.src || undefined;
       }
     case 'worker':
       return self.location.href;
@@ -485,30 +723,53 @@ function currentScriptPath() {
     default:
       break;
   }
-  throw new Error();
 }
 
 var initialScriptPath = currentScriptPath();
 
-var FilePath = {
-  get self() {
-    return initialScriptPath;
-  },
+var aliases = void 0;
+if (Environment.type === 'node') {
+  aliases = {
+    resolve: nodePath.resolve,
+    normalize: nodePath.normalize,
+    join: nodePath.join,
+    relative: nodePath.relative,
+    dirname: nodePath.dirname,
+    basename: nodePath.basename,
+    extname: nodePath.extname,
+    separator: nodePath.sep,
+    delimiter: nodePath.delimiter
+  };
+} else {
+  aliases = {
+    resolve: function resolve() {
+      for (var _len = arguments.length, paths = Array(_len), _key = 0; _key < _len; _key++) {
+        paths[_key] = arguments[_key];
+      }
+
+      return index.resolve.apply(index, ['/'].concat(paths));
+    },
+
+
+    normalize: index.normalize,
+    join: index.join,
+    relative: index.relative,
+    dirname: index.dirname,
+    basename: index.basename,
+    extname: index.extname,
+    separator: index.sep,
+    delimiter: index.delimiter
+  };
+}
+
+var FilePath = _extends({
+  self: initialScriptPath,
 
   get current() {
     return currentScriptPath();
   }
-};
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-
-
-
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
+}, aliases);
 
 var crypt = createCommonjsModule(function (module) {
   (function () {
@@ -645,7 +906,7 @@ var charenc_1 = charenc;
 
 // The _isBuffer check is for Safari 5-7 support, because it's missing
 // Object.prototype.constructor. Remove this eventually
-var index = function index(obj) {
+var index$1 = function index(obj) {
   return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer);
 };
 
@@ -662,7 +923,7 @@ var md5 = createCommonjsModule(function (module) {
   (function () {
     var crypt$$1 = crypt,
         utf8 = charenc_1.utf8,
-        isBuffer = index,
+        isBuffer = index$1,
         bin = charenc_1.bin,
 
 
@@ -1230,14 +1491,14 @@ var stringify$2 = function stringify(value, replacer, space) {
 var parse = parse$1;
 var stringify$1 = stringify$2;
 
-var index$3 = {
+var index$4 = {
 	parse: parse,
 	stringify: stringify$1
 };
 
-var json = typeof JSON !== 'undefined' ? JSON : index$3;
+var json = typeof JSON !== 'undefined' ? JSON : index$4;
 
-var index$2 = function index(obj, opts) {
+var index$3 = function index(obj, opts) {
     if (!opts) opts = {};
     if (typeof opts === 'function') opts = { cmp: opts };
     var space = opts.space || '';
@@ -1345,7 +1606,7 @@ var objectKeys = Object.keys || function (obj) {
 //
 
 function Hash(object) {
-  return md5(index$2(object));
+  return md5(index$3(object));
 }
 
 //
@@ -1433,12 +1694,6 @@ function LazyInstance(factory) {
         instance = instantiate.apply(undefined, [factory].concat(args));
       }
       return Reflect.get(instance, property, receiver);
-    },
-    getPrototypeOf: function getPrototypeOf(target) {
-      if (instance === undefined) {
-        instance = instantiate.apply(undefined, [factory].concat(args));
-      }
-      return instance.constructor.prototype;
     }
   });
 }
@@ -1536,7 +1791,7 @@ var Multiton = function () {
  * @api private
  */
 
-var index$6 = function required(port, protocol) {
+var index$7 = function required(port, protocol) {
   protocol = protocol.split(':')[0];
   port = +port;
 
@@ -1632,7 +1887,7 @@ function querystringify(obj, prefix) {
 var stringify$4 = querystringify;
 var parse$3 = querystring;
 
-var index$8 = {
+var index$9 = {
   stringify: stringify$4,
   parse: parse$3
 };
@@ -1813,7 +2068,7 @@ function URL$1(address, location, parser) {
     location = null;
   }
 
-  if (parser && 'function' !== typeof parser) parser = index$8.parse;
+  if (parser && 'function' !== typeof parser) parser = index$9.parse;
 
   location = lolcation(location);
 
@@ -1882,7 +2137,7 @@ function URL$1(address, location, parser) {
   // for a given protocol. As the host also contains the port number we're going
   // override it with the hostname which contains no port number.
   //
-  if (!index$6(url.port, url.protocol)) {
+  if (!index$7(url.port, url.protocol)) {
     url.host = url.hostname;
     url.port = '';
   }
@@ -1924,7 +2179,7 @@ function set$1(part, value, fn) {
   switch (part) {
     case 'query':
       if ('string' === typeof value && value.length) {
-        value = (fn || index$8.parse)(value);
+        value = (fn || index$9.parse)(value);
       }
 
       url[part] = value;
@@ -1933,7 +2188,7 @@ function set$1(part, value, fn) {
     case 'port':
       url[part] = value;
 
-      if (!index$6(value, url.protocol)) {
+      if (!index$7(value, url.protocol)) {
         url.host = url.hostname;
         url[part] = '';
       } else if (value) {
@@ -1998,7 +2253,7 @@ function set$1(part, value, fn) {
  * @api public
  */
 function toString(stringify) {
-  if (!stringify || 'function' !== typeof stringify) stringify = index$8.stringify;
+  if (!stringify || 'function' !== typeof stringify) stringify = index$9.stringify;
 
   var query,
       url = this,
@@ -2032,9 +2287,9 @@ URL$1.prototype = { set: set$1, toString: toString };
 //
 URL$1.extractProtocol = extractProtocol;
 URL$1.location = lolcation;
-URL$1.qs = index$8;
+URL$1.qs = index$9;
 
-var index$5 = URL$1;
+var index$6 = URL$1;
 
 //
 //  The MIT License
@@ -2093,7 +2348,7 @@ var request = Environment.external('request');
 
 function browserRequest(url, options) {
   return new Promise(function (resolve, reject) {
-    var parsed = new index$5(url, true);
+    var parsed = new index$6(url, true);
     if (options.query) {
       parsed.set('query', Object.assign({}, parsed.query, options.query));
     }
@@ -2763,7 +3018,7 @@ var uuid = v4_1;
 uuid.v1 = v1_1;
 uuid.v4 = v4_1;
 
-var index$10 = uuid;
+var index$11 = uuid;
 
 //
 //  The MIT License
@@ -2791,7 +3046,7 @@ var index$10 = uuid;
 
 // Just use uuid v4 for now
 function UUID() {
-  return index$10.v4();
+  return index$11.v4();
 }
 
 //
@@ -2832,7 +3087,7 @@ exports.Request = Request;
 exports.Semaphore = Semaphore;
 exports.Stride = Stride;
 exports.Transferral = Transferral;
-exports.URL = index$5;
+exports.URL = index$6;
 exports.UUID = UUID;
 
 Object.defineProperty(exports, '__esModule', { value: true });
