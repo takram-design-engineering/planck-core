@@ -58,10 +58,6 @@ export default class Aggregate {
     return Reflect.get(scope.targets[0], property, receiver)
   }
 
-  getPrototypeOf(target) {
-    return this.constructor.prototype
-  }
-
   static new(...args) {
     const instance = new this(internal, ...args)
     return new Proxy({}, instance)

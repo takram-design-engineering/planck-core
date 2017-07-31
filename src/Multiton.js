@@ -22,25 +22,45 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export default function LazyInstanceMap(target, ...args) {
-  const instances = new Map()
-  return {
-    for(key) {
-      const coercedKey = (target.coerceKey && target.coerceKey(key)) || key
-      if (instances.has(coercedKey)) {
-        return instances.get(coercedKey)
-      }
-      const instance = (
-        (target.new && target.new(...args)) ||
-        new target(...args)  // eslint-disable-line new-cap
-      )
-      instances.set(coercedKey, instance)
-      return instance
-    },
+import Namespace from './Namespace'
 
-    has(key) {
-      const coercedKey = (target.coerceKey && target.coerceKey(key)) || key
-      return instances.has(coercedKey)
-    },
+export const internal = Namespace('Multiton')
+
+export default class Multiton {
+  constructor(key) {
+    if (this.constructor.has(key)) {
+      throw new Error(`Attempt to create multiple instances for key "${key}"`)
+    }
+    const scope = internal(this.constructor)
+    scope.instances.set(key, this)
+  }
+
+  static has(key) {
+    const scope = internal(this)
+    if (scope.instances === undefined) {
+      return false
+    }
+    const coercedKey = this.coerceKey(key)
+    return scope.instances[coercedKey] !== undefined
+  }
+
+  static for(key, ...args) {
+    const scope = internal(this)
+    if (!scope.instances) {
+      scope.instances = new Map()
+    }
+    const coercedKey = this.coerceKey(key)
+    if (scope.instances.has(coercedKey)) {
+      return scope.instances.get(coercedKey)
+    }
+    return this.new(coercedKey, ...args)
+  }
+
+  static new(key, ...args) {
+    return new this(key, ...args)
+  }
+
+  static coerceKey(key) {
+    return key
   }
 }

@@ -22,17 +22,26 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export default function LazyInstance(target, ...args) {
+function instantiate(factory, ...args) {
+  // eslint-disable-next-line new-cap
+  return (factory.new && factory.new(...args)) || new factory(...args)
+}
+
+export default function LazyInstance(factory, ...args) {
   let instance
-  return {
-    get shared() {
+  return new Proxy({}, {
+    set(target, property, value, receiver) {
       if (instance === undefined) {
-        instance = (
-          (target.new && target.new(...args)) ||
-          new target(...args)  // eslint-disable-line new-cap
-        )
+        instance = instantiate(factory, ...args)
       }
-      return instance
+      return Reflect.set(instance, property, value, receiver)
     },
-  }
+
+    get(target, property, receiver) {
+      if (instance === undefined) {
+        instance = instantiate(factory, ...args)
+      }
+      return Reflect.get(instance, property, receiver)
+    },
+  })
 }
