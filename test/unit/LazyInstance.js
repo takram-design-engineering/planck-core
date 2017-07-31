@@ -33,10 +33,14 @@ chai.use(sinonChai)
 
 describe('LazyInstance', () => {
   it('creates shared instance', () => {
-    class T {}
+    class T {
+      a() { return 'a' }
+      get b() { return 'b' }
+    }
     const instance = LazyInstance(T)
-    expect(instance.shared).equal(instance.shared)
-    expect(instance.shared).not.equal(new T())
+    expect(instance).instanceof(T)
+    expect(instance.a()).equal('a')
+    expect(instance.b).equal('b')
   })
 
   it('creates shared instance with arguments', () => {
@@ -44,39 +48,57 @@ describe('LazyInstance', () => {
       constructor(...args) {
         this.args = args
       }
+      a() { return 'a' }
+      get b() { return 'b' }
     }
     const args = [1, 'a']
     const instance = LazyInstance(T, ...args)
-    expect(instance.shared).equal(instance.shared)
-    expect(instance.shared).not.equal(new T())
-    expect(instance.shared.args).deep.equal(args)
+    expect(instance).instanceof(T)
+    expect(instance.a()).equal('a')
+    expect(instance.b).equal('b')
+    expect(instance.args).deep.equal(args)
   })
 
   it('prefer new function over new operator', () => {
-    const T = {
+    class T {
+      a() { return 'a' }
+      get b() { return 'b' }
+    }
+    const factory = {
       new() {
-        return {}
+        return new T()
       },
     }
-    const newStub = sinon.spy(T, 'new')
-    const instance = LazyInstance(T)
-    expect(instance.shared).equal(instance.shared)
+    const newStub = sinon.spy(factory, 'new')
+    const instance = LazyInstance(factory)
+    expect(newStub).not.called
+    expect(instance).instanceof(T)
+    expect(instance.a()).equal('a')
+    expect(instance.b).equal('b')
     expect(newStub).calledOnce
-    expect(instance.shared).not.equal(T.new())
   })
 
   it('prefer new function over new operator with arguments', () => {
-    const T = {
+    class T {
+      constructor(...args) {
+        this.args = args
+      }
+      a() { return 'a' }
+      get b() { return 'b' }
+    }
+    const factory = {
       new(...args) {
-        return { args }
+        return new T(...args)
       },
     }
     const args = [1, 'a']
-    const newStub = sinon.spy(T, 'new')
-    const instance = LazyInstance(T, ...args)
-    expect(instance.shared).equal(instance.shared)
+    const newStub = sinon.spy(factory, 'new')
+    const instance = LazyInstance(factory, ...args)
+    expect(newStub).not.called
+    expect(instance).instanceof(T)
+    expect(instance.a()).equal('a')
+    expect(instance.b).equal('b')
+    expect(instance.args).deep.equal(args)
     expect(newStub).calledOnce
-    expect(instance.shared).not.equal(T.new())
-    expect(instance.shared.args).deep.equal(args)
   })
 })
