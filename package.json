@@ -1,6 +1,6 @@
 {
   "name": "@takram/planck-core",
-  "version": "0.1.22",
+  "version": "0.2.0",
   "description": "",
   "repository": "takram-design-engineering/planck-core",
   "main": "dist/planck-core.js",
