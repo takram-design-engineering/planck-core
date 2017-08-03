@@ -406,6 +406,7 @@ var environmentType = function () {
       return 'node';
     }
   } catch (error) {}
+  return undefined;
 }();
 
 var environmentSelf = void 0;
@@ -423,31 +424,125 @@ switch (environmentType) {
     break;
 }
 
-function _external(id) {
+var Environment = {
+  type: environmentType,
+  self: environmentSelf
+};
+
+//
+//  The MIT License
+//
+//  Copyright (C) 2016-Present Shota Matsuda
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
+
+function branchingImport(arg) {
+  // Assuming `process.browser` is defined via DefinePlugin on webpack, this
+  // conditional will be determined at transpilation time, and `else` block will
+  // be completely removed in order to prevent webpack from bundling module.
+  var name = void 0;
+  var id = void 0;
+  if (typeof arg === 'string') {
+    id = arg;
+    name = arg;
+  } else {
+    id = Object.keys(arg)[0];
+    name = arg[id];
+  }
   if (process.browser) {
-    return {};
+    return Environment.self[name];
     // eslint-disable-next-line no-else-return
   } else {
-    if (environmentType !== 'node') {
-      return {};
+    if (Environment.type !== 'node') {
+      return undefined;
     }
-    // eslint-disable-next-line global-require, import/no-dynamic-require
-    return require(id);
+    try {
+      // eslint-disable-next-line global-require, import/no-dynamic-require
+      return require(id);
+    } catch (error) {}
+    return undefined;
   }
 }
 
-var Environment = {
-  type: environmentType,
-  self: environmentSelf,
-
-  external: function external(id) {
-    try {
-      return _external(id);
-    } catch (e) {
-      environmentSelf.process = { browser: true };
-    }
-    return _external(id);
+function runtimeImport(id) {
+  // This will throw error on browser, in which `process` is typically not
+  // defined in the global scope. Re-importing after defining `process.browser`
+  // in the global scope will evaluate the conditional in `branchingImport` for
+  // rollup's bundles.
+  try {
+    return branchingImport(id);
+  } catch (e) {
+    Environment.self.process = {
+      browser: Environment.type !== 'node'
+    };
   }
+  return branchingImport(id);
+}
+
+function importOptional(id) {
+  var module = runtimeImport(id);
+  if (module === undefined) {
+    return {};
+  }
+  return module;
+}
+
+function importRequired(id) {
+  var module = runtimeImport(id);
+  if (module === undefined) {
+    if (Environment.type === 'node') {
+      throw new Error('Could not resolve module "' + id + '"');
+    } else {
+      throw new Error('"' + id + '" isn\u2019t defined in the global scope');
+    }
+  }
+  return module;
+}
+
+function importNode(id) {
+  var module = runtimeImport(id);
+  if (module === undefined) {
+    if (Environment.type === 'node') {
+      throw new Error('Could not resolve module "' + id + '"');
+    }
+    return {};
+  }
+  return module;
+}
+
+function importBrowser(id) {
+  var module = runtimeImport(id);
+  if (module === undefined) {
+    if (Environment.type !== 'node') {
+      throw new Error('"' + id + '" isn\u2019t defined in the global scope');
+    }
+    return {};
+  }
+  return module;
+}
+
+var External = {
+  optional: importOptional,
+  required: importRequired,
+  browser: importBrowser,
+  node: importNode
 };
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -706,7 +801,7 @@ var index = createCommonjsModule(function (module, exports) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var nodePath = Environment.external('path');
+var nodePath = External.node('path');
 
 function currentScriptPath() {
   switch (Environment.type) {
@@ -723,6 +818,7 @@ function currentScriptPath() {
     default:
       break;
   }
+  return undefined;
 }
 
 var initialScriptPath = currentScriptPath();
@@ -1643,144 +1739,6 @@ ImplementationError.prototype.name = 'ImplementationError';
 ImplementationError.prototype.message = '';
 ImplementationError.prototype.constructor = ImplementationError;
 
-//
-//  The MIT License
-//
-//  Copyright (C) 2016-Present Shota Matsuda
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
-
-function instantiate(factory) {
-  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-
-  // eslint-disable-next-line new-cap
-  return factory.new && factory.new.apply(factory, args) || new (Function.prototype.bind.apply(factory, [null].concat(args)))();
-}
-
-function LazyInstance(factory) {
-  for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-    args[_key2 - 1] = arguments[_key2];
-  }
-
-  var instance = void 0;
-  return new Proxy({}, {
-    set: function set(target, property, value, receiver) {
-      if (instance === undefined) {
-        instance = instantiate.apply(undefined, [factory].concat(args));
-      }
-      return Reflect.set(instance, property, value, receiver);
-    },
-    get: function get(target, property, receiver) {
-      if (instance === undefined) {
-        instance = instantiate.apply(undefined, [factory].concat(args));
-      }
-      return Reflect.get(instance, property, receiver);
-    }
-  });
-}
-
-//
-//  The MIT License
-//
-//  Copyright (C) 2016-Present Shota Matsuda
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
-
-var internal$2 = Namespace('Multiton');
-
-var Multiton = function () {
-  function Multiton(key) {
-    classCallCheck(this, Multiton);
-
-    if (this.constructor.has(key)) {
-      throw new Error('Attempt to create multiple instances for key "' + key + '"');
-    }
-    var scope = internal$2(this.constructor);
-    scope.instances.set(key, this);
-  }
-
-  createClass(Multiton, null, [{
-    key: 'has',
-    value: function has(key) {
-      var scope = internal$2(this);
-      if (scope.instances === undefined) {
-        return false;
-      }
-      var coercedKey = this.coerceKey(key);
-      return scope.instances[coercedKey] !== undefined;
-    }
-  }, {
-    key: 'for',
-    value: function _for(key) {
-      var scope = internal$2(this);
-      if (!scope.instances) {
-        scope.instances = new Map();
-      }
-      var coercedKey = this.coerceKey(key);
-      if (scope.instances.has(coercedKey)) {
-        return scope.instances.get(coercedKey);
-      }
-
-      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        args[_key - 1] = arguments[_key];
-      }
-
-      return this.new.apply(this, [coercedKey].concat(args));
-    }
-  }, {
-    key: 'new',
-    value: function _new(key) {
-      for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-        args[_key2 - 1] = arguments[_key2];
-      }
-
-      return new (Function.prototype.bind.apply(this, [null].concat([key], args)))();
-    }
-  }, {
-    key: 'coerceKey',
-    value: function coerceKey(key) {
-      return key;
-    }
-  }]);
-  return Multiton;
-}();
-
 /**
  * Check if we're required to add a port number.
  *
@@ -2339,10 +2297,10 @@ var index$6 = URL$1;
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var _Environment$external = Environment.external('fs');
-var readFile = _Environment$external.readFile;
+var _External$node = External.node('fs');
+var readFile = _External$node.readFile;
 
-var request = Environment.external('request');
+var request = External.node('request');
 
 
 
@@ -2494,7 +2452,10 @@ var Request = {
         options = _parseArguments8[1];
 
     return this.text(url, options).then(function (response) {
-      return Environment.self.d3.csvParse(response, options.row);
+      var _External$required = External.required({ 'd3-dsv': 'd3' }),
+          csvParse = _External$required.csvParse;
+
+      return csvParse(response, options.row);
     });
   },
   tsv: function tsv() {
@@ -2504,7 +2465,10 @@ var Request = {
         options = _parseArguments10[1];
 
     return this.text(url, options).then(function (response) {
-      return Environment.self.d3.tsvParse(response, options.row);
+      var _External$required2 = External.required({ 'd3-dsv': 'd3' }),
+          tsvParse = _External$required2.tsvParse;
+
+      return tsvParse(response, options.row);
     });
   }
 };
@@ -2533,7 +2497,7 @@ var Request = {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$4 = Namespace('Semaphore');
+var internal$3 = Namespace('Semaphore');
 
 var Task = function Task(semaphore, callback) {
   var _this = this;
@@ -2561,7 +2525,7 @@ var Semaphore = function () {
   function Semaphore(capacity) {
     classCallCheck(this, Semaphore);
 
-    var scope = internal$4(this);
+    var scope = internal$3(this);
     scope.capacity = capacity;
     scope.available = capacity;
     scope.queue = [];
@@ -2570,7 +2534,7 @@ var Semaphore = function () {
   createClass(Semaphore, [{
     key: 'wait',
     value: function wait(callback) {
-      var scope = internal$4(this);
+      var scope = internal$3(this);
       var task = new Task(this, callback);
       if (scope.available === 0) {
         scope.queue.push(task);
@@ -2583,7 +2547,7 @@ var Semaphore = function () {
   }, {
     key: 'signal',
     value: function signal() {
-      var scope = internal$4(this);
+      var scope = internal$3(this);
       if (scope.queue.length === 0) {
         ++scope.available;
       } else {
@@ -2593,13 +2557,13 @@ var Semaphore = function () {
   }, {
     key: 'capacity',
     get: function get$$1() {
-      var scope = internal$4(this);
+      var scope = internal$3(this);
       return scope.capacity;
     }
   }, {
     key: 'available',
     get: function get$$1() {
-      var scope = internal$4(this);
+      var scope = internal$3(this);
       return scope.available;
     }
   }]);
@@ -2687,156 +2651,6 @@ var Stride = {
       }
     });
     return array;
-  }
-};
-
-var base64Arraybuffer = createCommonjsModule(function (module, exports) {
-  /*
-   * base64-arraybuffer
-   * https://github.com/niklasvh/base64-arraybuffer
-   *
-   * Copyright (c) 2012 Niklas von Hertzen
-   * Licensed under the MIT license.
-   */
-  (function () {
-    "use strict";
-
-    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-    // Use a lookup table to find the index.
-    var lookup = new Uint8Array(256);
-    for (var i = 0; i < chars.length; i++) {
-      lookup[chars.charCodeAt(i)] = i;
-    }
-
-    exports.encode = function (arraybuffer) {
-      var bytes = new Uint8Array(arraybuffer),
-          i,
-          len = bytes.length,
-          base64 = "";
-
-      for (i = 0; i < len; i += 3) {
-        base64 += chars[bytes[i] >> 2];
-        base64 += chars[(bytes[i] & 3) << 4 | bytes[i + 1] >> 4];
-        base64 += chars[(bytes[i + 1] & 15) << 2 | bytes[i + 2] >> 6];
-        base64 += chars[bytes[i + 2] & 63];
-      }
-
-      if (len % 3 === 2) {
-        base64 = base64.substring(0, base64.length - 1) + "=";
-      } else if (len % 3 === 1) {
-        base64 = base64.substring(0, base64.length - 2) + "==";
-      }
-
-      return base64;
-    };
-
-    exports.decode = function (base64) {
-      var bufferLength = base64.length * 0.75,
-          len = base64.length,
-          i,
-          p = 0,
-          encoded1,
-          encoded2,
-          encoded3,
-          encoded4;
-
-      if (base64[base64.length - 1] === "=") {
-        bufferLength--;
-        if (base64[base64.length - 2] === "=") {
-          bufferLength--;
-        }
-      }
-
-      var arraybuffer = new ArrayBuffer(bufferLength),
-          bytes = new Uint8Array(arraybuffer);
-
-      for (i = 0; i < len; i += 4) {
-        encoded1 = lookup[base64.charCodeAt(i)];
-        encoded2 = lookup[base64.charCodeAt(i + 1)];
-        encoded3 = lookup[base64.charCodeAt(i + 2)];
-        encoded4 = lookup[base64.charCodeAt(i + 3)];
-
-        bytes[p++] = encoded1 << 2 | encoded2 >> 4;
-        bytes[p++] = (encoded2 & 15) << 4 | encoded3 >> 2;
-        bytes[p++] = (encoded3 & 3) << 6 | encoded4 & 63;
-      }
-
-      return arraybuffer;
-    };
-  })();
-});
-
-//
-//  The MIT License
-//
-//  Copyright (C) 2016-Present Shota Matsuda
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
-
-var encoding = Environment.external('text-encoding');
-
-var Transferral = {
-  encode: function encode(object) {
-    var TextEncoder = Environment.self.TextEncoder || encoding.TextEncoder;
-    if (TextEncoder === undefined) {
-      throw new Error('TextEncoder is missing');
-    }
-    var encoder = new TextEncoder();
-    var text = JSON.stringify(object);
-    var array = encoder.encode(text);
-    return array.buffer;
-  },
-  decode: function decode(buffer) {
-    var TextDecoder = Environment.self.TextDecoder || encoding.TextDecoder;
-    if (TextDecoder === undefined) {
-      throw new Error('TextDecoder is missing');
-    }
-    var decoder = new TextDecoder();
-    var view = new DataView(buffer);
-    var text = decoder.decode(view);
-    return JSON.parse(text);
-  },
-  pack: function pack(buffer) {
-    return base64Arraybuffer.encode(buffer);
-  },
-  unpack: function unpack(string) {
-    return base64Arraybuffer.decode(string);
-  },
-  packBufferGeometry: function packBufferGeometry(geometry) {
-    var _this = this;
-
-    Object.values(geometry.data.attributes).forEach(function (attribute) {
-      var constructor = Environment.self[attribute.type];
-      var buffer = new constructor(attribute.array).buffer;
-      attribute.array = _this.pack(buffer);
-    });
-  },
-  unpackBufferGeometry: function unpackBufferGeometry(geometry) {
-    var _this2 = this;
-
-    Object.values(geometry.data.attributes).forEach(function (attribute) {
-      var constructor = Environment.self[attribute.type];
-      var buffer = _this2.unpack(attribute.array);
-      attribute.array = Array.from(new constructor(buffer));
-    });
   }
 };
 
@@ -3077,16 +2891,14 @@ exports.Aggregate = Aggregate;
 exports.AggregateFunction = AggregateFunction;
 exports.AssertionError = AssertionError;
 exports.Environment = Environment;
+exports.External = External;
 exports.FilePath = FilePath;
 exports.Hash = Hash;
 exports.ImplementationError = ImplementationError;
-exports.LazyInstance = LazyInstance;
-exports.Multiton = Multiton;
 exports.Namespace = Namespace;
 exports.Request = Request;
 exports.Semaphore = Semaphore;
 exports.Stride = Stride;
-exports.Transferral = Transferral;
 exports.URL = index$6;
 exports.UUID = UUID;
 

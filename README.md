@@ -154,6 +154,20 @@ Environment.**type**
 <a id="environment-class-self" href="#environment-class-self">#</a>
 Environment.**self**
 
+### External
+
+<a id="external-class-optional" href="#external-class-optional">#</a>
+External.**optional**(*id*)
+
+<a id="external-class-required" href="#external-class-required">#</a>
+External.**required**(*id*)
+
+<a id="external-class-browser" href="#external-class-browser">#</a>
+External.**browser**(*id*)
+
+<a id="external-class-node" href="#external-class-node">#</a>
+External.**node**(*id*)
+
 ### FilePath
 
 <a id="filepath-class-self" href="#filepath-class-self">#</a>
@@ -198,25 +212,6 @@ FilePath.**delimiter**
 
 <a id="new-implementationerror" href="#new-implementationerror">#</a>
 new **ImplementationError**([*message*])
-
-### LazyInstance
-
-<a id="lazyinstance-function-apply" href="#lazyinstance-function-apply">#</a>
-**LazyInstance**(*target* [, *arg1* [, *arg2* [, ...]]])
-
-### Multiton
-
-<a id="multiton-class-has" href="#multiton-class-has">#</a>
-Multiton.**has**(*key*)
-
-<a id="multiton-class-for" href="#multiton-class-for">#</a>
-Multiton.**for**(*key*, [*arg1* [, *arg2* [, ...]]])
-
-<a id="multiton-class-new" href="#multiton-class-new">#</a>
-Multiton.**new**(*key*, [*arg1* [, *arg2* [, ...]]])
-
-<a id="multiton-class-coercekey" href="#multiton-class-coercekey">#</a>
-Multiton.**coerceKey**(*key*)
 
 ### Namespace
 
