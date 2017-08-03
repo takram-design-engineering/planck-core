@@ -31,11 +31,11 @@ function branchingImport(arg) {
   let name
   let id
   if (typeof arg === 'string') {
-    name = arg
     id = arg
+    name = arg
   } else {
-    name = Object.keys(arg)[0]
-    id = arg[name]
+    id = Object.keys(arg)[0]
+    name = arg[id]
   }
   if (process.browser) {
     return Environment.self[name]

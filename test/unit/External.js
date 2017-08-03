@@ -34,6 +34,12 @@ describe('External', () => {
       expect(External.required('chai')).equal(chai)
     })
 
+    it('supports global name', () => {
+      expect(() => {
+        External.required({ 'd3-dsv': 'd3' })
+      }).not.throws(Error)
+    })
+
     it('throws error if cannot resolve module', () => {
       expect(() => {
         External.required('non-existent')
