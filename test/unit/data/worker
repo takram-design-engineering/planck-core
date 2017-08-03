@@ -1,0 +1,5 @@
+self.importScripts('/dist/planck-core.js')
+
+self.onmessage = function(message) {
+  self.postMessage(Planck.Environment.type)
+}
