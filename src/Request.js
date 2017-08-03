@@ -23,11 +23,12 @@
 //
 
 import Environment from './Environment'
+import External from './External'
 import Namespace from './Namespace'
 import URL from './URL'
 
-const { readFile } = Environment.external('fs')
-const request = Environment.external('request')
+const { readFile } = External.node('fs')
+const request = External.node('request')
 
 export const internal = Namespace('Request')
 
