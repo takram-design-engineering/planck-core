@@ -29,7 +29,10 @@ import { Environment } from '../..'
 
 const expect = chai.expect
 
-describe('Environment', () => {
+// eslint-disable-next-line func-names
+describe('Environment', function () {
+  this.timeout(30000)
+
   describe('#type', () => {
     it('returns environment name', done => {
       if (detectNode) {
