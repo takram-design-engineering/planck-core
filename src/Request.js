@@ -161,14 +161,16 @@ export default {
   csv(...args) {
     const [url, options] = parseArguments(...args)
     return this.text(url, options).then(response => {
-      return Environment.self.d3.csvParse(response, options.row)
+      const { csvParse } = External.required({ 'd3-dsv': 'd3' })
+      return csvParse(response, options.row)
     })
   },
 
   tsv(...args) {
     const [url, options] = parseArguments(...args)
     return this.text(url, options).then(response => {
-      return Environment.self.d3.tsvParse(response, options.row)
+      const { tsvParse } = External.required({ 'd3-dsv': 'd3' })
+      return tsvParse(response, options.row)
     })
   },
 }
