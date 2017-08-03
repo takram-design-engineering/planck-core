@@ -460,11 +460,11 @@ function branchingImport(arg) {
   var name = void 0;
   var id = void 0;
   if (typeof arg === 'string') {
-    name = arg;
     id = arg;
+    name = arg;
   } else {
-    name = Object.keys(arg)[0];
-    id = arg[name];
+    id = Object.keys(arg)[0];
+    name = arg[id];
   }
   if (process.browser) {
     return Environment.self[name];
@@ -2452,7 +2452,10 @@ var Request = {
         options = _parseArguments8[1];
 
     return this.text(url, options).then(function (response) {
-      return Environment.self.d3.csvParse(response, options.row);
+      var _External$required = External.required({ 'd3-dsv': 'd3' }),
+          csvParse = _External$required.csvParse;
+
+      return csvParse(response, options.row);
     });
   },
   tsv: function tsv() {
@@ -2462,7 +2465,10 @@ var Request = {
         options = _parseArguments10[1];
 
     return this.text(url, options).then(function (response) {
-      return Environment.self.d3.tsvParse(response, options.row);
+      var _External$required2 = External.required({ 'd3-dsv': 'd3' }),
+          tsvParse = _External$required2.tsvParse;
+
+      return tsvParse(response, options.row);
     });
   }
 };
