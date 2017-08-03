@@ -22,43 +22,9 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import base64 from 'base64-arraybuffer'
-
 import Environment from './Environment'
 
-const encoding = Environment.external('text-encoding')
-
 export default {
-  encode(object) {
-    const TextEncoder = Environment.self.TextEncoder || encoding.TextEncoder
-    if (TextEncoder === undefined) {
-      throw new Error('TextEncoder is missing')
-    }
-    const encoder = new TextEncoder()
-    const text = JSON.stringify(object)
-    const array = encoder.encode(text)
-    return array.buffer
-  },
-
-  decode(buffer) {
-    const TextDecoder = Environment.self.TextDecoder || encoding.TextDecoder
-    if (TextDecoder === undefined) {
-      throw new Error('TextDecoder is missing')
-    }
-    const decoder = new TextDecoder()
-    const view = new DataView(buffer)
-    const text = decoder.decode(view)
-    return JSON.parse(text)
-  },
-
-  pack(buffer) {
-    return base64.encode(buffer)
-  },
-
-  unpack(string) {
-    return base64.decode(string)
-  },
-
   packBufferGeometry(geometry) {
     Object.values(geometry.data.attributes).forEach(attribute => {
       const constructor = Environment.self[attribute.type]
