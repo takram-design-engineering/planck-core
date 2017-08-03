@@ -24,9 +24,9 @@
 
 import chai from 'chai'
 
-import { Environment, FilePath, URL } from '../..'
+import { Environment, External, FilePath, URL } from '../..'
 
-const path = Environment.external('path')
+const path = External.node('path')
 
 const expect = chai.expect
 const current = FilePath.current
