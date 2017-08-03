@@ -44,8 +44,8 @@ function branchingImport(arg) {
     if (Environment.type !== 'node') {
       return undefined
     }
-    // eslint-disable-next-line global-require, import/no-dynamic-require
     try {
+    // eslint-disable-next-line global-require, import/no-dynamic-require
       return require(id)
     } catch (error) {}
     return undefined
