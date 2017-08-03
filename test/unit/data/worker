@@ -1,0 +1,8 @@
+self.importScripts(
+  '/node_modules/babel-polyfill/dist/polyfill.js',
+  '/dist/planck-core.js'
+);
+
+self.onmessage = function(message) {
+  self.postMessage(Planck.Environment.type);
+};

@@ -59,29 +59,7 @@ switch (environmentType) {
     break
 }
 
-function external(id) {
-  if (process.browser) {
-    return {}
-  // eslint-disable-next-line no-else-return
-  } else {
-    if (environmentType !== 'node') {
-      return {}
-    }
-    // eslint-disable-next-line global-require, import/no-dynamic-require
-    return require(id)
-  }
-}
-
 export default {
   type: environmentType,
   self: environmentSelf,
-
-  external(id) {
-    try {
-      return external(id)
-    } catch (e) {
-      environmentSelf.process = { browser: true }
-    }
-    return external(id)
-  },
 }

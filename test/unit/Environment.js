@@ -22,26 +22,31 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-function instantiate(factory, ...args) {
-  // eslint-disable-next-line new-cap
-  return (factory.new && factory.new(...args)) || new factory(...args)
-}
+import chai from 'chai'
+import detectNode from 'detect-node'
 
-export default function LazyInstance(factory, ...args) {
-  let instance
-  return new Proxy({}, {
-    set(target, property, value, receiver) {
-      if (instance === undefined) {
-        instance = instantiate(factory, ...args)
-      }
-      return Reflect.set(instance, property, value, receiver)
-    },
+import { Environment } from '../..'
 
-    get(target, property, receiver) {
-      if (instance === undefined) {
-        instance = instantiate(factory, ...args)
+const expect = chai.expect
+
+// eslint-disable-next-line func-names
+describe('Environment', function () {
+  this.timeout(30000)
+
+  describe('#type', () => {
+    it('returns environment name', done => {
+      if (detectNode) {
+        expect(Environment.type).equal('node')
+        done()
+      } else {
+        expect(Environment.type).equal('browser')
+        const worker = new Worker('/test/unit/data/worker')
+        worker.addEventListener('message', event => {
+          expect(event.data).equal('worker')
+          done()
+        }, false)
+        worker.postMessage('')
       }
-      return Reflect.get(instance, property, receiver)
-    },
+    })
   })
-}
+})

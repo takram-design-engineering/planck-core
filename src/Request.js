@@ -23,11 +23,12 @@
 //
 
 import Environment from './Environment'
+import External from './External'
 import Namespace from './Namespace'
 import URL from './URL'
 
-const { readFile } = Environment.external('fs')
-const request = Environment.external('request')
+const { readFile } = External.node('fs')
+const request = External.node('request')
 
 export const internal = Namespace('Request')
 
@@ -160,14 +161,16 @@ export default {
   csv(...args) {
     const [url, options] = parseArguments(...args)
     return this.text(url, options).then(response => {
-      return Environment.self.d3.csvParse(response, options.row)
+      const { csvParse } = External.required({ 'd3-dsv': 'd3' })
+      return csvParse(response, options.row)
     })
   },
 
   tsv(...args) {
     const [url, options] = parseArguments(...args)
     return this.text(url, options).then(response => {
-      return Environment.self.d3.tsvParse(response, options.row)
+      const { tsvParse } = External.required({ 'd3-dsv': 'd3' })
+      return tsvParse(response, options.row)
     })
   },
 }

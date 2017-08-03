@@ -25,8 +25,9 @@
 import browserPath from 'path-browserify'
 
 import Environment from './Environment'
+import External from './External'
 
-const nodePath = Environment.external('path')
+const nodePath = External.node('path')
 
 function currentScriptPath() {
   switch (Environment.type) {
