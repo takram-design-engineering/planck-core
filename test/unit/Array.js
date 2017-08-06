@@ -22,20 +22,34 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import './runner'
+import chai from 'chai'
 
-import './unit/Aggregate'
-import './unit/AggregateFunction'
-import './unit/Array'
-import './unit/AssertionError'
-import './unit/Environment'
-import './unit/External'
-import './unit/FilePath'
-import './unit/Hash'
-import './unit/ImplementationError'
-import './unit/Namespace'
-import './unit/Request'
-import './unit/Semaphore'
-import './unit/Stride'
-import './unit/String'
-import './unit/UUID'
+import { Array } from '../..'
+
+const expect = chai.expect
+
+describe('Array', () => {
+  describe('#min', () => {
+    it('finds minimum element', () => {
+      const array = [
+        { value: 3 },
+        { value: 4 },
+        { value: 1 },
+        { value: 2 },
+      ]
+      expect(Array.min(array, element => element.value)).equal(array[2])
+    })
+  })
+
+  describe('#max', () => {
+    it('finds maximum element', () => {
+      const array = [
+        { value: 3 },
+        { value: 4 },
+        { value: 1 },
+        { value: 2 },
+      ]
+      expect(Array.max(array, element => element.value)).equal(array[1])
+    })
+  })
+})

@@ -22,20 +22,20 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import './runner'
+import chai from 'chai'
 
-import './unit/Aggregate'
-import './unit/AggregateFunction'
-import './unit/Array'
-import './unit/AssertionError'
-import './unit/Environment'
-import './unit/External'
-import './unit/FilePath'
-import './unit/Hash'
-import './unit/ImplementationError'
-import './unit/Namespace'
-import './unit/Request'
-import './unit/Semaphore'
-import './unit/Stride'
-import './unit/String'
-import './unit/UUID'
+import { UUID } from '../..'
+
+const expect = chai.expect
+
+describe('UUID', () => {
+  it('generates universally unique identifier', () => {
+    expect(UUID()).a('string')
+    const lengths = [8, 4, 4, 4, 12]
+    UUID().split('-').forEach((group, index) => {
+      expect(group.length).equal(lengths[index])
+      expect(/^[0-9a-z]+$/.test(group)).true
+    })
+    expect(UUID()).not.equal(UUID())
+  })
+})

@@ -22,20 +22,24 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import './runner'
+import chai from 'chai'
 
-import './unit/Aggregate'
-import './unit/AggregateFunction'
-import './unit/Array'
-import './unit/AssertionError'
-import './unit/Environment'
-import './unit/External'
-import './unit/FilePath'
-import './unit/Hash'
-import './unit/ImplementationError'
-import './unit/Namespace'
-import './unit/Request'
-import './unit/Semaphore'
-import './unit/Stride'
-import './unit/String'
-import './unit/UUID'
+import { String } from '../..'
+
+const expect = chai.expect
+
+describe('String', () => {
+  describe('#template', () => {
+    it('replaces template with matching variables', () => {
+      // eslint-disable-next-line no-template-curly-in-string
+      expect(String.template('a ${b} c', { b: 1 })).equal('a 1 c')
+    })
+
+    it('throws error for undefined variables', () => {
+      expect(() => {
+        // eslint-disable-next-line no-template-curly-in-string
+        expect(String.template('a ${b} c', {})).equal('a 1 c')
+      }).throws(Error)
+    })
+  })
+})
