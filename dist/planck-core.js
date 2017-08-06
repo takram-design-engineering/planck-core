@@ -353,6 +353,63 @@ var Aggregate = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
+var _Array = {
+  min: function min(array, transform) {
+    if (typeof transform !== 'function') {
+      return Math.min.apply(Math, toConsumableArray(array));
+    }
+    var result = void 0;
+    array.reduce(function (min, value, index) {
+      var transformed = transform(value, index);
+      if (min > transformed) {
+        result = value;
+        return transformed;
+      }
+      return min;
+    }, Number.POSITIVE_INFINITY);
+    return result;
+  },
+  max: function max(array, transform) {
+    if (typeof transform !== 'function') {
+      return Math.max.apply(Math, toConsumableArray(array));
+    }
+    var result = void 0;
+    array.reduce(function (max, value, index) {
+      var transformed = transform(value, index);
+      if (max < transformed) {
+        result = value;
+        return transformed;
+      }
+      return max;
+    }, Number.NEGATIVE_INFINITY);
+    return result;
+  }
+};
+
+//
+//  The MIT License
+//
+//  Copyright (C) 2016-Present Shota Matsuda
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
+
 function AssertionError(message) {
   this.message = message;
 }
@@ -2637,20 +2694,6 @@ var Stride = {
       }
       return result;
     }, initial);
-  },
-  transform: function transform(array, stride, callback) {
-    var values = [];
-    array.forEach(function (value, index) {
-      var modulo = index % stride;
-      values[modulo] = value;
-      if (modulo === stride - 1) {
-        var transformed = callback(values, Math.floor(index / stride));
-        for (var offset = 0; offset < stride; ++offset) {
-          array[index - (stride - offset - 1)] = transformed[offset];
-        }
-      }
-    });
-    return array;
   }
 };
 
@@ -2859,9 +2902,7 @@ var index$11 = uuid;
 //
 
 // Just use uuid v4 for now
-function UUID() {
-  return index$11.v4();
-}
+var UUID = index$11.v4;
 
 //
 //  The MIT License
@@ -2889,6 +2930,7 @@ function UUID() {
 
 exports.Aggregate = Aggregate;
 exports.AggregateFunction = AggregateFunction;
+exports.Array = _Array;
 exports.AssertionError = AssertionError;
 exports.Environment = Environment;
 exports.External = External;
