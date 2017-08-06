@@ -33,7 +33,7 @@ export default {
   entry: './test/unit.js',
   sourceMap: true,
   plugins: [
-    nodeResolve({ main: true, module: true, browser: true }),
+    nodeResolve({ browser: true }),
     commonjs(),
     babel({
       presets: [
@@ -50,14 +50,14 @@ export default {
   ],
   intro: 'var BUNDLER = "rollup";',
   external: [
-    path.resolve(pkg.module),
+    path.resolve(pkg.browser),
     'chai',
     'mocha',
     'nock',
     'sinon',
   ],
   globals: {
-    [path.resolve(pkg.module)]: 'Planck',
+    [path.resolve(pkg.browser)]: 'Planck',
     'chai': 'chai',
     'mocha': 'mocha',
     'nock': 'nock',

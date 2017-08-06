@@ -22,18 +22,36 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export { default as Aggregate } from '../src/Aggregate'
-export { default as AggregateFunction } from '../src/AggregateFunction'
-export { default as Array } from '../src/Array'
-export { default as AssertionError } from '../src/AssertionError'
-export { default as Environment } from '../src/Environment'
-export { default as External } from '../src/External'
-export { default as FilePath } from '../src/FilePath'
-export { default as Hash } from '../src/Hash'
-export { default as ImplementationError } from '../src/ImplementationError'
-export { default as Namespace } from '../src/Namespace'
-export { default as Request } from '../src/Request'
-export { default as Semaphore } from '../src/Semaphore'
-export { default as Stride } from '../src/Stride'
-export { default as URL } from '../src/URL'
-export { default as UUID } from '../src/UUID'
+export default {
+  min(array, transform) {
+    if (typeof transform !== 'function') {
+      return Math.min(...array)
+    }
+    let result
+    array.reduce((min, value, index) => {
+      const transformed = transform(value, index)
+      if (min > transformed) {
+        result = value
+        return transformed
+      }
+      return min
+    }, Number.POSITIVE_INFINITY)
+    return result
+  },
+
+  max(array, transform) {
+    if (typeof transform !== 'function') {
+      return Math.max(...array)
+    }
+    let result
+    array.reduce((max, value, index) => {
+      const transformed = transform(value, index)
+      if (max < transformed) {
+        result = value
+        return transformed
+      }
+      return max
+    }, Number.NEGATIVE_INFINITY)
+    return result
+  },
+}

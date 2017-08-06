@@ -353,6 +353,63 @@ var Aggregate = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
+var _Array = {
+  min: function min(array, transform) {
+    if (typeof transform !== 'function') {
+      return Math.min.apply(Math, toConsumableArray(array));
+    }
+    var result = void 0;
+    array.reduce(function (min, value, index) {
+      var transformed = transform(value, index);
+      if (min > transformed) {
+        result = value;
+        return transformed;
+      }
+      return min;
+    }, Number.POSITIVE_INFINITY);
+    return result;
+  },
+  max: function max(array, transform) {
+    if (typeof transform !== 'function') {
+      return Math.max.apply(Math, toConsumableArray(array));
+    }
+    var result = void 0;
+    array.reduce(function (max, value, index) {
+      var transformed = transform(value, index);
+      if (max < transformed) {
+        result = value;
+        return transformed;
+      }
+      return max;
+    }, Number.NEGATIVE_INFINITY);
+    return result;
+  }
+};
+
+//
+//  The MIT License
+//
+//  Copyright (C) 2016-Present Shota Matsuda
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
+
 function AssertionError(message) {
   this.message = message;
 }
@@ -1739,6 +1796,158 @@ ImplementationError.prototype.name = 'ImplementationError';
 ImplementationError.prototype.message = '';
 ImplementationError.prototype.constructor = ImplementationError;
 
+function objectConverter(columns) {
+  return new Function("d", "return {" + columns.map(function (name, i) {
+    return JSON.stringify(name) + ": d[" + i + "]";
+  }).join(",") + "}");
+}
+
+function customConverter(columns, f) {
+  var object = objectConverter(columns);
+  return function (row, i) {
+    return f(object(row), i, columns);
+  };
+}
+
+// Compute unique columns in order of discovery.
+function inferColumns(rows) {
+  var columnSet = Object.create(null),
+      columns = [];
+
+  rows.forEach(function (row) {
+    for (var column in row) {
+      if (!(column in columnSet)) {
+        columns.push(columnSet[column] = column);
+      }
+    }
+  });
+
+  return columns;
+}
+
+var dsv = function (delimiter) {
+  var reFormat = new RegExp("[\"" + delimiter + "\n\r]"),
+      delimiterCode = delimiter.charCodeAt(0);
+
+  function parse(text, f) {
+    var convert,
+        columns,
+        rows = parseRows(text, function (row, i) {
+      if (convert) return convert(row, i - 1);
+      columns = row, convert = f ? customConverter(row, f) : objectConverter(row);
+    });
+    rows.columns = columns;
+    return rows;
+  }
+
+  function parseRows(text, f) {
+    var EOL = {},
+        // sentinel value for end-of-line
+    EOF = {},
+        // sentinel value for end-of-file
+    rows = [],
+        // output rows
+    N = text.length,
+        I = 0,
+        // current character index
+    n = 0,
+        // the current line number
+    t,
+        // the current token
+    eol; // is the current token followed by EOL?
+
+    function token() {
+      if (I >= N) return EOF; // special case: end of file
+      if (eol) return eol = false, EOL; // special case: end of line
+
+      // special case: quotes
+      var j = I,
+          c;
+      if (text.charCodeAt(j) === 34) {
+        var i = j;
+        while (i++ < N) {
+          if (text.charCodeAt(i) === 34) {
+            if (text.charCodeAt(i + 1) !== 34) break;
+            ++i;
+          }
+        }
+        I = i + 2;
+        c = text.charCodeAt(i + 1);
+        if (c === 13) {
+          eol = true;
+          if (text.charCodeAt(i + 2) === 10) ++I;
+        } else if (c === 10) {
+          eol = true;
+        }
+        return text.slice(j + 1, i).replace(/""/g, "\"");
+      }
+
+      // common case: find next delimiter or newline
+      while (I < N) {
+        var k = 1;
+        c = text.charCodeAt(I++);
+        if (c === 10) eol = true; // \n
+        else if (c === 13) {
+            eol = true;if (text.charCodeAt(I) === 10) ++I, ++k;
+          } // \r|\r\n
+          else if (c !== delimiterCode) continue;
+        return text.slice(j, I - k);
+      }
+
+      // special case: last token before EOF
+      return text.slice(j);
+    }
+
+    while ((t = token()) !== EOF) {
+      var a = [];
+      while (t !== EOL && t !== EOF) {
+        a.push(t);
+        t = token();
+      }
+      if (f && (a = f(a, n++)) == null) continue;
+      rows.push(a);
+    }
+
+    return rows;
+  }
+
+  function format(rows, columns) {
+    if (columns == null) columns = inferColumns(rows);
+    return [columns.map(formatValue).join(delimiter)].concat(rows.map(function (row) {
+      return columns.map(function (column) {
+        return formatValue(row[column]);
+      }).join(delimiter);
+    })).join("\n");
+  }
+
+  function formatRows(rows) {
+    return rows.map(formatRow).join("\n");
+  }
+
+  function formatRow(row) {
+    return row.map(formatValue).join(delimiter);
+  }
+
+  function formatValue(text) {
+    return text == null ? "" : reFormat.test(text += "") ? "\"" + text.replace(/\"/g, "\"\"") + "\"" : text;
+  }
+
+  return {
+    parse: parse,
+    parseRows: parseRows,
+    format: format,
+    formatRows: formatRows
+  };
+};
+
+var csv = dsv(",");
+
+var csvParse = csv.parse;
+
+var tsv = dsv("\t");
+
+var tsvParse = tsv.parse;
+
 /**
  * Check if we're required to add a port number.
  *
@@ -2452,9 +2661,6 @@ var Request = {
         options = _parseArguments8[1];
 
     return this.text(url, options).then(function (response) {
-      var _External$required = External.required({ 'd3-dsv': 'd3' }),
-          csvParse = _External$required.csvParse;
-
       return csvParse(response, options.row);
     });
   },
@@ -2465,9 +2671,6 @@ var Request = {
         options = _parseArguments10[1];
 
     return this.text(url, options).then(function (response) {
-      var _External$required2 = External.required({ 'd3-dsv': 'd3' }),
-          tsvParse = _External$required2.tsvParse;
-
       return tsvParse(response, options.row);
     });
   }
@@ -2637,20 +2840,6 @@ var Stride = {
       }
       return result;
     }, initial);
-  },
-  transform: function transform(array, stride, callback) {
-    var values = [];
-    array.forEach(function (value, index) {
-      var modulo = index % stride;
-      values[modulo] = value;
-      if (modulo === stride - 1) {
-        var transformed = callback(values, Math.floor(index / stride));
-        for (var offset = 0; offset < stride; ++offset) {
-          array[index - (stride - offset - 1)] = transformed[offset];
-        }
-      }
-    });
-    return array;
   }
 };
 
@@ -2859,9 +3048,7 @@ var index$11 = uuid;
 //
 
 // Just use uuid v4 for now
-function UUID() {
-  return index$11.v4();
-}
+var UUID = index$11.v4;
 
 //
 //  The MIT License
@@ -2889,6 +3076,7 @@ function UUID() {
 
 exports.Aggregate = Aggregate;
 exports.AggregateFunction = AggregateFunction;
+exports.Array = _Array;
 exports.AssertionError = AssertionError;
 exports.Environment = Environment;
 exports.External = External;

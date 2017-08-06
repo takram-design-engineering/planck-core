@@ -22,6 +22,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+import { csvParse, tsvParse } from 'd3-dsv'
+
 import Environment from './Environment'
 import External from './External'
 import Namespace from './Namespace'
@@ -161,7 +163,6 @@ export default {
   csv(...args) {
     const [url, options] = parseArguments(...args)
     return this.text(url, options).then(response => {
-      const { csvParse } = External.required({ 'd3-dsv': 'd3' })
       return csvParse(response, options.row)
     })
   },
@@ -169,7 +170,6 @@ export default {
   tsv(...args) {
     const [url, options] = parseArguments(...args)
     return this.text(url, options).then(response => {
-      const { tsvParse } = External.required({ 'd3-dsv': 'd3' })
       return tsvParse(response, options.row)
     })
   },

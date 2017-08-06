@@ -22,30 +22,34 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export default {
-  min(array, transform = value => value) {
-    let result
-    let min = Number.POSITIVE_INFINITY
-    array.forEach((value, index) => {
-      const transformed = transform(value, index)
-      if (min > transformed) {
-        min = transformed
-        result = value
-      }
-    })
-    return result
-  },
+import chai from 'chai'
 
-  max(array, transform = value => value) {
-    let result
-    let max = Number.NEGATIVE_INFINITY
-    array.forEach((value, index) => {
-      const transformed = transform(value, index)
-      if (max < transformed) {
-        max = transformed
-        result = value
-      }
+import { Array } from '../..'
+
+const expect = chai.expect
+
+describe('Array', () => {
+  describe('#min', () => {
+    it('finds minimum element', () => {
+      const array = [
+        { value: 3 },
+        { value: 4 },
+        { value: 1 },
+        { value: 2 },
+      ]
+      expect(Array.min(array, element => element.value)).equal(array[2])
     })
-    return result
-  },
-}
+  })
+
+  describe('#max', () => {
+    it('finds maximum element', () => {
+      const array = [
+        { value: 3 },
+        { value: 4 },
+        { value: 1 },
+        { value: 2 },
+      ]
+      expect(Array.max(array, element => element.value)).equal(array[1])
+    })
+  })
+})
