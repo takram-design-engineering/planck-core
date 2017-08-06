@@ -4,6 +4,7 @@
   "description": "",
   "repository": "takram-design-engineering/planck-core",
   "main": "dist/planck-core.js",
+  "browser": "dist/planck-core.js",
   "module": "dist/planck-core.module.js",
   "author": "Shota Matsuda",
   "license": "MIT",
