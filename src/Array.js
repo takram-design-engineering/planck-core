@@ -23,29 +23,35 @@
 //
 
 export default {
-  min(array, transform = value => value) {
+  min(array, transform) {
+    if (typeof transform !== 'function') {
+      return Math.min(...array)
+    }
     let result
-    let min = Number.POSITIVE_INFINITY
-    array.forEach((value, index) => {
+    array.reduce((min, value, index) => {
       const transformed = transform(value, index)
       if (min > transformed) {
-        min = transformed
         result = value
+        return transformed
       }
-    })
+      return min
+    }, Number.POSITIVE_INFINITY)
     return result
   },
 
-  max(array, transform = value => value) {
+  max(array, transform) {
+    if (typeof transform !== 'function') {
+      return Math.max(...array)
+    }
     let result
-    let max = Number.NEGATIVE_INFINITY
-    array.forEach((value, index) => {
+    array.reduce((max, value, index) => {
       const transformed = transform(value, index)
       if (max < transformed) {
-        max = transformed
         result = value
+        return transformed
       }
-    })
+      return max
+    }, Number.NEGATIVE_INFINITY)
     return result
   },
 }
