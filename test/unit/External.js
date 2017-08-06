@@ -28,6 +28,8 @@ import { Environment, External } from '../..'
 
 const expect = chai.expect
 
+Environment.self.d3 = {}
+
 describe('External', () => {
   describe('#required', () => {
     it('returns module', () => {
