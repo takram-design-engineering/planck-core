@@ -33,7 +33,7 @@ export default {
   entry: './test/unit.js',
   sourceMap: true,
   plugins: [
-    nodeResolve({ main: true, module: true, browser: true }),
+    nodeResolve(),
     commonjs(),
     babel({
       presets: [
