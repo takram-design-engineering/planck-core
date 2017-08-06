@@ -36,6 +36,7 @@
   "dependencies": {
     "babel-polyfill": "^6.23.0",
     "d3-dsv": "^1.0.5",
+    "es6-template-strings": "^2.0.1",
     "json-stable-stringify": "^1.0.1",
     "md5": "^2.2.1",
     "path-browserify": "0.0.0",
