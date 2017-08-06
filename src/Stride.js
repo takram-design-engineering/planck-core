@@ -69,19 +69,4 @@ export default {
       return result
     }, initial)
   },
-
-  transform(array, stride, callback) {
-    const values = []
-    array.forEach((value, index) => {
-      const modulo = index % stride
-      values[modulo] = value
-      if (modulo === stride - 1) {
-        const transformed = callback(values, Math.floor(index / stride))
-        for (let offset = 0; offset < stride; ++offset) {
-          array[index - (stride - offset - 1)] = transformed[offset]
-        }
-      }
-    })
-    return array
-  },
 }
