@@ -25,6 +25,4 @@
 import uuid from 'uuid'
 
 // Just use uuid v4 for now
-export default function UUID() {
-  return uuid.v4()
-}
+export default uuid.v4
