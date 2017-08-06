@@ -141,6 +141,14 @@ AggregateFunction.**new**(*target1* [, *target2* [, ...]])
 <a id="aggregatefunction-apply" href="#aggregatefunction-apply">#</a>
 *aggregateFunction*([*arg1* [, *arg2* [, ...]]])
 
+### Array
+
+<a id="array-class-min" href="#array-class-min">#</a>
+Array.**min**(*array*, *transform*)
+
+<a id="array-class-max" href="#array-class-max">#</a>
+Array.**max**(*array*, *transform*)
+
 ### AssertionError
 
 <a id="new-assertionerror" href="#new-assertionerror">#</a>
@@ -264,6 +272,25 @@ new **Semaphore**(*capacity*)
 
 <a id="semaphore-available" href="#semaphore-available">#</a>
 *semaphore*.**available**
+
+### Stride
+
+<a id="stride-class-foreach" href="#stride-class-foreach">#</a>
+Stride.**forEach**(*array*, *stride*, *callback*)
+
+<a id="stride-class-some" href="#stride-class-some">#</a>
+Stride.**some**(*array*, *stride*, *callback*)
+
+<a id="stride-class-every" href="#stride-class-every">#</a>
+Stride.**every**(*array*, *stride*, *callback*)
+
+<a id="stride-class-reduce" href="#stride-class-reduce">#</a>
+Stride.**reduce**(*array*, *stride*, *callback*, *initial*)
+
+### String
+
+<a id="string-class-template" href="#string-class-template">#</a>
+String.**template**(*string*, *variables*)
 
 ### URL
 
