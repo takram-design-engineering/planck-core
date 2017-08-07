@@ -1820,14 +1820,58 @@ ImplementationError.prototype.constructor = ImplementationError;
 //  DEALINGS IN THE SOFTWARE.
 //
 
+function lerp(start, stop, amount) {
+  return start + (stop - start) * amount;
+}
+
+function constrain(value, min, max) {
+  return value < min ? min : value > max ? max : value;
+}
+
+function map(value, min1, max1, min2, max2) {
+  return min2 + (max2 - min2) * ((value - min1) / (max1 - min1));
+}
+
+// GLSL functions
+
+var RADIANS = Math.PI / 180;
+var DEGREES = 180 / Math.PI;
+
+function radians(degrees) {
+  return degrees * RADIANS;
+}
+
+function degrees(radians) {
+  return radians * DEGREES;
+}
+
+function fract(value) {
+  return value - Math.floor(value);
+}
+
+function mod(value, divisor) {
+  return value - divisor * Math.floor(value / divisor);
+}
+
+function step(edge, value) {
+  return value < edge ? 0 : 1;
+}
+
+function smoothstep(edge0, edge1, value) {
+  var t = constrain((value - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
 var _Math = {
-  step: function step(edge, value) {
-    return value < edge ? 0 : 1;
-  },
-  smoothstep: function smoothstep(edge0, edge1, value) {
-    var t = this.clamp((value - edge0) / (edge1 - edge0), 0, 1);
-    return t * t * (3 - 2 * t);
-  }
+  lerp: lerp,
+  constrain: constrain,
+  map: map,
+  radians: radians,
+  degrees: degrees,
+  fract: fract,
+  mod: mod,
+  step: step,
+  smoothstep: smoothstep
 };
 
 function objectConverter(columns) {
