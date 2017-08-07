@@ -50,6 +50,8 @@ export default {
   ],
   intro: 'var BUNDLER = "rollup";',
   external: [
+    'source-map-support/register',
+    'd3-dsv',
     path.resolve(pkg.browser),
     'chai',
     'mocha',
@@ -57,6 +59,7 @@ export default {
     'sinon',
   ],
   globals: {
+    'd3-dsv': 'd3',
     [path.resolve(pkg.browser)]: 'Planck',
     'chai': 'chai',
     'mocha': 'mocha',

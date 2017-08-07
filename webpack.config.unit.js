@@ -37,6 +37,8 @@ module.exports = {
   },
   devtool: 'source-map',
   externals: {
+    'source-map-support/register': 'null',
+    'd3-dsv': 'd3',
     'chai': 'chai',
     'mocha': 'mocha',
     'nock': 'nock',
