@@ -29,9 +29,11 @@
     "test:cloud": "mocha test/setup.js",
     "lint": "eslint src test",
     "prewatch": "npm-run-all main:compile test:compile",
-    "watch": "npm-run-all --parallel test:local watch:main watch:test serve",
+    "watch": "npm-run-all --parallel test:local watch:main watch:test watch:rollup watch:webpack serve",
     "watch:main": "nodemon -C --watch src --exec 'npm-run-all main:compile test:local'",
     "watch:test": "nodemon -C --watch test --exec 'npm-run-all test:compile test:local'",
+    "watch:rollup": "nodemon -C --watch rollup.config.unit.js --exec 'npm run test:compile:rollup'",
+    "watch:webpack": "nodemon -C --watch webpack.config.unit.js --exec 'npm run test:compile:webpack'",
     "serve": "browser-sync start --server . --files dist --startPath test --no-notify"
   },
   "dependencies": {
