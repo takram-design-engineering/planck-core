@@ -2918,6 +2918,20 @@ var Stride = {
       }
       return result;
     }, initial);
+  },
+  transform: function transform(array, stride, callback) {
+    var values = [];
+    array.forEach(function (value, index) {
+      var modulo = index % stride;
+      values[modulo] = value;
+      if (modulo === stride - 1) {
+        var transformed = callback(values, Math.floor(index / stride));
+        for (var offset = 0; offset < stride; ++offset) {
+          array[index - (stride - offset - 1)] = transformed[offset];
+        }
+      }
+    });
+    return array;
   }
 };
 
