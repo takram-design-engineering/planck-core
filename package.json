@@ -46,7 +46,7 @@
     "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "@takram/eslint-config-planck": "^0.1.7",
+    "@takram/eslint-config-planck": "^0.2.1",
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
     "babel-plugin-external-helpers": "^6.22.0",
@@ -61,7 +61,7 @@
     "chai-as-promised": "^7.1.1",
     "chalk": "^2.1.0",
     "detect-node": "^2.0.3",
-    "eslint": "^3.19.0",
+    "eslint": "^4.3.0",
     "express": "^4.15.4",
     "mocha": "^3.5.0",
     "nock": "^9.0.14",
@@ -73,11 +73,11 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "sauce-connect-launcher": "^1.2.2",
     "saucelabs": "^1.4.0",
-    "sinon": "^3.0.0",
+    "sinon": "^3.1.0",
     "sinon-chai": "^2.12.0",
     "source-map-support": "^0.4.15",
     "uglify-js": "^3.0.27",
-    "webpack": "^3.4.1"
+    "webpack": "^3.5.2"
   },
   "saucelabs": {
     "framework": "mocha",

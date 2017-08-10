@@ -78,6 +78,7 @@ export default {
       if (modulo === stride - 1) {
         const transformed = callback(values, Math.floor(index / stride))
         for (let offset = 0; offset < stride; ++offset) {
+          // eslint-disable-next-line no-param-reassign
           array[index - (stride - offset - 1)] = transformed[offset]
         }
       }

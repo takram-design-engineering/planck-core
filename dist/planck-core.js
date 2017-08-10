@@ -38,6 +38,7 @@ function Namespace() {
     };
 
     if (object[symbol] === undefined) {
+      // eslint-disable-next-line no-param-reassign
       object[symbol] = init({});
     }
     return object[symbol];
@@ -2935,6 +2936,7 @@ var Stride = {
       if (modulo === stride - 1) {
         var transformed = callback(values, Math.floor(index / stride));
         for (var offset = 0; offset < stride; ++offset) {
+          // eslint-disable-next-line no-param-reassign
           array[index - (stride - offset - 1)] = transformed[offset];
         }
       }
