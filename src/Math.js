@@ -34,6 +34,13 @@ function map(value, min1, max1, min2, max2) {
   return min2 + (max2 - min2) * ((value - min1) / (max1 - min1))
 }
 
+function wrap(value, min, max) {
+  if (value < min) {
+    return max - (min - value) % (max - min)
+  }
+  return min + (value - min) % (max - min)
+}
+
 // GLSL functions
 
 const RADIANS = Math.PI / 180
@@ -68,6 +75,7 @@ export default {
   lerp,
   constrain,
   map,
+  wrap,
   radians,
   degrees,
   fract,
