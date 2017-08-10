@@ -17,8 +17,6 @@ A collection of classes and functions that are used anywhere in [Planck framewor
 
 ```sh
 npm install @takram/planck-core
-
-# Install peer dependencies. Look for .travis.yml how we test this.
 ```
 
 ## Usage
