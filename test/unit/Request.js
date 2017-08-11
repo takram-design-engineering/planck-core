@@ -22,6 +22,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+import 'source-map-support/register'
+
 import * as d3 from 'd3-dsv'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -31,10 +33,6 @@ import { Environment, Request } from '../..'
 
 const expect = chai.expect
 chai.use(chaiAsPromised)
-
-if (Environment.type === 'node') {
-  global.d3 = d3
-}
 
 // eslint-disable-next-line func-names
 describe('Request', function () {

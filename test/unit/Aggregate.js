@@ -22,6 +22,8 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+import 'source-map-support/register'
+
 import chai from 'chai'
 
 import { Aggregate } from '../..'
@@ -53,6 +55,7 @@ describe('Aggregate', () => {
     const targets = [new T(), new T(), new T()]
     const aggregate = Aggregate.new(...targets)
     targets.forEach((target, index) => {
+      // eslint-disable-next-line no-param-reassign
       target.value = index
     })
     expect(aggregate.value).equal(0)

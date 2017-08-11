@@ -38,6 +38,7 @@ function Namespace() {
     };
 
     if (object[symbol] === undefined) {
+      // eslint-disable-next-line no-param-reassign
       object[symbol] = init({});
     }
     return object[symbol];
@@ -1796,6 +1797,92 @@ ImplementationError.prototype.name = 'ImplementationError';
 ImplementationError.prototype.message = '';
 ImplementationError.prototype.constructor = ImplementationError;
 
+//
+//  The MIT License
+//
+//  Copyright (C) 2016-Present Shota Matsuda
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
+
+function lerp(start, stop, amount) {
+  return start + (stop - start) * amount;
+}
+
+function constrain(value, min, max) {
+  return value < min ? min : value > max ? max : value;
+}
+
+function map(value, min1, max1, min2, max2) {
+  return min2 + (max2 - min2) * ((value - min1) / (max1 - min1));
+}
+
+function wrap(value, min, max) {
+  if (value < min) {
+    return max - (min - value) % (max - min);
+  }
+  return min + (value - min) % (max - min);
+}
+
+// GLSL functions
+
+var RADIANS = Math.PI / 180;
+var DEGREES = 180 / Math.PI;
+
+function radians(degrees) {
+  return degrees * RADIANS;
+}
+
+function degrees(radians) {
+  return radians * DEGREES;
+}
+
+function fract(value) {
+  return value - Math.floor(value);
+}
+
+function mod(value, divisor) {
+  return value - divisor * Math.floor(value / divisor);
+}
+
+function step(edge, value) {
+  return value < edge ? 0 : 1;
+}
+
+function smoothstep(edge0, edge1, value) {
+  var t = constrain((value - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+var _Math = {
+  lerp: lerp,
+  constrain: constrain,
+  map: map,
+  wrap: wrap,
+  radians: radians,
+  degrees: degrees,
+  fract: fract,
+  mod: mod,
+  step: step,
+  smoothstep: smoothstep
+};
+
 function objectConverter(columns) {
   return new Function("d", "return {" + columns.map(function (name, i) {
     return JSON.stringify(name) + ": d[" + i + "]";
@@ -2840,6 +2927,21 @@ var Stride = {
       }
       return result;
     }, initial);
+  },
+  transform: function transform(array, stride, callback) {
+    var values = [];
+    array.forEach(function (value, index) {
+      var modulo = index % stride;
+      values[modulo] = value;
+      if (modulo === stride - 1) {
+        var transformed = callback(values, Math.floor(index / stride));
+        for (var offset = 0; offset < stride; ++offset) {
+          // eslint-disable-next-line no-param-reassign
+          array[index - (stride - offset - 1)] = transformed[offset];
+        }
+      }
+    });
+    return array;
   }
 };
 
@@ -3083,6 +3185,7 @@ exports.External = External;
 exports.FilePath = FilePath;
 exports.Hash = Hash;
 exports.ImplementationError = ImplementationError;
+exports.Math = _Math;
 exports.Namespace = Namespace;
 exports.Request = Request;
 exports.Semaphore = Semaphore;

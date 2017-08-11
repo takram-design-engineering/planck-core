@@ -22,54 +22,64 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import babel from 'rollup-plugin-babel'
-import commonjs from 'rollup-plugin-commonjs'
-import nodeResolve from 'rollup-plugin-node-resolve'
-import path from 'path'
+function lerp(start, stop, amount) {
+  return start + (stop - start) * amount
+}
 
-const pkg = require('./package.json')
+function constrain(value, min, max) {
+  return (value < min ? min : (value > max ? max : value))
+}
+
+function map(value, min1, max1, min2, max2) {
+  return min2 + (max2 - min2) * ((value - min1) / (max1 - min1))
+}
+
+function wrap(value, min, max) {
+  if (value < min) {
+    return max - (min - value) % (max - min)
+  }
+  return min + (value - min) % (max - min)
+}
+
+// GLSL functions
+
+const RADIANS = Math.PI / 180
+const DEGREES = 180 / Math.PI
+
+function radians(degrees) {
+  return degrees * RADIANS
+}
+
+function degrees(radians) {
+  return radians * DEGREES
+}
+
+function fract(value) {
+  return value - Math.floor(value)
+}
+
+function mod(value, divisor) {
+  return value - divisor * Math.floor(value / divisor)
+}
+
+function step(edge, value) {
+  return value < edge ? 0 : 1
+}
+
+function smoothstep(edge0, edge1, value) {
+  const t = constrain((value - edge0) / (edge1 - edge0), 0, 1)
+  return t * t * (3 - 2 * t)
+}
 
 export default {
-  entry: './test/unit.js',
-  sourceMap: true,
-  plugins: [
-    nodeResolve({ browser: true }),
-    commonjs(),
-    babel({
-      presets: [
-        ['es2015', { modules: false }],
-        'es2016',
-        'es2017',
-        'stage-3',
-      ],
-      plugins: [
-        'external-helpers',
-      ],
-      babelrc: false,
-    }),
-  ],
-  intro: 'var BUNDLER = "rollup";',
-  external: [
-    'source-map-support/register',
-    'd3-dsv',
-    path.resolve(pkg.browser),
-    'chai',
-    'mocha',
-    'nock',
-    'sinon',
-  ],
-  globals: {
-    'd3-dsv': 'd3',
-    [path.resolve(pkg.browser)]: 'Planck',
-    'chai': 'chai',
-    'mocha': 'mocha',
-    'nock': 'nock',
-    'sinon': 'sinon',
-  },
-  targets: [
-    {
-      format: 'iife',
-      dest: './dist/test/unit/rollup.js',
-    },
-  ],
+  lerp,
+  constrain,
+  map,
+  wrap,
+  radians,
+  degrees,
+  fract,
+  mod,
+  step,
+  smoothstep,
 }
