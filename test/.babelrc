@@ -3,6 +3,6 @@
     ["env", {
       "targets": { "node": "current" }
     }],
-    "stage3"
+    "stage-3"
   ]
 }
