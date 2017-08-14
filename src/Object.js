@@ -22,20 +22,5 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export { default as Aggregate } from '../src/Aggregate'
-export { default as AggregateFunction } from '../src/AggregateFunction'
-export { default as Array } from '../src/Array'
-export { default as AssertionError } from '../src/AssertionError'
-export { default as Environment } from '../src/Environment'
-export { default as External } from '../src/External'
-export { default as FilePath } from '../src/FilePath'
-export { default as Hash } from '../src/Hash'
-export { default as ImplementationError } from '../src/ImplementationError'
-export { default as Math } from '../src/Math'
-export { default as Namespace } from '../src/Namespace'
-export { default as Object } from '../src/Object'
-export { default as Request } from '../src/Request'
-export { default as Semaphore } from '../src/Semaphore'
-export { default as Stride } from '../src/Stride'
-export { default as URL } from '../src/URL'
-export { default as UUID } from '../src/UUID'
+// It's just a class with object prototype to be used as the base of mixins
+export default class Object {}
