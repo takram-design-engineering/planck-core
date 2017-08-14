@@ -34,7 +34,7 @@
     "watch:test": "nodemon -C --watch test --exec 'npm-run-all test:compile test:local'",
     "watch:rollup": "nodemon -C --watch rollup.config.unit.js --exec 'npm run test:compile:rollup'",
     "watch:webpack": "nodemon -C --watch webpack.config.unit.js --exec 'npm run test:compile:webpack'",
-    "serve": "browser-sync start --server . --files dist --startPath test --no-notify"
+    "serve": "browser-sync start --server . --files dist --startPath test --no-open --no-notify"
   },
   "dependencies": {
     "d3-dsv": "^1.0.5",
@@ -70,17 +70,17 @@
     "nock": "^9.0.14",
     "nodemon": "^1.11.0",
     "npm-run-all": "^4.0.2",
-    "rollup": "^0.46.1",
+    "rollup": "^0.47.4",
     "rollup-plugin-babel": "^3.0.1",
     "rollup-plugin-commonjs": "^8.1.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "sauce-connect-launcher": "^1.2.2",
     "saucelabs": "^1.4.0",
     "sinon": "^3.2.0",
-    "sinon-chai": "^2.12.0",
+    "sinon-chai": "^2.13.0",
     "source-map-support": "^0.4.15",
     "uglify-js": "^3.0.27",
-    "webpack": "^3.5.3"
+    "webpack": "^3.5.4"
   },
   "saucelabs": {
     "framework": "mocha",
