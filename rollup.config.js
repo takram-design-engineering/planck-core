@@ -27,8 +27,8 @@ import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
 
 export default {
-  entry: './dist/planck-core.module.js',
-  sourceMap: true,
+  input: './dist/planck-core.module.js',
+  sourcemap: true,
   plugins: [
     nodeResolve({ browser: true }),
     commonjs(),
@@ -42,14 +42,15 @@ export default {
       plugins: [
         'external-helpers',
       ],
+      babelrc: false,
     }),
   ],
-  targets: [
+  output: [
     {
       format: 'umd',
       extend: true,
-      moduleName: 'Planck',
-      dest: './dist/planck-core.js',
+      name: 'Planck',
+      file: './dist/planck-core.js',
     },
   ],
 }

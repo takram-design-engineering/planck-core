@@ -1,5 +1,5 @@
 script:
-- npm install --no-save eslint-plugin-import@^2.7.0 eslint-plugin-jsx-a11y@^5.1.1 eslint-plugin-react@^7.1.0
+- npm install
 - npm run test
 language: node_js
 node_js:
