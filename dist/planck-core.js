@@ -613,7 +613,7 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var index = createCommonjsModule(function (module, exports) {
+var pathBrowserify = createCommonjsModule(function (module, exports) {
   // Copyright Joyent, Inc. and other Node contributors.
   //
   // Permission is hereby granted, free of charge, to any person obtaining a
@@ -901,18 +901,18 @@ if (Environment.type === 'node') {
         paths[_key] = arguments[_key];
       }
 
-      return index.resolve.apply(index, ['/'].concat(paths));
+      return pathBrowserify.resolve.apply(pathBrowserify, ['/'].concat(paths));
     },
 
 
-    normalize: index.normalize,
-    join: index.join,
-    relative: index.relative,
-    dirname: index.dirname,
-    basename: index.basename,
-    extname: index.extname,
-    separator: index.sep,
-    delimiter: index.delimiter
+    normalize: pathBrowserify.normalize,
+    join: pathBrowserify.join,
+    relative: pathBrowserify.relative,
+    dirname: pathBrowserify.dirname,
+    basename: pathBrowserify.basename,
+    extname: pathBrowserify.extname,
+    separator: pathBrowserify.sep,
+    delimiter: pathBrowserify.delimiter
   };
 }
 
@@ -1060,7 +1060,7 @@ var charenc_1 = charenc;
 
 // The _isBuffer check is for Safari 5-7 support, because it's missing
 // Object.prototype.constructor. Remove this eventually
-var index$1 = function index(obj) {
+var isBuffer_1 = function isBuffer_1(obj) {
   return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer);
 };
 
@@ -1077,7 +1077,7 @@ var md5 = createCommonjsModule(function (module) {
   (function () {
     var crypt$$1 = crypt,
         utf8 = charenc_1.utf8,
-        isBuffer = index$1,
+        isBuffer = isBuffer_1,
         bin = charenc_1.bin,
 
 
@@ -1645,14 +1645,14 @@ var stringify$2 = function stringify(value, replacer, space) {
 var parse = parse$1;
 var stringify$1 = stringify$2;
 
-var index$4 = {
+var jsonify = {
 	parse: parse,
 	stringify: stringify$1
 };
 
-var json = typeof JSON !== 'undefined' ? JSON : index$4;
+var json = typeof JSON !== 'undefined' ? JSON : jsonify;
 
-var index$3 = function index(obj, opts) {
+var jsonStableStringify = function jsonStableStringify(obj, opts) {
     if (!opts) opts = {};
     if (typeof opts === 'function') opts = { cmp: opts };
     var space = opts.space || '';
@@ -1760,7 +1760,7 @@ var objectKeys = Object.keys || function (obj) {
 //
 
 function Hash(object) {
-  return md5(index$3(object));
+  return md5(jsonStableStringify(object));
 }
 
 //
@@ -2045,7 +2045,7 @@ var tsvParse = tsv.parse;
  * @api private
  */
 
-var index$7 = function required(port, protocol) {
+var requiresPort = function required(port, protocol) {
   protocol = protocol.split(':')[0];
   port = +port;
 
@@ -2141,7 +2141,7 @@ function querystringify(obj, prefix) {
 var stringify$4 = querystringify;
 var parse$3 = querystring;
 
-var index$9 = {
+var querystringify_1 = {
   stringify: stringify$4,
   parse: parse$3
 };
@@ -2322,7 +2322,7 @@ function URL$1(address, location, parser) {
     location = null;
   }
 
-  if (parser && 'function' !== typeof parser) parser = index$9.parse;
+  if (parser && 'function' !== typeof parser) parser = querystringify_1.parse;
 
   location = lolcation(location);
 
@@ -2391,7 +2391,7 @@ function URL$1(address, location, parser) {
   // for a given protocol. As the host also contains the port number we're going
   // override it with the hostname which contains no port number.
   //
-  if (!index$7(url.port, url.protocol)) {
+  if (!requiresPort(url.port, url.protocol)) {
     url.host = url.hostname;
     url.port = '';
   }
@@ -2433,7 +2433,7 @@ function set$1(part, value, fn) {
   switch (part) {
     case 'query':
       if ('string' === typeof value && value.length) {
-        value = (fn || index$9.parse)(value);
+        value = (fn || querystringify_1.parse)(value);
       }
 
       url[part] = value;
@@ -2442,7 +2442,7 @@ function set$1(part, value, fn) {
     case 'port':
       url[part] = value;
 
-      if (!index$7(value, url.protocol)) {
+      if (!requiresPort(value, url.protocol)) {
         url.host = url.hostname;
         url[part] = '';
       } else if (value) {
@@ -2507,7 +2507,7 @@ function set$1(part, value, fn) {
  * @api public
  */
 function toString(stringify) {
-  if (!stringify || 'function' !== typeof stringify) stringify = index$9.stringify;
+  if (!stringify || 'function' !== typeof stringify) stringify = querystringify_1.stringify;
 
   var query,
       url = this,
@@ -2541,9 +2541,9 @@ URL$1.prototype = { set: set$1, toString: toString };
 //
 URL$1.extractProtocol = extractProtocol;
 URL$1.location = lolcation;
-URL$1.qs = index$9;
+URL$1.qs = querystringify_1;
 
-var index$6 = URL$1;
+var urlParse = URL$1;
 
 //
 //  The MIT License
@@ -2602,7 +2602,7 @@ var request = External.node('request');
 
 function browserRequest(url, options) {
   return new Promise(function (resolve, reject) {
-    var parsed = new index$6(url, true);
+    var parsed = new urlParse(url, true);
     if (options.query) {
       parsed.set('query', Object.assign({}, parsed.query, options.query));
     }
@@ -3123,7 +3123,7 @@ var uuid = v4_1;
 uuid.v1 = v1_1;
 uuid.v4 = v4_1;
 
-var index$11 = uuid;
+var uuid_1 = uuid;
 
 //
 //  The MIT License
@@ -3150,7 +3150,7 @@ var index$11 = uuid;
 //
 
 // Just use uuid v4 for now
-var UUID = index$11.v4;
+var UUID = uuid_1.v4;
 
 //
 //  The MIT License
@@ -3190,7 +3190,7 @@ exports.Namespace = Namespace;
 exports.Request = Request;
 exports.Semaphore = Semaphore;
 exports.Stride = Stride;
-exports.URL = index$6;
+exports.URL = urlParse;
 exports.UUID = UUID;
 
 Object.defineProperty(exports, '__esModule', { value: true });
