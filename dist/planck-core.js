@@ -232,9 +232,12 @@ var AggregateFunction = function () {
     key: 'apply',
     value: function apply(target, bound, args) {
       var scope = internal$1(this);
-      return scope.targets.map(function (target) {
-        return Reflect.apply(target, bound, args);
-      });
+      var targets = scope.targets;
+      var result = [];
+      for (var i = 0; i < targets.length; ++i) {
+        result.push(targets[i].apply(bound, args));
+      }
+      return result;
     }
   }], [{
     key: 'new',
@@ -297,24 +300,30 @@ var Aggregate = function () {
     key: 'set',
     value: function set$$1(target, property, value, receiver) {
       var scope = internal(this);
-      scope.targets.forEach(function (target) {
-        Reflect.set(target, property, value);
-      });
-      return Reflect.set(target, property, value, receiver);
+      var targets = scope.targets;
+      for (var i = 0; i < targets.length; ++i) {
+        targets[i][property] = value;
+      }
+      // eslint-disable-next-line no-param-reassign
+      target[property] = value;
+      return true;
     }
   }, {
     key: 'get',
     value: function get$$1(target, property, receiver) {
       var scope = internal(this);
-      var aggregative = scope.targets.every(function (target) {
-        return typeof Reflect.get(target, property) === 'function';
-      });
-      if (aggregative) {
-        return AggregateFunction.new.apply(AggregateFunction, toConsumableArray(scope.targets.map(function (target) {
-          return Reflect.get(target, property).bind(target);
-        })));
+      var targets = scope.targets;
+      for (var i = 0; i < targets.length; ++i) {
+        if (typeof target[property] !== 'function') {
+          return scope.targets[0][property];
+        }
       }
-      return Reflect.get(scope.targets[0], property, receiver);
+      var args = [];
+      for (var _i = 0; _i < targets.length; ++_i) {
+        var _target = targets[_i];
+        args.push(_target[property].bind(_target));
+      }
+      return AggregateFunction.new.apply(AggregateFunction, args);
     }
   }], [{
     key: 'new',
@@ -356,33 +365,49 @@ var Aggregate = function () {
 
 var _Array = {
   min: function min(array, transform) {
-    if (typeof transform !== 'function') {
-      return Math.min.apply(Math, toConsumableArray(array));
-    }
     var result = void 0;
-    array.reduce(function (min, value, index) {
-      var transformed = transform(value, index);
-      if (min > transformed) {
-        result = value;
-        return transformed;
+    var min = Number.POSITIVE_INFINITY;
+    if (typeof transform !== 'function') {
+      for (var index = 0; index < array.length; ++index) {
+        var item = array[index];
+        if (item < min) {
+          result = item;
+          min = item;
+        }
       }
-      return min;
-    }, Number.POSITIVE_INFINITY);
+      return result;
+    }
+    for (var _index = 0; _index < array.length; ++_index) {
+      var _item = array[_index];
+      var transformed = transform(_item, _index);
+      if (transformed < min) {
+        result = _item;
+        min = transformed;
+      }
+    }
     return result;
   },
   max: function max(array, transform) {
-    if (typeof transform !== 'function') {
-      return Math.max.apply(Math, toConsumableArray(array));
-    }
     var result = void 0;
-    array.reduce(function (max, value, index) {
-      var transformed = transform(value, index);
-      if (max < transformed) {
-        result = value;
-        return transformed;
+    var max = Number.NEGATIVE_INFINITY;
+    if (typeof transform !== 'function') {
+      for (var index = 0; index < array.length; ++index) {
+        var item = array[index];
+        if (item > max) {
+          result = item;
+          max = item;
+        }
       }
-      return max;
-    }, Number.NEGATIVE_INFINITY);
+      return result;
+    }
+    for (var _index2 = 0; _index2 < array.length; ++_index2) {
+      var _item2 = array[_index2];
+      var transformed = transform(_item2, _index2);
+      if (transformed > max) {
+        result = _item2;
+        max = transformed;
+      }
+    }
     return result;
   }
 };
@@ -2609,9 +2634,10 @@ function browserRequest(url, options) {
     var request = new XMLHttpRequest();
     request.open('get', parsed.toString(), true);
     if (options.headers) {
-      Object.entries(options.headers).forEach(function (header) {
-        request.setRequestHeader.apply(request, toConsumableArray(header));
-      });
+      var names = Object.keys(options.headers);
+      for (var i = 0; i < names.length; ++i) {
+        request.setRequestHeader.apply(request, toConsumableArray(options.headers[names[i]]));
+      }
     }
     request.responseType = options.type;
     request.addEventListener('loadend', function (event) {
@@ -2884,63 +2910,87 @@ var Semaphore = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
+function isTypedArray(array) {
+  return array instanceof Int8Array || array instanceof Uint8Array || array instanceof Uint8ClampedArray || array instanceof Int16Array || array instanceof Uint16Array || array instanceof Int32Array || array instanceof Uint32Array || array instanceof Float32Array || array instanceof Float64Array;
+}
+
+function slice(array, start, end) {
+  return array.slice(start, end);
+}
+
+function subarray(array, start, end) {
+  return array.subarray(start, end);
+}
+
 var Stride = {
   forEach: function forEach(array, stride, callback) {
-    var values = [];
-    array.forEach(function (value, index) {
-      var modulo = index % stride;
-      values[modulo] = value;
-      if (modulo === stride - 1) {
-        callback(values, Math.floor(index / stride));
-      }
-    });
+    var func = isTypedArray(array) ? subarray : slice;
+    var end = array.length - array.length % stride;
+    for (var start = 0, index = 0; start < end; start += stride, ++index) {
+      callback(func(array, start, start + stride), index);
+    }
   },
   some: function some(array, stride, callback) {
-    var values = [];
-    return array.some(function (value, index) {
-      var modulo = index % stride;
-      values[modulo] = value;
-      if (modulo === stride - 1) {
-        return callback(values, Math.floor(index / stride));
+    var end = array.length - array.length % stride;
+    var func = isTypedArray(array) ? subarray : slice;
+    for (var start = 0, index = 0; start < end; start += stride, ++index) {
+      if (callback(func(array, start, start + stride), index)) {
+        return true;
       }
-      return false;
-    });
+    }
+    return false;
   },
   every: function every(array, stride, callback) {
-    var values = [];
-    return array.every(function (value, index) {
-      var modulo = index % stride;
-      values[modulo] = value;
-      if (modulo === stride - 1) {
-        return callback(values, Math.floor(index / stride));
+    var end = array.length - array.length % stride;
+    var func = isTypedArray(array) ? subarray : slice;
+    for (var start = 0, index = 0; start < end; start += stride, ++index) {
+      if (!callback(func(array, start, start + stride), index)) {
+        return false;
       }
-      return true;
-    });
+    }
+    return true;
   },
   reduce: function reduce(array, stride, callback, initial) {
-    var values = [];
-    return array.reduce(function (result, value, index) {
-      var modulo = index % stride;
-      values[modulo] = value;
-      if (modulo === stride - 1) {
-        return callback(result, values, Math.floor(index / stride));
-      }
-      return result;
-    }, initial);
+    var result = initial;
+    var end = array.length - array.length % stride;
+    var func = isTypedArray(array) ? subarray : slice;
+    for (var start = 0, index = 0; start < end; start += stride, ++index) {
+      result = callback(result, func(array, start, start + stride), index);
+    }
+    return result;
   },
-  transform: function transform(array, stride, callback) {
-    var values = [];
-    array.forEach(function (value, index) {
-      var modulo = index % stride;
-      values[modulo] = value;
-      if (modulo === stride - 1) {
-        var transformed = callback(values, Math.floor(index / stride));
+  set: function set(array, stride, item) {
+    var end = array.length - array.length % stride;
+    if (isTypedArray(array)) {
+      for (var start = 0; start < end; start += stride) {
+        array.set(item, start);
+      }
+    } else {
+      for (var _start = 0; _start < end; _start += stride) {
         for (var offset = 0; offset < stride; ++offset) {
           // eslint-disable-next-line no-param-reassign
-          array[index - (stride - offset - 1)] = transformed[offset];
+          array[_start + offset] = item[offset];
         }
       }
-    });
+    }
+    return array;
+  },
+  transform: function transform(array, stride, callback) {
+    var end = array.length - array.length % stride;
+    if (isTypedArray(array)) {
+      for (var start = 0, index = 0; start < end; start += stride, ++index) {
+        var item = callback(array.slice(start, start + stride), index);
+        array.set(item, start);
+      }
+    } else {
+      for (var _start2 = 0, _index = 0; _start2 < end; _start2 += stride, ++_index) {
+        for (var offset = 0; offset < stride; ++offset) {
+          var _item = callback(array.slice(_start2, _start2 + stride), _index);
+          // eslint-disable-next-line no-param-reassign
+          array[_start2 + offset] = _item[offset];
+        }
+      }
+    }
     return array;
   }
 };
