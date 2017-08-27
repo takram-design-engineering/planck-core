@@ -304,6 +304,7 @@ var Aggregate = function () {
       for (var i = 0; i < targets.length; ++i) {
         targets[i][property] = value;
       }
+      // eslint-disable-next-line no-param-reassign
       target[property] = value;
       return true;
     }
