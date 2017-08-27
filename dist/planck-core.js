@@ -235,7 +235,7 @@ var AggregateFunction = function () {
       var targets = scope.targets;
       var result = [];
       for (var i = 0; i < targets.length; ++i) {
-        result.push(Reflect.apply(targets[i], bound, args));
+        result.push(targets[i].apply(bound, args));
       }
       return result;
     }
@@ -302,9 +302,10 @@ var Aggregate = function () {
       var scope = internal(this);
       var targets = scope.targets;
       for (var i = 0; i < targets.length; ++i) {
-        Reflect.set(targets[i], property, value, receiver);
+        targets[i][property] = value;
       }
-      return Reflect.set(target, property, value, receiver);
+      target[property] = value;
+      return true;
     }
   }, {
     key: 'get',
@@ -312,14 +313,14 @@ var Aggregate = function () {
       var scope = internal(this);
       var targets = scope.targets;
       for (var i = 0; i < targets.length; ++i) {
-        if (!(typeof Reflect.get(target, property, receiver) === 'function')) {
-          return Reflect.get(scope.targets[0], property, receiver);
+        if (typeof target[property] !== 'function') {
+          return scope.targets[0][property];
         }
       }
       var args = [];
       for (var _i = 0; _i < targets.length; ++_i) {
         var _target = targets[_i];
-        args.push(Reflect.get(_target, property, receiver).bind(_target));
+        args.push(_target[property].bind(_target));
       }
       return AggregateFunction.new.apply(AggregateFunction, args);
     }
@@ -2908,76 +2909,85 @@ var Semaphore = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
+function isTypedArray(array) {
+  return array instanceof Int8Array || array instanceof Uint8Array || array instanceof Uint8ClampedArray || array instanceof Int16Array || array instanceof Uint16Array || array instanceof Int32Array || array instanceof Uint32Array || array instanceof Float32Array || array instanceof Float64Array;
+}
+
+function slice(array, start, end) {
+  return array.slice(start, end);
+}
+
+function subarray(array, start, end) {
+  return array.subarray(start, end);
+}
+
 var Stride = {
   forEach: function forEach(array, stride, callback) {
-    var values = Array(stride);
-    var strideIndex = 0;
-    for (var index = 0; index < array.length; ++index) {
-      var modulo = index % stride;
-      values[modulo] = values[index];
-      if (modulo === stride - 1) {
-        callback(values, strideIndex);
-        strideIndex += stride;
-      }
+    var func = isTypedArray(array) ? subarray : slice;
+    var end = array.length - array.length % stride;
+    for (var start = 0, index = 0; start < end; start += stride, ++index) {
+      callback(func(array, start, start + stride), index);
     }
   },
   some: function some(array, stride, callback) {
-    var values = Array(stride);
-    var strideIndex = 0;
-    for (var index = 0; index < array.length; ++index) {
-      var modulo = index % stride;
-      values[modulo] = values[index];
-      if (modulo === stride - 1) {
-        if (callback(values, strideIndex)) {
-          return true;
-        }
-        strideIndex += stride;
+    var end = array.length - array.length % stride;
+    var func = isTypedArray(array) ? subarray : slice;
+    for (var start = 0, index = 0; start < end; start += stride, ++index) {
+      if (callback(func(array, start, start + stride), index)) {
+        return true;
       }
     }
     return false;
   },
   every: function every(array, stride, callback) {
-    var values = Array(stride);
-    var strideIndex = 0;
-    for (var index = 0; index < array.length; ++index) {
-      var modulo = index % stride;
-      values[modulo] = values[index];
-      if (modulo === stride - 1) {
-        if (!callback(values, strideIndex)) {
-          return false;
-        }
-        strideIndex += stride;
+    var end = array.length - array.length % stride;
+    var func = isTypedArray(array) ? subarray : slice;
+    for (var start = 0, index = 0; start < end; start += stride, ++index) {
+      if (!callback(func(array, start, start + stride), index)) {
+        return false;
       }
     }
     return true;
   },
   reduce: function reduce(array, stride, callback, initial) {
     var result = initial;
-    var values = Array(stride);
-    var strideIndex = 0;
-    for (var index = 0; index < array.length; ++index) {
-      var modulo = index % stride;
-      values[modulo] = values[index];
-      if (modulo === stride - 1) {
-        result = callback(result, values, strideIndex);
-        strideIndex += stride;
-      }
+    var end = array.length - array.length % stride;
+    var func = isTypedArray(array) ? subarray : slice;
+    for (var start = 0, index = 0; start < end; start += stride, ++index) {
+      result = callback(result, func(array, start, start + stride), index);
     }
     return result;
   },
-  transform: function transform(array, stride, callback) {
-    var values = Array(stride);
-    var strideIndex = 0;
-    for (var index = 0; index < array.length; ++index) {
-      var modulo = index % stride;
-      values[modulo] = values[index];
-      if (modulo === stride - 1) {
-        var transformed = callback(values, strideIndex);
+  set: function set(array, stride, item) {
+    var end = array.length - array.length % stride;
+    if (isTypedArray(array)) {
+      for (var start = 0; start < end; start += stride) {
+        array.set(item, start);
+      }
+    } else {
+      for (var _start = 0; _start < end; _start += stride) {
         for (var offset = 0; offset < stride; ++offset) {
           // eslint-disable-next-line no-param-reassign
-          array[index - (stride - offset - 1)] = transformed[offset];
+          array[_start + offset] = item[offset];
         }
-        strideIndex += stride;
+      }
+    }
+    return array;
+  },
+  transform: function transform(array, stride, callback) {
+    var end = array.length - array.length % stride;
+    if (isTypedArray(array)) {
+      for (var start = 0, index = 0; start < end; start += stride, ++index) {
+        var item = callback(array.slice(start, start + stride), index);
+        array.set(item, start);
+      }
+    } else {
+      for (var _start2 = 0, _index = 0; _start2 < end; _start2 += stride, ++_index) {
+        for (var offset = 0; offset < stride; ++offset) {
+          var _item = callback(array.slice(_start2, _start2 + stride), _index);
+          // eslint-disable-next-line no-param-reassign
+          array[_start2 + offset] = _item[offset];
+        }
       }
     }
     return array;
