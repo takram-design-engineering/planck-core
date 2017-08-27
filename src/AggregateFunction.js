@@ -38,9 +38,12 @@ export default class AggregateFunction {
 
   apply(target, bound, args) {
     const scope = internal(this)
-    return scope.targets.map(target => {
-      return Reflect.apply(target, bound, args)
-    })
+    const targets = scope.targets
+    const result = []
+    for (let i = 0; i < targets.length; ++i) {
+      result.push(targets[i].apply(bound, args))
+    }
+    return result
   }
 
   static new(...args) {

@@ -39,23 +39,29 @@ export default class Aggregate {
 
   set(target, property, value, receiver) {
     const scope = internal(this)
-    scope.targets.forEach(target => {
-      Reflect.set(target, property, value)
-    })
-    return Reflect.set(target, property, value, receiver)
+    const targets = scope.targets
+    for (let i = 0; i < targets.length; ++i) {
+      targets[i][property] = value
+    }
+    // eslint-disable-next-line no-param-reassign
+    target[property] = value
+    return true
   }
 
   get(target, property, receiver) {
     const scope = internal(this)
-    const aggregative = scope.targets.every(target => {
-      return typeof Reflect.get(target, property) === 'function'
-    })
-    if (aggregative) {
-      return AggregateFunction.new(...scope.targets.map(target => {
-        return Reflect.get(target, property).bind(target)
-      }))
+    const targets = scope.targets
+    for (let i = 0; i < targets.length; ++i) {
+      if (typeof target[property] !== 'function') {
+        return scope.targets[0][property]
+      }
     }
-    return Reflect.get(scope.targets[0], property, receiver)
+    const args = []
+    for (let i = 0; i < targets.length; ++i) {
+      const target = targets[i]
+      args.push(target[property].bind(target))
+    }
+    return AggregateFunction.new(...args)
   }
 
   static new(...args) {

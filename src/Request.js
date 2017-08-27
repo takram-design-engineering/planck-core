@@ -43,9 +43,10 @@ function browserRequest(url, options) {
     const request = new XMLHttpRequest()
     request.open('get', parsed.toString(), true)
     if (options.headers) {
-      Object.entries(options.headers).forEach(header => {
-        request.setRequestHeader(...header)
-      })
+      const names = Object.keys(options.headers)
+      for (let i = 0; i < names.length; ++i) {
+        request.setRequestHeader(...options.headers[names[i]])
+      }
     }
     request.responseType = options.type
     request.addEventListener('loadend', event => {
