@@ -41,7 +41,7 @@ export default class AggregateFunction {
     const targets = scope.targets
     const result = []
     for (let i = 0; i < targets.length; ++i) {
-      result.push(Reflect.apply(targets[i], bound, args))
+      result.push(targets[i].apply(bound, args))
     }
     return result
   }

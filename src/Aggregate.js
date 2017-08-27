@@ -41,23 +41,24 @@ export default class Aggregate {
     const scope = internal(this)
     const targets = scope.targets
     for (let i = 0; i < targets.length; ++i) {
-      Reflect.set(targets[i], property, value, receiver)
+      targets[i][property] = value
     }
-    return Reflect.set(target, property, value, receiver)
+    target[property] = value
+    return true
   }
 
   get(target, property, receiver) {
     const scope = internal(this)
     const targets = scope.targets
     for (let i = 0; i < targets.length; ++i) {
-      if (!(typeof Reflect.get(target, property, receiver) === 'function')) {
-        return Reflect.get(scope.targets[0], property, receiver)
+      if (typeof target[property] !== 'function') {
+        return scope.targets[0][property]
       }
     }
     const args = []
     for (let i = 0; i < targets.length; ++i) {
       const target = targets[i]
-      args.push(Reflect.get(target, property, receiver).bind(target))
+      args.push(target[property].bind(target))
     }
     return AggregateFunction.new(...args)
   }
