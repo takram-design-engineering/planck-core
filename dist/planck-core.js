@@ -232,9 +232,12 @@ var AggregateFunction = function () {
     key: 'apply',
     value: function apply(target, bound, args) {
       var scope = internal$1(this);
-      return scope.targets.map(function (target) {
-        return Reflect.apply(target, bound, args);
-      });
+      var targets = scope.targets;
+      var result = [];
+      for (var i = 0; i < targets.length; ++i) {
+        result.push(Reflect.apply(targets[i], bound, args));
+      }
+      return result;
     }
   }], [{
     key: 'new',
@@ -297,24 +300,28 @@ var Aggregate = function () {
     key: 'set',
     value: function set$$1(target, property, value, receiver) {
       var scope = internal(this);
-      scope.targets.forEach(function (target) {
-        Reflect.set(target, property, value);
-      });
+      var targets = scope.targets;
+      for (var i = 0; i < targets.length; ++i) {
+        Reflect.set(targets[i], property, value, receiver);
+      }
       return Reflect.set(target, property, value, receiver);
     }
   }, {
     key: 'get',
     value: function get$$1(target, property, receiver) {
       var scope = internal(this);
-      var aggregative = scope.targets.every(function (target) {
-        return typeof Reflect.get(target, property) === 'function';
-      });
-      if (aggregative) {
-        return AggregateFunction.new.apply(AggregateFunction, toConsumableArray(scope.targets.map(function (target) {
-          return Reflect.get(target, property).bind(target);
-        })));
+      var targets = scope.targets;
+      for (var i = 0; i < targets.length; ++i) {
+        if (!(typeof Reflect.get(target, property, receiver) === 'function')) {
+          return Reflect.get(scope.targets[0], property, receiver);
+        }
       }
-      return Reflect.get(scope.targets[0], property, receiver);
+      var args = [];
+      for (var _i = 0; _i < targets.length; ++_i) {
+        var _target = targets[_i];
+        args.push(Reflect.get(_target, property, receiver).bind(_target));
+      }
+      return AggregateFunction.new.apply(AggregateFunction, args);
     }
   }], [{
     key: 'new',
@@ -356,33 +363,49 @@ var Aggregate = function () {
 
 var _Array = {
   min: function min(array, transform) {
-    if (typeof transform !== 'function') {
-      return Math.min.apply(Math, toConsumableArray(array));
-    }
     var result = void 0;
-    array.reduce(function (min, value, index) {
-      var transformed = transform(value, index);
-      if (min > transformed) {
-        result = value;
-        return transformed;
+    var min = Number.POSITIVE_INFINITY;
+    if (typeof transform !== 'function') {
+      for (var index = 0; index < array.length; ++index) {
+        var item = array[index];
+        if (item < min) {
+          result = item;
+          min = item;
+        }
       }
-      return min;
-    }, Number.POSITIVE_INFINITY);
+      return result;
+    }
+    for (var _index = 0; _index < array.length; ++_index) {
+      var _item = array[_index];
+      var transformed = transform(_item, _index);
+      if (transformed < min) {
+        result = _item;
+        min = transformed;
+      }
+    }
     return result;
   },
   max: function max(array, transform) {
-    if (typeof transform !== 'function') {
-      return Math.max.apply(Math, toConsumableArray(array));
-    }
     var result = void 0;
-    array.reduce(function (max, value, index) {
-      var transformed = transform(value, index);
-      if (max < transformed) {
-        result = value;
-        return transformed;
+    var max = Number.NEGATIVE_INFINITY;
+    if (typeof transform !== 'function') {
+      for (var index = 0; index < array.length; ++index) {
+        var item = array[index];
+        if (item > max) {
+          result = item;
+          max = item;
+        }
       }
-      return max;
-    }, Number.NEGATIVE_INFINITY);
+      return result;
+    }
+    for (var _index2 = 0; _index2 < array.length; ++_index2) {
+      var _item2 = array[_index2];
+      var transformed = transform(_item2, _index2);
+      if (transformed > max) {
+        result = _item2;
+        max = transformed;
+      }
+    }
     return result;
   }
 };
@@ -613,7 +636,7 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var index = createCommonjsModule(function (module, exports) {
+var pathBrowserify = createCommonjsModule(function (module, exports) {
   // Copyright Joyent, Inc. and other Node contributors.
   //
   // Permission is hereby granted, free of charge, to any person obtaining a
@@ -901,18 +924,18 @@ if (Environment.type === 'node') {
         paths[_key] = arguments[_key];
       }
 
-      return index.resolve.apply(index, ['/'].concat(paths));
+      return pathBrowserify.resolve.apply(pathBrowserify, ['/'].concat(paths));
     },
 
 
-    normalize: index.normalize,
-    join: index.join,
-    relative: index.relative,
-    dirname: index.dirname,
-    basename: index.basename,
-    extname: index.extname,
-    separator: index.sep,
-    delimiter: index.delimiter
+    normalize: pathBrowserify.normalize,
+    join: pathBrowserify.join,
+    relative: pathBrowserify.relative,
+    dirname: pathBrowserify.dirname,
+    basename: pathBrowserify.basename,
+    extname: pathBrowserify.extname,
+    separator: pathBrowserify.sep,
+    delimiter: pathBrowserify.delimiter
   };
 }
 
@@ -1060,7 +1083,7 @@ var charenc_1 = charenc;
 
 // The _isBuffer check is for Safari 5-7 support, because it's missing
 // Object.prototype.constructor. Remove this eventually
-var index$1 = function index(obj) {
+var isBuffer_1 = function isBuffer_1(obj) {
   return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer);
 };
 
@@ -1077,7 +1100,7 @@ var md5 = createCommonjsModule(function (module) {
   (function () {
     var crypt$$1 = crypt,
         utf8 = charenc_1.utf8,
-        isBuffer = index$1,
+        isBuffer = isBuffer_1,
         bin = charenc_1.bin,
 
 
@@ -1645,14 +1668,14 @@ var stringify$2 = function stringify(value, replacer, space) {
 var parse = parse$1;
 var stringify$1 = stringify$2;
 
-var index$4 = {
+var jsonify = {
 	parse: parse,
 	stringify: stringify$1
 };
 
-var json = typeof JSON !== 'undefined' ? JSON : index$4;
+var json = typeof JSON !== 'undefined' ? JSON : jsonify;
 
-var index$3 = function index(obj, opts) {
+var jsonStableStringify = function jsonStableStringify(obj, opts) {
     if (!opts) opts = {};
     if (typeof opts === 'function') opts = { cmp: opts };
     var space = opts.space || '';
@@ -1760,7 +1783,7 @@ var objectKeys = Object.keys || function (obj) {
 //
 
 function Hash(object) {
-  return md5(index$3(object));
+  return md5(jsonStableStringify(object));
 }
 
 //
@@ -2045,7 +2068,7 @@ var tsvParse = tsv.parse;
  * @api private
  */
 
-var index$7 = function required(port, protocol) {
+var requiresPort = function required(port, protocol) {
   protocol = protocol.split(':')[0];
   port = +port;
 
@@ -2141,7 +2164,7 @@ function querystringify(obj, prefix) {
 var stringify$4 = querystringify;
 var parse$3 = querystring;
 
-var index$9 = {
+var querystringify_1 = {
   stringify: stringify$4,
   parse: parse$3
 };
@@ -2322,7 +2345,7 @@ function URL$1(address, location, parser) {
     location = null;
   }
 
-  if (parser && 'function' !== typeof parser) parser = index$9.parse;
+  if (parser && 'function' !== typeof parser) parser = querystringify_1.parse;
 
   location = lolcation(location);
 
@@ -2391,7 +2414,7 @@ function URL$1(address, location, parser) {
   // for a given protocol. As the host also contains the port number we're going
   // override it with the hostname which contains no port number.
   //
-  if (!index$7(url.port, url.protocol)) {
+  if (!requiresPort(url.port, url.protocol)) {
     url.host = url.hostname;
     url.port = '';
   }
@@ -2433,7 +2456,7 @@ function set$1(part, value, fn) {
   switch (part) {
     case 'query':
       if ('string' === typeof value && value.length) {
-        value = (fn || index$9.parse)(value);
+        value = (fn || querystringify_1.parse)(value);
       }
 
       url[part] = value;
@@ -2442,7 +2465,7 @@ function set$1(part, value, fn) {
     case 'port':
       url[part] = value;
 
-      if (!index$7(value, url.protocol)) {
+      if (!requiresPort(value, url.protocol)) {
         url.host = url.hostname;
         url[part] = '';
       } else if (value) {
@@ -2507,7 +2530,7 @@ function set$1(part, value, fn) {
  * @api public
  */
 function toString(stringify) {
-  if (!stringify || 'function' !== typeof stringify) stringify = index$9.stringify;
+  if (!stringify || 'function' !== typeof stringify) stringify = querystringify_1.stringify;
 
   var query,
       url = this,
@@ -2541,9 +2564,9 @@ URL$1.prototype = { set: set$1, toString: toString };
 //
 URL$1.extractProtocol = extractProtocol;
 URL$1.location = lolcation;
-URL$1.qs = index$9;
+URL$1.qs = querystringify_1;
 
-var index$6 = URL$1;
+var urlParse = URL$1;
 
 //
 //  The MIT License
@@ -2602,16 +2625,17 @@ var request = External.node('request');
 
 function browserRequest(url, options) {
   return new Promise(function (resolve, reject) {
-    var parsed = new index$6(url, true);
+    var parsed = new urlParse(url, true);
     if (options.query) {
       parsed.set('query', Object.assign({}, parsed.query, options.query));
     }
     var request = new XMLHttpRequest();
     request.open('get', parsed.toString(), true);
     if (options.headers) {
-      Object.entries(options.headers).forEach(function (header) {
-        request.setRequestHeader.apply(request, toConsumableArray(header));
-      });
+      var names = Object.keys(options.headers);
+      for (var i = 0; i < names.length; ++i) {
+        request.setRequestHeader.apply(request, toConsumableArray(options.headers[names[i]]));
+      }
     }
     request.responseType = options.type;
     request.addEventListener('loadend', function (event) {
@@ -2886,61 +2910,76 @@ var Semaphore = function () {
 
 var Stride = {
   forEach: function forEach(array, stride, callback) {
-    var values = [];
-    array.forEach(function (value, index) {
+    var values = Array(stride);
+    var strideIndex = 0;
+    for (var index = 0; index < array.length; ++index) {
       var modulo = index % stride;
-      values[modulo] = value;
+      values[modulo] = values[index];
       if (modulo === stride - 1) {
-        callback(values, Math.floor(index / stride));
+        callback(values, strideIndex);
+        strideIndex += stride;
       }
-    });
+    }
   },
   some: function some(array, stride, callback) {
-    var values = [];
-    return array.some(function (value, index) {
+    var values = Array(stride);
+    var strideIndex = 0;
+    for (var index = 0; index < array.length; ++index) {
       var modulo = index % stride;
-      values[modulo] = value;
+      values[modulo] = values[index];
       if (modulo === stride - 1) {
-        return callback(values, Math.floor(index / stride));
+        if (callback(values, strideIndex)) {
+          return true;
+        }
+        strideIndex += stride;
       }
-      return false;
-    });
+    }
+    return false;
   },
   every: function every(array, stride, callback) {
-    var values = [];
-    return array.every(function (value, index) {
+    var values = Array(stride);
+    var strideIndex = 0;
+    for (var index = 0; index < array.length; ++index) {
       var modulo = index % stride;
-      values[modulo] = value;
+      values[modulo] = values[index];
       if (modulo === stride - 1) {
-        return callback(values, Math.floor(index / stride));
+        if (!callback(values, strideIndex)) {
+          return false;
+        }
+        strideIndex += stride;
       }
-      return true;
-    });
+    }
+    return true;
   },
   reduce: function reduce(array, stride, callback, initial) {
-    var values = [];
-    return array.reduce(function (result, value, index) {
+    var result = initial;
+    var values = Array(stride);
+    var strideIndex = 0;
+    for (var index = 0; index < array.length; ++index) {
       var modulo = index % stride;
-      values[modulo] = value;
+      values[modulo] = values[index];
       if (modulo === stride - 1) {
-        return callback(result, values, Math.floor(index / stride));
+        result = callback(result, values, strideIndex);
+        strideIndex += stride;
       }
-      return result;
-    }, initial);
+    }
+    return result;
   },
   transform: function transform(array, stride, callback) {
-    var values = [];
-    array.forEach(function (value, index) {
+    var values = Array(stride);
+    var strideIndex = 0;
+    for (var index = 0; index < array.length; ++index) {
       var modulo = index % stride;
-      values[modulo] = value;
+      values[modulo] = values[index];
       if (modulo === stride - 1) {
-        var transformed = callback(values, Math.floor(index / stride));
+        var transformed = callback(values, strideIndex);
         for (var offset = 0; offset < stride; ++offset) {
           // eslint-disable-next-line no-param-reassign
           array[index - (stride - offset - 1)] = transformed[offset];
         }
+        strideIndex += stride;
       }
-    });
+    }
     return array;
   }
 };
@@ -3123,7 +3162,7 @@ var uuid = v4_1;
 uuid.v1 = v1_1;
 uuid.v4 = v4_1;
 
-var index$11 = uuid;
+var uuid_1 = uuid;
 
 //
 //  The MIT License
@@ -3150,7 +3189,7 @@ var index$11 = uuid;
 //
 
 // Just use uuid v4 for now
-var UUID = index$11.v4;
+var UUID = uuid_1.v4;
 
 //
 //  The MIT License
@@ -3190,7 +3229,7 @@ exports.Namespace = Namespace;
 exports.Request = Request;
 exports.Semaphore = Semaphore;
 exports.Stride = Stride;
-exports.URL = index$6;
+exports.URL = urlParse;
 exports.UUID = UUID;
 
 Object.defineProperty(exports, '__esModule', { value: true });

@@ -24,34 +24,50 @@
 
 export default {
   min(array, transform) {
-    if (typeof transform !== 'function') {
-      return Math.min(...array)
-    }
     let result
-    array.reduce((min, value, index) => {
-      const transformed = transform(value, index)
-      if (min > transformed) {
-        result = value
-        return transformed
+    let min = Number.POSITIVE_INFINITY
+    if (typeof transform !== 'function') {
+      for (let index = 0; index < array.length; ++index) {
+        const item = array[index]
+        if (item < min) {
+          result = item
+          min = item
+        }
       }
-      return min
-    }, Number.POSITIVE_INFINITY)
+      return result
+    }
+    for (let index = 0; index < array.length; ++index) {
+      const item = array[index]
+      const transformed = transform(item, index)
+      if (transformed < min) {
+        result = item
+        min = transformed
+      }
+    }
     return result
   },
 
   max(array, transform) {
-    if (typeof transform !== 'function') {
-      return Math.max(...array)
-    }
     let result
-    array.reduce((max, value, index) => {
-      const transformed = transform(value, index)
-      if (max < transformed) {
-        result = value
-        return transformed
+    let max = Number.NEGATIVE_INFINITY
+    if (typeof transform !== 'function') {
+      for (let index = 0; index < array.length; ++index) {
+        const item = array[index]
+        if (item > max) {
+          result = item
+          max = item
+        }
       }
-      return max
-    }, Number.NEGATIVE_INFINITY)
+      return result
+    }
+    for (let index = 0; index < array.length; ++index) {
+      const item = array[index]
+      const transformed = transform(item, index)
+      if (transformed > max) {
+        result = item
+        max = transformed
+      }
+    }
     return result
   },
 }

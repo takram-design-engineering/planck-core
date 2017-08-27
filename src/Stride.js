@@ -24,65 +24,80 @@
 
 export default {
   forEach(array, stride, callback) {
-    const values = []
-    array.forEach((value, index) => {
+    const values = Array(stride)
+    let strideIndex = 0
+    for (let index = 0; index < array.length; ++index) {
       const modulo = index % stride
-      values[modulo] = value
+      values[modulo] = values[index]
       if (modulo === stride - 1) {
-        callback(values, Math.floor(index / stride))
+        callback(values, strideIndex)
+        strideIndex += stride
       }
-    })
+    }
   },
 
   some(array, stride, callback) {
-    const values = []
-    return array.some((value, index) => {
+    const values = Array(stride)
+    let strideIndex = 0
+    for (let index = 0; index < array.length; ++index) {
       const modulo = index % stride
-      values[modulo] = value
+      values[modulo] = values[index]
       if (modulo === stride - 1) {
-        return callback(values, Math.floor(index / stride))
+        if (callback(values, strideIndex)) {
+          return true
+        }
+        strideIndex += stride
       }
-      return false
-    })
+    }
+    return false
   },
 
   every(array, stride, callback) {
-    const values = []
-    return array.every((value, index) => {
+    const values = Array(stride)
+    let strideIndex = 0
+    for (let index = 0; index < array.length; ++index) {
       const modulo = index % stride
-      values[modulo] = value
+      values[modulo] = values[index]
       if (modulo === stride - 1) {
-        return callback(values, Math.floor(index / stride))
+        if (!callback(values, strideIndex)) {
+          return false
+        }
+        strideIndex += stride
       }
-      return true
-    })
+    }
+    return true
   },
 
   reduce(array, stride, callback, initial) {
-    const values = []
-    return array.reduce((result, value, index) => {
+    let result = initial
+    const values = Array(stride)
+    let strideIndex = 0
+    for (let index = 0; index < array.length; ++index) {
       const modulo = index % stride
-      values[modulo] = value
+      values[modulo] = values[index]
       if (modulo === stride - 1) {
-        return callback(result, values, Math.floor(index / stride))
+        result = callback(result, values, strideIndex)
+        strideIndex += stride
       }
-      return result
-    }, initial)
+    }
+    return result
   },
 
   transform(array, stride, callback) {
-    const values = []
-    array.forEach((value, index) => {
+    const values = Array(stride)
+    let strideIndex = 0
+    for (let index = 0; index < array.length; ++index) {
       const modulo = index % stride
-      values[modulo] = value
+      values[modulo] = values[index]
       if (modulo === stride - 1) {
-        const transformed = callback(values, Math.floor(index / stride))
+        const transformed = callback(values, strideIndex)
         for (let offset = 0; offset < stride; ++offset) {
           // eslint-disable-next-line no-param-reassign
           array[index - (stride - offset - 1)] = transformed[offset]
         }
+        strideIndex += stride
       }
-    })
+    }
     return array
   },
 }
