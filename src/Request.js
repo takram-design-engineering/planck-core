@@ -111,7 +111,7 @@ function performRequest(url, options) {
         if (!(response instanceof Buffer)) {
           throw new Error('Response is unexpectedly not a buffer')
         }
-        return response
+        return response.buffer
       })
     }
     return promise
