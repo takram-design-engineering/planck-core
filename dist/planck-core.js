@@ -2641,9 +2641,16 @@ function browserRequest(url, options) {
     }
     request.responseType = options.type;
     request.addEventListener('loadend', function (event) {
-      if (request.status < 200 || request.status >= 300) {
-        reject(request.status);
-        return;
+      if (!options.local) {
+        if (request.status < 200 || request.status >= 300) {
+          reject(request.status);
+          return;
+        }
+      } else {
+        if (request.status !== 0) {
+          reject(request.status);
+          return;
+        }
       }
       if (request.response === null && options.type === 'json') {
         reject(new Error('Could not parse JSON'));
@@ -2702,12 +2709,7 @@ function performRequest(url, options) {
         if (!(response instanceof Buffer)) {
           throw new Error('Response is unexpectedly not a buffer');
         }
-        var buffer = new ArrayBuffer(response.length);
-        var view = new Uint8Array(buffer);
-        for (var i = 0; i < response.length; ++i) {
-          view[i] = response[i];
-        }
-        return buffer;
+        return response.buffer;
       });
     }
     return promise;
