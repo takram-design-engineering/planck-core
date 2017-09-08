@@ -50,7 +50,12 @@ function browserRequest(url, options) {
     }
     request.responseType = options.type
     request.addEventListener('loadend', event => {
-      if (request.status < 200 || request.status >= 300) {
+      if (!options.local) {
+        if (request.status < 200 || request.status >= 300) {
+          reject(request.status)
+          return
+        }
+      } else if (request.status !== 0) {
         reject(request.status)
         return
       }
