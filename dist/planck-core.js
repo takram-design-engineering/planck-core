@@ -2646,11 +2646,9 @@ function browserRequest(url, options) {
           reject(request.status);
           return;
         }
-      } else {
-        if (request.status !== 0) {
-          reject(request.status);
-          return;
-        }
+      } else if (request.status !== 0) {
+        reject(request.status);
+        return;
       }
       if (request.response === null && options.type === 'json') {
         reject(new Error('Could not parse JSON'));
