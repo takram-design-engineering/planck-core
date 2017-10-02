@@ -111,7 +111,12 @@ function performRequest(url, options) {
         if (!(response instanceof Buffer)) {
           throw new Error('Response is unexpectedly not a buffer')
         }
-        return response.buffer
+        const buffer = new ArrayBuffer(response.length)
+        const view = new Uint8Array(buffer)
+        for (let i = 0; i < response.length; ++i) {
+          view[i] = response[i]
+        }
+        return buffer
       })
     }
     return promise
