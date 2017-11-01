@@ -1,7 +1,7 @@
 {
   "name": "@takram/planck-core",
   "version": "0.2.5",
-  "description": "",
+  "description": "A collection of classes and functions that are used anywhere in Planck framework, while is not precisely it’s core",
   "repository": "takram-design-engineering/planck-core",
   "main": "dist/planck-core.js",
   "browser": "dist/planck-core.js",
