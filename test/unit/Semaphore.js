@@ -28,7 +28,7 @@ import chai from 'chai'
 
 import { Semaphore } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 
 describe('Semaphore', () => {
   it('runs tasks below or equal its capacity', () => {

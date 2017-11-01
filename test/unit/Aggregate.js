@@ -28,7 +28,7 @@ import chai from 'chai'
 
 import { Aggregate } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 
 describe('Aggregate', () => {
   class T {

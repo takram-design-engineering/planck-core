@@ -28,7 +28,7 @@ import chai from 'chai'
 
 import { AssertionError } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 
 describe('AssertionError', () => {
   it('supports instanceof', () => {

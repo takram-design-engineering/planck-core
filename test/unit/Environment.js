@@ -29,7 +29,7 @@ import detectNode from 'detect-node'
 
 import { Environment } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 
 // eslint-disable-next-line func-names
 describe('Environment', function () {

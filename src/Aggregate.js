@@ -39,7 +39,7 @@ export default class Aggregate {
 
   set(target, property, value, receiver) {
     const scope = internal(this)
-    const targets = scope.targets
+    const { targets } = scope
     for (let i = 0; i < targets.length; ++i) {
       targets[i][property] = value
     }
@@ -50,7 +50,7 @@ export default class Aggregate {
 
   get(target, property, receiver) {
     const scope = internal(this)
-    const targets = scope.targets
+    const { targets } = scope
     for (let i = 0; i < targets.length; ++i) {
       if (typeof target[property] !== 'function') {
         return scope.targets[0][property]

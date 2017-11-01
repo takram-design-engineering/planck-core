@@ -28,7 +28,7 @@ import chai from 'chai'
 
 import { Stride } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 
 describe('Stride', () => {
   describe('#forEach', () => {

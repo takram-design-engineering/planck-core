@@ -344,6 +344,7 @@ var AggregateFunction = function () {
     value: function apply(target, bound, args) {
       var scope = internal$1(this);
       var targets = scope.targets;
+
       var result = [];
       for (var i = 0; i < targets.length; ++i) {
         result.push(targets[i].apply(bound, args));
@@ -412,6 +413,7 @@ var Aggregate = function () {
     value: function set$$1(target, property, value, receiver) {
       var scope = internal(this);
       var targets = scope.targets;
+
       for (var i = 0; i < targets.length; ++i) {
         targets[i][property] = value;
       }
@@ -424,6 +426,7 @@ var Aggregate = function () {
     value: function get$$1(target, property, receiver) {
       var scope = internal(this);
       var targets = scope.targets;
+
       for (var i = 0; i < targets.length; ++i) {
         if (typeof target[property] !== 'function') {
           return scope.targets[0][property];
@@ -609,6 +612,7 @@ switch (environmentType) {
     environmentSelf = window;
     break;
   case 'worker':
+    // eslint-disable-next-line no-restricted-globals
     environmentSelf = self;
     break;
   case 'node':
@@ -657,7 +661,12 @@ function branchingImport(arg) {
     id = arg;
     name = arg;
   } else {
-    id = Object.keys(arg)[0];
+    var _Object$keys = Object.keys(arg);
+
+    var _Object$keys2 = slicedToArray(_Object$keys, 1);
+
+    id = _Object$keys2[0];
+
     name = arg[id];
   }
   if (process.browser) {
@@ -749,7 +758,7 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var pathBrowserify = createCommonjsModule(function (module, exports) {
+var index = createCommonjsModule(function (module, exports) {
   // Copyright Joyent, Inc. and other Node contributors.
   //
   // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1006,6 +1015,7 @@ function currentScriptPath() {
         return currentScript && currentScript.src || undefined;
       }
     case 'worker':
+      // eslint-disable-next-line no-restricted-globals
       return self.location.href;
     case 'node':
       return __filename;
@@ -1037,18 +1047,18 @@ if (Environment.type === 'node') {
         paths[_key] = arguments[_key];
       }
 
-      return pathBrowserify.resolve.apply(pathBrowserify, ['/'].concat(paths));
+      return index.resolve.apply(index, ['/'].concat(paths));
     },
 
 
-    normalize: pathBrowserify.normalize,
-    join: pathBrowserify.join,
-    relative: pathBrowserify.relative,
-    dirname: pathBrowserify.dirname,
-    basename: pathBrowserify.basename,
-    extname: pathBrowserify.extname,
-    separator: pathBrowserify.sep,
-    delimiter: pathBrowserify.delimiter
+    normalize: index.normalize,
+    join: index.join,
+    relative: index.relative,
+    dirname: index.dirname,
+    basename: index.basename,
+    extname: index.extname,
+    separator: index.sep,
+    delimiter: index.delimiter
   };
 }
 
@@ -1196,7 +1206,7 @@ var charenc_1 = charenc;
 
 // The _isBuffer check is for Safari 5-7 support, because it's missing
 // Object.prototype.constructor. Remove this eventually
-var isBuffer_1 = function isBuffer_1(obj) {
+var index$1 = function index(obj) {
   return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer);
 };
 
@@ -1213,7 +1223,7 @@ var md5 = createCommonjsModule(function (module) {
   (function () {
     var crypt$$1 = crypt,
         utf8 = charenc_1.utf8,
-        isBuffer = isBuffer_1,
+        isBuffer = index$1,
         bin = charenc_1.bin,
 
 
@@ -1781,14 +1791,14 @@ var stringify$2 = function stringify(value, replacer, space) {
 var parse = parse$1;
 var stringify$1 = stringify$2;
 
-var jsonify = {
+var index$4 = {
 	parse: parse,
 	stringify: stringify$1
 };
 
-var json = typeof JSON !== 'undefined' ? JSON : jsonify;
+var json = typeof JSON !== 'undefined' ? JSON : index$4;
 
-var jsonStableStringify = function jsonStableStringify(obj, opts) {
+var index$3 = function index(obj, opts) {
     if (!opts) opts = {};
     if (typeof opts === 'function') opts = { cmp: opts };
     var space = opts.space || '';
@@ -1896,7 +1906,7 @@ var objectKeys = Object.keys || function (obj) {
 //
 
 function Hash(object) {
-  return md5(jsonStableStringify(object));
+  return md5(index$3(object));
 }
 
 //
@@ -2175,7 +2185,7 @@ var tsvParse = tsv.parse;
  * @api private
  */
 
-var requiresPort = function required(port, protocol) {
+var index$7 = function required(port, protocol) {
   protocol = protocol.split(':')[0];
   port = +port;
 
@@ -2273,7 +2283,7 @@ function querystringify(obj, prefix) {
 var stringify$4 = querystringify;
 var parse$3 = querystring;
 
-var querystringify_1 = {
+var index$9 = {
   stringify: stringify$4,
   parse: parse$3
 };
@@ -2456,7 +2466,7 @@ function URL$1(address, location, parser) {
     location = null;
   }
 
-  if (parser && 'function' !== typeof parser) parser = querystringify_1.parse;
+  if (parser && 'function' !== typeof parser) parser = index$9.parse;
 
   location = lolcation(location);
 
@@ -2525,7 +2535,7 @@ function URL$1(address, location, parser) {
   // for a given protocol. As the host also contains the port number we're going
   // override it with the hostname which contains no port number.
   //
-  if (!requiresPort(url.port, url.protocol)) {
+  if (!index$7(url.port, url.protocol)) {
     url.host = url.hostname;
     url.port = '';
   }
@@ -2567,7 +2577,7 @@ function set$1(part, value, fn) {
   switch (part) {
     case 'query':
       if ('string' === typeof value && value.length) {
-        value = (fn || querystringify_1.parse)(value);
+        value = (fn || index$9.parse)(value);
       }
 
       url[part] = value;
@@ -2576,7 +2586,7 @@ function set$1(part, value, fn) {
     case 'port':
       url[part] = value;
 
-      if (!requiresPort(value, url.protocol)) {
+      if (!index$7(value, url.protocol)) {
         url.host = url.hostname;
         url[part] = '';
       } else if (value) {
@@ -2641,7 +2651,7 @@ function set$1(part, value, fn) {
  * @api public
  */
 function toString(stringify) {
-  if (!stringify || 'function' !== typeof stringify) stringify = querystringify_1.stringify;
+  if (!stringify || 'function' !== typeof stringify) stringify = index$9.stringify;
 
   var query,
       url = this,
@@ -2675,9 +2685,9 @@ URL$1.prototype = { set: set$1, toString: toString };
 //
 URL$1.extractProtocol = extractProtocol;
 URL$1.location = lolcation;
-URL$1.qs = querystringify_1;
+URL$1.qs = index$9;
 
-var urlParse = URL$1;
+var index$6 = URL$1;
 
 //
 //  The MIT License
@@ -2736,7 +2746,7 @@ var internal$2 = Namespace('Request');
 
 function browserRequest(url, options) {
   return new Promise(function (resolve, reject) {
-    var parsed = new urlParse(url, true);
+    var parsed = new index$6(url, true);
     if (options.query) {
       parsed.set('query', Object.assign({}, parsed.query, options.query));
     }
@@ -2833,8 +2843,7 @@ function parseArguments() {
       options = args[1];
 
   if (typeof url !== 'string') {
-    options = url;
-    url = options.url;
+    options = url;url = options.url.url;
   }
   if (typeof url !== 'string') {
     throw new Error('The first argument or options.url must be a string');
@@ -3282,7 +3291,7 @@ var uuid = v4_1;
 uuid.v1 = v1_1;
 uuid.v4 = v4_1;
 
-var uuid_1 = uuid;
+var index$11 = uuid;
 
 //
 //  The MIT License
@@ -3309,7 +3318,7 @@ var uuid_1 = uuid;
 //
 
 // Just use uuid v4 for now
-var UUID = uuid_1.v4;
+var UUID = index$11.v4;
 
 //
 //  The MIT License
@@ -3349,7 +3358,7 @@ exports.Namespace = Namespace;
 exports.Request = Request;
 exports.Semaphore = Semaphore;
 exports.Stride = Stride;
-exports.URL = urlParse;
+exports.URL = index$6;
 exports.UUID = UUID;
 
 Object.defineProperty(exports, '__esModule', { value: true });

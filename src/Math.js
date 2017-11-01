@@ -36,9 +36,9 @@ function map(value, min1, max1, min2, max2) {
 
 function wrap(value, min, max) {
   if (value < min) {
-    return max - (min - value) % (max - min)
+    return max - ((min - value) % (max - min))
   }
-  return min + (value - min) % (max - min)
+  return min + ((value - min) % (max - min))
 }
 
 // GLSL functions

@@ -28,7 +28,7 @@ import chai from 'chai'
 
 import { Hash } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 
 describe('Hash', () => {
   it('generates a stable hash for objects', () => {
