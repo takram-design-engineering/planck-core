@@ -34,7 +34,7 @@ function branchingImport(arg) {
     id = arg
     name = arg
   } else {
-    id = Object.keys(arg)[0]
+    [id] = Object.keys(arg)
     name = arg[id]
   }
   if (process.browser) {

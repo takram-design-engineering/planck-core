@@ -37,6 +37,7 @@ function currentScriptPath() {
       return (currentScript && currentScript.src) || undefined
     }
     case 'worker':
+      // eslint-disable-next-line no-restricted-globals
       return self.location.href
     case 'node':
       return __filename

@@ -47,14 +47,14 @@ function subarray(array, start, end) {
 export default {
   forEach(array, stride, callback) {
     const func = isTypedArray(array) ? subarray : slice
-    const end = array.length - array.length % stride
+    const end = array.length - (array.length % stride)
     for (let start = 0, index = 0; start < end; start += stride, ++index) {
       callback(func(array, start, start + stride), index)
     }
   },
 
   some(array, stride, callback) {
-    const end = array.length - array.length % stride
+    const end = array.length - (array.length % stride)
     const func = isTypedArray(array) ? subarray : slice
     for (let start = 0, index = 0; start < end; start += stride, ++index) {
       if (callback(func(array, start, start + stride), index)) {
@@ -65,7 +65,7 @@ export default {
   },
 
   every(array, stride, callback) {
-    const end = array.length - array.length % stride
+    const end = array.length - (array.length % stride)
     const func = isTypedArray(array) ? subarray : slice
     for (let start = 0, index = 0; start < end; start += stride, ++index) {
       if (!callback(func(array, start, start + stride), index)) {
@@ -77,7 +77,7 @@ export default {
 
   reduce(array, stride, callback, initial) {
     let result = initial
-    const end = array.length - array.length % stride
+    const end = array.length - (array.length % stride)
     const func = isTypedArray(array) ? subarray : slice
     for (let start = 0, index = 0; start < end; start += stride, ++index) {
       result = callback(result, func(array, start, start + stride), index)
@@ -86,7 +86,7 @@ export default {
   },
 
   set(array, stride, item) {
-    const end = array.length - array.length % stride
+    const end = array.length - (array.length % stride)
     if (isTypedArray(array)) {
       for (let start = 0; start < end; start += stride) {
         array.set(item, start)
@@ -103,7 +103,7 @@ export default {
   },
 
   transform(array, stride, callback) {
-    const end = array.length - array.length % stride
+    const end = array.length - (array.length % stride)
     if (isTypedArray(array)) {
       for (let start = 0, index = 0; start < end; start += stride, ++index) {
         const item = callback(array.slice(start, start + stride), index)

@@ -31,7 +31,7 @@ import nock from 'nock'
 
 import { Environment, Request } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 chai.use(chaiAsPromised)
 
 // eslint-disable-next-line func-names
@@ -120,7 +120,7 @@ describe('Request', function () {
       const expected = new Float32Array([1, 2, 3, 4]).buffer
 
       if (Environment.type === 'node') {
-        const buffer = new Buffer(expected.byteLength)
+        const buffer = Buffer.alloc(expected.byteLength)
         const view = new Uint8Array(expected)
         for (let i = 0; i < buffer.length; ++i) {
           buffer[i] = view[i]

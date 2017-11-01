@@ -28,7 +28,7 @@ import chai from 'chai'
 
 import { Array } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 
 describe('Array', () => {
   describe('#min', () => {

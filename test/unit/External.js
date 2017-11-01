@@ -28,7 +28,7 @@ import chai from 'chai'
 
 import { Environment, External } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 
 Environment.self.d3 = {}
 

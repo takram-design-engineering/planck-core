@@ -30,8 +30,8 @@ import { Environment, External, FilePath, URL } from '../..'
 
 const path = External.node('path')
 
-const expect = chai.expect
-const current = FilePath.current
+const { expect } = chai
+const { current } = FilePath
 
 describe('FilePath', () => {
   describe('#self', () => {

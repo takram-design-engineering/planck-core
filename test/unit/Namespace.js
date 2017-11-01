@@ -30,7 +30,7 @@ import sinonChai from 'sinon-chai'
 
 import { Namespace } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 chai.use(sinonChai)
 
 describe('Namespace', () => {

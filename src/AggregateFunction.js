@@ -38,7 +38,7 @@ export default class AggregateFunction {
 
   apply(target, bound, args) {
     const scope = internal(this)
-    const targets = scope.targets
+    const { targets } = scope
     const result = []
     for (let i = 0; i < targets.length; ++i) {
       result.push(targets[i].apply(bound, args))

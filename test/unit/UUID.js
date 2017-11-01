@@ -28,7 +28,7 @@ import chai from 'chai'
 
 import { UUID } from '../..'
 
-const expect = chai.expect
+const { expect } = chai
 
 describe('UUID', () => {
   it('generates universally unique identifier', () => {
