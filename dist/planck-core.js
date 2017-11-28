@@ -55,118 +55,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
 
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
 
 
 
@@ -979,6 +868,17 @@ var index = createCommonjsModule(function (module, exports) {
     return str.substr(start, len);
   };
 });
+
+var index_1 = index.resolve;
+var index_2 = index.normalize;
+var index_3 = index.isAbsolute;
+var index_4 = index.join;
+var index_5 = index.relative;
+var index_6 = index.sep;
+var index_7 = index.delimiter;
+var index_8 = index.dirname;
+var index_9 = index.basename;
+var index_10 = index.extname;
 
 //
 //  The MIT License
@@ -2075,7 +1975,7 @@ var dsv = function (delimiter) {
       if (convert) return convert(row, i - 1);
       columns = row, convert = f ? customConverter(row, f) : objectConverter(row);
     });
-    rows.columns = columns;
+    rows.columns = columns || [];
     return rows;
   }
 
@@ -2173,8 +2073,6 @@ var tsv = dsv("\t");
 
 var tsvParse = tsv.parse;
 
-'use strict';
-
 /**
  * Check if we're required to add a port number.
  *
@@ -2212,8 +2110,6 @@ var index$7 = function required(port, protocol) {
 
   return port !== 0;
 };
-
-'use strict';
 
 var has = Object.prototype.hasOwnProperty;
 
@@ -2287,8 +2183,6 @@ var index$9 = {
   stringify: stringify$4,
   parse: parse$3
 };
-
-'use strict';
 
 var protocolre = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i;
 var slashes = /^[A-Za-z][A-Za-z0-9+-.]*:\/\//;
@@ -2622,8 +2516,13 @@ function set$1(part, value, fn) {
       break;
 
     case 'pathname':
-      url.pathname = value.length && value.charAt(0) !== '/' ? '/' + value : value;
-
+    case 'hash':
+      if (value) {
+        var char = part === 'pathname' ? '/' : '#';
+        url[part] = value.charAt(0) !== char ? char + value : value;
+      } else {
+        url[part] = value;
+      }
       break;
 
     default:
@@ -2742,52 +2641,72 @@ var readFile = _External$node.readFile;
 
 var request = External.node('request');
 
-var internal$2 = Namespace('Request');
+
 
 function browserRequest(url, options) {
-  return new Promise(function (resolve, reject) {
-    var parsed = new index$6(url, true);
-    if (options.query) {
-      parsed.set('query', Object.assign({}, parsed.query, options.query));
+  var resolve = void 0;
+  var reject = void 0;
+  var promise = new Promise(function () {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
     }
-    var request = new XMLHttpRequest();
-    request.open('get', parsed.toString(), true);
-    if (options.headers) {
-      var names = Object.keys(options.headers);
-      for (var i = 0; i < names.length; ++i) {
-        request.setRequestHeader.apply(request, toConsumableArray(options.headers[names[i]]));
-      }
-    }
-    request.responseType = options.type;
-    request.addEventListener('loadend', function (event) {
-      if (request.status < 200 || request.status >= 300) {
-        reject(request.status);
-        return;
-      }
-      if (request.response === null && options.type === 'json') {
-        reject(new Error('Could not parse JSON'));
-        return;
-      }
-      resolve(request.response);
-    }, false);
-    request.send();
+
+    resolve = args[0];
+    reject = args[1];
   });
+  var parsed = new index$6(url, true);
+  if (options.query) {
+    parsed.set('query', Object.assign({}, parsed.query, options.query));
+  }
+  var request = new XMLHttpRequest();
+  request.open('get', parsed.toString(), true);
+  if (options.headers) {
+    var names = Object.keys(options.headers);
+    for (var i = 0; i < names.length; ++i) {
+      request.setRequestHeader.apply(request, toConsumableArray(options.headers[names[i]]));
+    }
+  }
+  request.responseType = options.type;
+  request.addEventListener('loadend', function (event) {
+    if (request.status < 200 || request.status >= 300) {
+      reject(request.status);
+      return;
+    }
+    if (request.response === null && options.type === 'json') {
+      reject(new Error('Could not parse JSON'));
+      return;
+    }
+    resolve(request.response);
+  }, false);
+  request.send();
+  promise.abort = function () {
+    request.abort();
+  };
+  return promise;
 }
 
 function nodeRequest(url, options) {
+  var resolve = void 0;
+  var reject = void 0;
+  var promise = new Promise(function () {
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    resolve = args[0];
+    reject = args[1];
+  });
   if (options.local) {
-    return new Promise(function (resolve, reject) {
-      readFile(url, options.encoding, function (error, response) {
-        if (error) {
-          reject(error);
-          return;
-        }
-        resolve(response);
-      });
+    readFile(url, options.encoding, function (error, response) {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(response);
     });
-  }
-  return new Promise(function (resolve, reject) {
-    request({
+    promise.abort = function () {}; // TODO: Support abortion
+  } else {
+    var stream = request({
       url: url,
       headers: options.headers || {},
       qs: options.query || {},
@@ -2802,22 +2721,33 @@ function nodeRequest(url, options) {
       }
       resolve(response.body);
     });
-  });
+    stream.on('abort', function () {
+      reject(0);
+    });
+    promise.abort = function () {
+      stream.abort();
+    };
+  }
+  return promise;
 }
 
 function performRequest(url, options) {
   if (Environment.type === 'node') {
-    var promise = nodeRequest(url, options);
+    var _request = nodeRequest(url, options);
     if (options.type === 'json') {
-      return promise.then(function (response) {
+      var promise = _request.then(function (response) {
         if (typeof response !== 'string') {
           throw new Error('Response is unexpectedly not a string');
         }
         return JSON.parse(response);
       });
+      promise.abort = function () {
+        _request.abort();
+      };
+      return promise;
     }
     if (options.type === 'arraybuffer') {
-      return promise.then(function (response) {
+      var _promise = _request.then(function (response) {
         if (!(response instanceof Buffer)) {
           throw new Error('Response is unexpectedly not a buffer');
         }
@@ -2828,15 +2758,19 @@ function performRequest(url, options) {
         }
         return buffer;
       });
+      _promise.abort = function () {
+        _request.abort();
+      };
+      return _promise;
     }
-    return promise;
+    return _request;
   }
   return browserRequest(url, options);
 }
 
 function parseArguments() {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
+  for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+    args[_key3] = arguments[_key3];
   }
 
   var url = args[0],
@@ -2891,9 +2825,14 @@ var Request = {
         url = _parseArguments8[0],
         options = _parseArguments8[1];
 
-    return this.text(url, options).then(function (response) {
+    var request = this.text(url, options);
+    var promise = request.then(function (response) {
       return csvParse(response, options.row);
     });
+    promise.abort = function () {
+      request.abort();
+    };
+    return promise;
   },
   tsv: function tsv() {
     var _parseArguments9 = parseArguments.apply(undefined, arguments),
@@ -2901,9 +2840,14 @@ var Request = {
         url = _parseArguments10[0],
         options = _parseArguments10[1];
 
-    return this.text(url, options).then(function (response) {
+    var request = this.text(url, options);
+    var promise = request.then(function (response) {
       return tsvParse(response, options.row);
     });
+    promise.abort = function () {
+      request.abort();
+    };
+    return promise;
   }
 };
 

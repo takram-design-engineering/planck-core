@@ -36,19 +36,6 @@ const saucelabs = new Saucelabs({
   password: process.env.SAUCE_ACCESS_KEY,
 })
 
-let interrupted = false
-process.stdin.setRawMode(true)
-process.stdin.resume()
-process.stdin.on('data', data => {
-  if (data.toString() === 'q') {
-    if (interrupted) {
-      process.exit(1)
-    }
-    interrupted = true
-    console.log('Interrupted')
-  }
-})
-
 function startServer(port) {
   return new Promise((resolve, reject) => {
     const app = express()
@@ -97,7 +84,7 @@ function startTests(data) {
   })
 }
 
-function updateTestsStatus(tests) {
+function updateTestStatus(tests) {
   return new Promise((resolve, reject) => {
     saucelabs.send({
       method: 'POST',
@@ -178,9 +165,9 @@ describe('', function () {
   // Wait for all of the tests to finish
   before(done => {
     const poll = async () => {
-      tests = await updateTestsStatus(tests)
+      tests = await updateTestStatus(tests)
       const completed = tests.every(test => test.completed)
-      if (completed || interrupted) {
+      if (completed) {
         done()
       } else {
         setTimeout(() => poll(), 5000)
@@ -196,11 +183,11 @@ describe('', function () {
           return test.platform.every((part, index) => part === platform[index])
         })
         if (!test) {
-          done(new Error('could not retrieve test result'))
+          done(new Error('Could not retrieve test result'))
         } else if (!test.result) {
-          done(new Error('error before or while testing'))
+          done(new Error('Error before or while testing'))
         } else if (test.result.failures !== 0) {
-          done(new Error(test.result.failures, 'test failures'))
+          done(new Error(test.result.failures, 'tests failed'))
         } else {
           done()
         }
@@ -212,7 +199,7 @@ describe('', function () {
   after(done => {
     tests = tests.filter(test => !test.completed)
     const poll = async () => {
-      tests = await updateTestsStatus(tests)
+      tests = await updateTestStatus(tests)
       tests = tests.filter(test => !test.completed)
       tests = await stopTests(tests)
       if (tests.length === 0) {
@@ -224,15 +211,13 @@ describe('', function () {
     poll()
   })
 
-  after(() => {
+  after(done => {
     if (tunnel) {
       tunnel.close()
     }
     if (server) {
       server.close()
     }
-    if (interrupted) {
-      process.exit(1)
-    }
+    process.exit(0)
   })
 })
