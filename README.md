@@ -256,6 +256,9 @@ Request.**tsv**(*url* [, *options*])<br>
 <a id="request-tsv-2" href="#request-tsv-2">#</a>
 Request.**tsv**(*options*)
 
+<a id="request-abort" href="#request-abort">#</a>
+*request*.**abort**()
+
 ### Semaphore
 
 <a id="new-semaphore" href="#new-semaphore">#</a>
