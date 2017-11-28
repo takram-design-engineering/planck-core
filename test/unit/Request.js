@@ -70,6 +70,21 @@ describe('Request', function () {
           expect(error).equal(404)
         })
     })
+
+    it('rejects with 0 status code when aborted', () => {
+      const path = '/test/unit/data/text'
+      const expected = 'response'
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(200, expected)
+      }
+      const request = Request.text(`${host}${path}`)
+      request.abort()
+      return expect(request).rejected.then(error => {
+        expect(error).equal(0)
+      })
+    })
   })
 
   describe('#json', () => {
@@ -111,6 +126,21 @@ describe('Request', function () {
         .then(error => {
           expect(error).equal(404)
         })
+    })
+
+    it('rejects with 0 status code when aborted', () => {
+      const path = '/test/unit/data/json'
+      const expected = { a: 1, b: 'c' }
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(200, JSON.stringify(expected))
+      }
+      const request = Request.json(`${host}${path}`)
+      request.abort()
+      return expect(request).rejected.then(error => {
+        expect(error).equal(0)
+      })
     })
   })
 
@@ -154,6 +184,28 @@ describe('Request', function () {
           expect(error).equal(404)
         })
     })
+
+    it('rejects with 0 status code when aborted', () => {
+      const path = '/test/unit/data/buffer'
+      const expected = new Float32Array([1, 2, 3, 4]).buffer
+
+      if (Environment.type === 'node') {
+        const buffer = Buffer.alloc(expected.byteLength)
+        const view = new Uint8Array(expected)
+        for (let i = 0; i < buffer.length; ++i) {
+          buffer[i] = view[i]
+        }
+
+        nock(host)
+          .get(path)
+          .reply(200, buffer)
+      }
+      const request = Request.buffer(`${host}${path}`)
+      request.abort()
+      return expect(request).rejected.then(error => {
+        expect(error).equal(0)
+      })
+    })
   })
 
   describe('#csv', () => {
@@ -184,6 +236,21 @@ describe('Request', function () {
           expect(error).equal(404)
         })
     })
+
+    it('rejects with 0 status code when aborted', () => {
+      const path = '/test/unit/data/csv'
+      const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(200, d3.csvFormat(expected))
+      }
+      const request = Request.csv(`${host}${path}`)
+      request.abort()
+      return expect(request).rejected.then(error => {
+        expect(error).equal(0)
+      })
+    })
   })
 
   describe('#tsv', () => {
@@ -213,6 +280,21 @@ describe('Request', function () {
         .then(error => {
           expect(error).equal(404)
         })
+    })
+
+    it('rejects with 0 status code when aborted', () => {
+      const path = '/test/unit/data/tsv'
+      const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
+      if (Environment.type === 'node') {
+        nock(host)
+          .get(path)
+          .reply(200, d3.tsvFormat(expected))
+      }
+      const request = Request.tsv(`${host}${path}`)
+      request.abort()
+      return expect(request).rejected.then(error => {
+        expect(error).equal(0)
+      })
     })
   })
 })

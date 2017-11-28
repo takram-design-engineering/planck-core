@@ -35,49 +35,59 @@ const request = External.node('request')
 export const internal = Namespace('Request')
 
 function browserRequest(url, options) {
-  return new Promise((resolve, reject) => {
-    const parsed = new URL(url, true)
-    if (options.query) {
-      parsed.set('query', Object.assign({}, parsed.query, options.query))
-    }
-    const request = new XMLHttpRequest()
-    request.open('get', parsed.toString(), true)
-    if (options.headers) {
-      const names = Object.keys(options.headers)
-      for (let i = 0; i < names.length; ++i) {
-        request.setRequestHeader(...options.headers[names[i]])
-      }
-    }
-    request.responseType = options.type
-    request.addEventListener('loadend', event => {
-      if (request.status < 200 || request.status >= 300) {
-        reject(request.status)
-        return
-      }
-      if (request.response === null && options.type === 'json') {
-        reject(new Error('Could not parse JSON'))
-        return
-      }
-      resolve(request.response)
-    }, false)
-    request.send()
+  let resolve
+  let reject
+  const promise = new Promise((...args) => {
+    [resolve, reject] = args
   })
+  const parsed = new URL(url, true)
+  if (options.query) {
+    parsed.set('query', Object.assign({}, parsed.query, options.query))
+  }
+  const request = new XMLHttpRequest()
+  request.open('get', parsed.toString(), true)
+  if (options.headers) {
+    const names = Object.keys(options.headers)
+    for (let i = 0; i < names.length; ++i) {
+      request.setRequestHeader(...options.headers[names[i]])
+    }
+  }
+  request.responseType = options.type
+  request.addEventListener('loadend', event => {
+    if (request.status < 200 || request.status >= 300) {
+      reject(request.status)
+      return
+    }
+    if (request.response === null && options.type === 'json') {
+      reject(new Error('Could not parse JSON'))
+      return
+    }
+    resolve(request.response)
+  }, false)
+  request.send()
+  promise.abort = () => {
+    request.abort()
+  }
+  return promise
 }
 
 function nodeRequest(url, options) {
+  let resolve
+  let reject
+  const promise = new Promise((...args) => {
+    [resolve, reject] = args
+  })
   if (options.local) {
-    return new Promise((resolve, reject) => {
-      readFile(url, options.encoding, (error, response) => {
-        if (error) {
-          reject(error)
-          return
-        }
-        resolve(response)
-      })
+    readFile(url, options.encoding, (error, response) => {
+      if (error) {
+        reject(error)
+        return
+      }
+      resolve(response)
     })
-  }
-  return new Promise((resolve, reject) => {
-    request({
+    promise.abort = () => {} // TODO: Support abortion
+  } else {
+    const stream = request({
       url,
       headers: options.headers || {},
       qs: options.query || {},
@@ -92,22 +102,33 @@ function nodeRequest(url, options) {
       }
       resolve(response.body)
     })
-  })
+    stream.on('abort', () => {
+      reject(0)
+    })
+    promise.abort = () => {
+      stream.abort()
+    }
+  }
+  return promise
 }
 
 function performRequest(url, options) {
   if (Environment.type === 'node') {
-    const promise = nodeRequest(url, options)
+    const request = nodeRequest(url, options)
     if (options.type === 'json') {
-      return promise.then(response => {
+      const promise = request.then(response => {
         if (typeof response !== 'string') {
           throw new Error('Response is unexpectedly not a string')
         }
         return JSON.parse(response)
       })
+      promise.abort = () => {
+        request.abort()
+      }
+      return promise
     }
     if (options.type === 'arraybuffer') {
-      return promise.then(response => {
+      const promise = request.then(response => {
         if (!(response instanceof Buffer)) {
           throw new Error('Response is unexpectedly not a buffer')
         }
@@ -118,8 +139,12 @@ function performRequest(url, options) {
         }
         return buffer
       })
+      promise.abort = () => {
+        request.abort()
+      }
+      return promise
     }
-    return promise
+    return request
   }
   return browserRequest(url, options)
 }
@@ -163,15 +188,25 @@ export default {
 
   csv(...args) {
     const [url, options] = parseArguments(...args)
-    return this.text(url, options).then(response => {
+    const request = this.text(url, options)
+    const promise = request.then(response => {
       return csvParse(response, options.row)
     })
+    promise.abort = () => {
+      request.abort()
+    }
+    return promise
   },
 
   tsv(...args) {
     const [url, options] = parseArguments(...args)
-    return this.text(url, options).then(response => {
+    const request = this.text(url, options)
+    const promise = request.then(response => {
       return tsvParse(response, options.row)
     })
+    promise.abort = () => {
+      request.abort()
+    }
+    return promise
   },
 }
