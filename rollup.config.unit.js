@@ -66,10 +66,8 @@ export default {
     'nock': 'nock',
     'sinon': 'sinon',
   },
-  output: [
-    {
-      format: 'iife',
-      file: './dist/test/unit/rollup.js',
-    },
-  ],
+  output: {
+    format: 'iife',
+    file: './dist/test/unit/rollup.js',
+  },
 }
