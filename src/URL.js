@@ -22,7 +22,5 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import URL from 'url-parse'
-
 // Just use url-parse for now
-export default URL
+export { default as default } from 'url-parse'
