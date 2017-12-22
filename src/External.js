@@ -24,7 +24,7 @@
 
 import Environment from './Environment'
 
-function branchingImport(arg) {
+function performBranchingImport(arg) {
   // Assuming `process.browser` is defined via DefinePlugin on webpack, this
   // conditional will be determined at transpilation time, and `else` block will
   // be completely removed in order to prevent webpack from bundling module.
@@ -52,31 +52,31 @@ function branchingImport(arg) {
   }
 }
 
-function runtimeImport(id) {
+function performRuntimeImport(id) {
   // This will throw error on browser, in which `process` is typically not
   // defined in the global scope. Re-importing after defining `process.browser`
-  // in the global scope will evaluate the conditional in `branchingImport` for
-  // rollup's bundles.
+  // in the global scope will evaluate the conditional in
+  // `performBranchingImport` for rollup's bundles.
   try {
-    return branchingImport(id)
+    return performBranchingImport(id)
   } catch (e) {
     Environment.self.process = {
       browser: Environment.type !== 'node',
     }
   }
-  return branchingImport(id)
+  return performBranchingImport(id)
 }
 
-function importOptional(id) {
-  const module = runtimeImport(id)
+export function importOptional(id) {
+  const module = performRuntimeImport(id)
   if (module === undefined) {
     return {}
   }
   return module
 }
 
-function importRequired(id) {
-  const module = runtimeImport(id)
+export function importRequired(id) {
+  const module = performRuntimeImport(id)
   if (module === undefined) {
     if (Environment.type === 'node') {
       throw new Error(`Could not resolve module "${id}"`)
@@ -87,8 +87,8 @@ function importRequired(id) {
   return module
 }
 
-function importNode(id) {
-  const module = runtimeImport(id)
+export function importNode(id) {
+  const module = performRuntimeImport(id)
   if (module === undefined) {
     if (Environment.type === 'node') {
       throw new Error(`Could not resolve module "${id}"`)
@@ -98,8 +98,8 @@ function importNode(id) {
   return module
 }
 
-function importBrowser(id) {
-  const module = runtimeImport(id)
+export function importBrowser(id) {
+  const module = performRuntimeImport(id)
   if (module === undefined) {
     if (Environment.type !== 'node') {
       throw new Error(`"${id}" isn’t defined in the global scope`)
@@ -109,9 +109,11 @@ function importBrowser(id) {
   return module
 }
 
-export default {
+Object.assign(performRuntimeImport, {
   optional: importOptional,
   required: importRequired,
-  browser: importBrowser,
   node: importNode,
-}
+  browser: importBrowser,
+})
+
+export default performRuntimeImport

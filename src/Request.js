@@ -166,47 +166,55 @@ function parseArguments(...args) {
   return [url, options]
 }
 
-export default {
-  text(...args) {
-    const [url, options] = parseArguments(...args)
-    options.type = 'text'
-    return performRequest(url, options)
-  },
-
-  json(...args) {
-    const [url, options] = parseArguments(...args)
-    options.type = 'json'
-    return performRequest(url, options)
-  },
-
-  buffer(...args) {
-    const [url, options] = parseArguments(...args)
-    options.type = 'arraybuffer'
-    options.encoding = null
-    return performRequest(url, options)
-  },
-
-  csv(...args) {
-    const [url, options] = parseArguments(...args)
-    const request = this.text(url, options)
-    const promise = request.then(response => {
-      return csvParse(response, options.row)
-    })
-    promise.abort = () => {
-      request.abort()
-    }
-    return promise
-  },
-
-  tsv(...args) {
-    const [url, options] = parseArguments(...args)
-    const request = this.text(url, options)
-    const promise = request.then(response => {
-      return tsvParse(response, options.row)
-    })
-    promise.abort = () => {
-      request.abort()
-    }
-    return promise
-  },
+export function requestText(...args) {
+  const [url, options] = parseArguments(...args)
+  options.type = 'text'
+  return performRequest(url, options)
 }
+
+export function requestJSON(...args) {
+  const [url, options] = parseArguments(...args)
+  options.type = 'json'
+  return performRequest(url, options)
+}
+
+export function requestBuffer(...args) {
+  const [url, options] = parseArguments(...args)
+  options.type = 'arraybuffer'
+  options.encoding = null
+  return performRequest(url, options)
+}
+
+export function requestCSV(...args) {
+  const [url, options] = parseArguments(...args)
+  const request = this.text(url, options)
+  const promise = request.then(response => {
+    return csvParse(response, options.row)
+  })
+  promise.abort = () => {
+    request.abort()
+  }
+  return promise
+}
+
+export function requestTSV(...args) {
+  const [url, options] = parseArguments(...args)
+  const request = this.text(url, options)
+  const promise = request.then(response => {
+    return tsvParse(response, options.row)
+  })
+  promise.abort = () => {
+    request.abort()
+  }
+  return promise
+}
+
+Object.assign(performRequest, {
+  text: requestText,
+  json: requestJSON,
+  buffer: requestBuffer,
+  csv: requestCSV,
+  tsv: requestTSV,
+})
+
+export default performRequest
