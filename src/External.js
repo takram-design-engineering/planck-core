@@ -22,11 +22,7 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import {
-  isBrowser,
-  isWorker,
-  isNode,
-} from './Environment'
+import { globalScope, isNode } from './Environment'
 
 function branchingImport(arg) {
   // Assuming `process.browser` is defined via DefinePlugin on webpack, this
@@ -42,7 +38,7 @@ function branchingImport(arg) {
     name = arg[id]
   }
   if (process.browser) {
-    return Environment.self[name]
+    return globalScope[name]
   // eslint-disable-next-line no-else-return
   } else {
     if (!isNode) {
@@ -64,7 +60,7 @@ function runtimeImport(id) {
   try {
     return branchingImport(id)
   } catch (e) {
-    Environment.self.process = {
+    globalScope.process = {
       browser: !isNode,
     }
   }
