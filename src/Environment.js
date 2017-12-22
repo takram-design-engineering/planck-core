@@ -61,6 +61,7 @@ export const globalScope = (() => {
   } else if (isNode) {
     return global
   }
+  return undefined
 })()
 
 export default {
