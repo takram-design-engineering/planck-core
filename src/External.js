@@ -22,9 +22,13 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import Environment from './Environment'
+import {
+  isBrowser,
+  isWorker,
+  isNode,
+} from './Environment'
 
-function performBranchingImport(arg) {
+function branchingImport(arg) {
   // Assuming `process.browser` is defined via DefinePlugin on webpack, this
   // conditional will be determined at transpilation time, and `else` block will
   // be completely removed in order to prevent webpack from bundling module.
@@ -41,7 +45,7 @@ function performBranchingImport(arg) {
     return Environment.self[name]
   // eslint-disable-next-line no-else-return
   } else {
-    if (Environment.type !== 'node') {
+    if (!isNode) {
       return undefined
     }
     try {
@@ -52,23 +56,23 @@ function performBranchingImport(arg) {
   }
 }
 
-function performRuntimeImport(id) {
+function runtimeImport(id) {
   // This will throw error on browser, in which `process` is typically not
   // defined in the global scope. Re-importing after defining `process.browser`
   // in the global scope will evaluate the conditional in
-  // `performBranchingImport` for rollup's bundles.
+  // `branchingImport` for rollup's bundles.
   try {
-    return performBranchingImport(id)
+    return branchingImport(id)
   } catch (e) {
     Environment.self.process = {
-      browser: Environment.type !== 'node',
+      browser: !isNode,
     }
   }
-  return performBranchingImport(id)
+  return branchingImport(id)
 }
 
 export function importOptional(id) {
-  const module = performRuntimeImport(id)
+  const module = runtimeImport(id)
   if (module === undefined) {
     return {}
   }
@@ -76,9 +80,9 @@ export function importOptional(id) {
 }
 
 export function importRequired(id) {
-  const module = performRuntimeImport(id)
+  const module = runtimeImport(id)
   if (module === undefined) {
-    if (Environment.type === 'node') {
+    if (isNode) {
       throw new Error(`Could not resolve module "${id}"`)
     } else {
       throw new Error(`"${id}" isn’t defined in the global scope`)
@@ -88,9 +92,9 @@ export function importRequired(id) {
 }
 
 export function importNode(id) {
-  const module = performRuntimeImport(id)
+  const module = runtimeImport(id)
   if (module === undefined) {
-    if (Environment.type === 'node') {
+    if (isNode) {
       throw new Error(`Could not resolve module "${id}"`)
     }
     return {}
@@ -99,9 +103,9 @@ export function importNode(id) {
 }
 
 export function importBrowser(id) {
-  const module = performRuntimeImport(id)
+  const module = runtimeImport(id)
   if (module === undefined) {
-    if (Environment.type !== 'node') {
+    if (!isNode) {
       throw new Error(`"${id}" isn’t defined in the global scope`)
     }
     return {}
@@ -109,11 +113,11 @@ export function importBrowser(id) {
   return module
 }
 
-Object.assign(performRuntimeImport, {
+Object.assign(runtimeImport, {
   optional: importOptional,
   required: importRequired,
   node: importNode,
   browser: importBrowser,
 })
 
-export default performRuntimeImport
+export default runtimeImport
