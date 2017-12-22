@@ -126,5 +126,5 @@ export default {
   every,
   reduce,
   set,
-  Ztransform,
+  transform,
 }
