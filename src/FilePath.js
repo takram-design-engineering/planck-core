@@ -24,78 +24,62 @@
 
 import browserPath from 'path-browserify'
 
-import Environment from './Environment'
-import External from './External'
+import { isBrowser, isWorker, isNode } from './Environment'
+import { importNode } from './External'
 
-const nodePath = External.node('path')
+const nodePath = importNode('path')
 
-export function currentScriptPath() {
-  switch (Environment.type) {
-    case 'browser': {
-      // eslint-disable-next-line no-underscore-dangle
-      const currentScript = document.currentScript || document._currentScript
-      return (currentScript && currentScript.src) || undefined
-    }
-    case 'worker':
-      // eslint-disable-next-line no-restricted-globals
-      return self.location.href
-    case 'node':
-      return __filename
-    default:
-      break
+export function currentFilePath() {
+  if (isBrowser) {
+    // eslint-disable-next-line no-underscore-dangle
+    const currentScript = document.currentScript || document._currentScript
+    return (currentScript && currentScript.src) || undefined
+  }
+  if (isWorker) {
+    // eslint-disable-next-line no-restricted-globals
+    return self.location.href
+  }
+  if (isNode) {
+    return __filename
   }
   return undefined
 }
 
-let resolve
-let normalize
-let join
-let relative
-let dirname
-let basename
-let extname
-let delimiter
-let separator
+export const resolve = (() => {
+  return isNode ? nodePath.resolve : browserPath.resolve
+})()
 
-if (Environment.type === 'node') {
-  ({
-    resolve,
-    normalize,
-    join,
-    relative,
-    dirname,
-    basename,
-    extname,
-    delimiter,
-    sep: separator,
-  } = nodePath)
-} else {
-  resolve = function resolve(...paths) {
-    return browserPath.resolve('/', ...paths)
-  }
-  ({
-    normalize,
-    join,
-    relative,
-    dirname,
-    basename,
-    extname,
-    delimiter,
-    sep: separator,
-  } = browserPath)
-}
+export const normalize = (() => {
+  return isNode ? nodePath.normalize : browserPath.normalize
+})()
 
-export {
-  resolve,
-  normalize,
-  join,
-  relative,
-  dirname,
-  basename,
-  extname,
-  delimiter,
-  separator,
-}
+export const join = (() => {
+  return isNode ? nodePath.join : browserPath.join
+})()
+
+export const relative = (() => {
+  return isNode ? nodePath.relative : browserPath.relative
+})()
+
+export const dirname = (() => {
+  return isNode ? nodePath.dirname : browserPath.dirname
+})()
+
+export const basename = (() => {
+  return isNode ? nodePath.basename : browserPath.basename
+})()
+
+export const extname = (() => {
+  return isNode ? nodePath.extname : browserPath.extname
+})()
+
+export const delimiter = (() => {
+  return isNode ? nodePath.delimiter : browserPath.delimiter
+})()
+
+export const sep = (() => {
+  return isNode ? nodePath.sep : browserPath.sep
+})()
 
 export default {
   resolve,
@@ -106,11 +90,5 @@ export default {
   basename,
   extname,
   delimiter,
-  separator,
-
-  self: initialScriptPath,
-
-  get current() {
-    return currentScriptPath()
-  },
+  sep,
 }
