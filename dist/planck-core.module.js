@@ -37,7 +37,6 @@ import Request from '../src/Request'
 import Semaphore from '../src/Semaphore'
 import Stride from '../src/Stride'
 import URL from '../src/URL'
-import UUID from '../src/UUID'
 
 export { Aggregate }
 export { AggregateFunction }
@@ -54,7 +53,6 @@ export { Request }
 export { Semaphore }
 export { Stride }
 export { URL }
-export { UUID }
 
 export default {
   Aggregate,
@@ -72,5 +70,4 @@ export default {
   Semaphore,
   Stride,
   URL,
-  UUID,
 }
