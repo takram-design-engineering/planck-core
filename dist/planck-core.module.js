@@ -38,21 +38,23 @@ import Semaphore from '../src/Semaphore'
 import Stride from '../src/Stride'
 import URL from '../src/URL'
 
-export { Aggregate }
-export { AggregateFunction }
-export { Array }
-export { AssertionError }
-export { Environment }
-export { External }
-export { FilePath }
-export { Hash }
-export { ImplementationError }
-export { Math }
-export { Namespace }
-export { Request }
-export { Semaphore }
-export { Stride }
-export { URL }
+export {
+  Aggregate,
+  AggregateFunction,
+  Array,
+  AssertionError,
+  Environment,
+  External,
+  FilePath,
+  Hash,
+  ImplementationError,
+  Math,
+  Namespace,
+  Request,
+  Semaphore,
+  Stride,
+  URL,
+}
 
 export default {
   Aggregate,
