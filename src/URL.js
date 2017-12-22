@@ -23,4 +23,5 @@
 //
 
 // Just use url-parse for now
-export { default as default } from 'url-parse'
+import URL from 'url-parse'
+export default URL
