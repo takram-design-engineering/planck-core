@@ -28,7 +28,7 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-function Namespace() {
+function createNamespace() {
   var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
 
   var symbol = Symbol(name);
@@ -90,20 +90,6 @@ var createClass = function () {
 
 
 
-
-var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-
-  return target;
-};
 
 
 
@@ -209,7 +195,7 @@ var toConsumableArray = function (arr) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$1 = Namespace('AggregateFunction');
+var internal$1 = createNamespace('AggregateFunction');
 
 var AggregateFunction = function () {
   // This constructor provides for inheritance only
@@ -278,7 +264,7 @@ var AggregateFunction = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal = Namespace('Aggregate');
+var internal = createNamespace('Aggregate');
 
 var Aggregate = function () {
   // This constructor provides for inheritance only
@@ -366,53 +352,57 @@ var Aggregate = function () {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var _Array = {
-  min: function min(array, transform) {
-    var result = void 0;
-    var min = Number.POSITIVE_INFINITY;
-    if (typeof transform !== 'function') {
-      for (var index = 0; index < array.length; ++index) {
-        var item = array[index];
-        if (item < min) {
-          result = item;
-          min = item;
-        }
-      }
-      return result;
-    }
-    for (var _index = 0; _index < array.length; ++_index) {
-      var _item = array[_index];
-      var transformed = transform(_item, _index);
-      if (transformed < min) {
-        result = _item;
-        min = transformed;
-      }
-    }
-    return result;
-  },
-  max: function max(array, transform) {
-    var result = void 0;
-    var max = Number.NEGATIVE_INFINITY;
-    if (typeof transform !== 'function') {
-      for (var index = 0; index < array.length; ++index) {
-        var item = array[index];
-        if (item > max) {
-          result = item;
-          max = item;
-        }
-      }
-      return result;
-    }
-    for (var _index2 = 0; _index2 < array.length; ++_index2) {
-      var _item2 = array[_index2];
-      var transformed = transform(_item2, _index2);
-      if (transformed > max) {
-        result = _item2;
-        max = transformed;
+function min(array, transform) {
+  var result = void 0;
+  var min = Number.POSITIVE_INFINITY;
+  if (typeof transform !== 'function') {
+    for (var index = 0; index < array.length; ++index) {
+      var item = array[index];
+      if (item < min) {
+        result = item;
+        min = item;
       }
     }
     return result;
   }
+  for (var _index = 0; _index < array.length; ++_index) {
+    var _item = array[_index];
+    var transformed = transform(_item, _index);
+    if (transformed < min) {
+      result = _item;
+      min = transformed;
+    }
+  }
+  return result;
+}
+
+function max(array, transform) {
+  var result = void 0;
+  var max = Number.NEGATIVE_INFINITY;
+  if (typeof transform !== 'function') {
+    for (var index = 0; index < array.length; ++index) {
+      var item = array[index];
+      if (item > max) {
+        result = item;
+        max = item;
+      }
+    }
+    return result;
+  }
+  for (var _index2 = 0; _index2 < array.length; ++_index2) {
+    var _item2 = array[_index2];
+    var transformed = transform(_item2, _index2);
+    if (transformed > max) {
+      result = _item2;
+      max = transformed;
+    }
+  }
+  return result;
+}
+
+var Array$1 = {
+  min: min,
+  max: max
 };
 
 //
@@ -473,47 +463,55 @@ AssertionError.prototype.constructor = AssertionError;
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var environmentType = function () {
+var isBrowser = function () {
   try {
     // eslint-disable-next-line no-new-func
     if (new Function('return this === window')()) {
-      return 'browser';
+      return true;
     }
   } catch (error) {}
+  return false;
+}();
+
+var isWorker = !isBrowser && function () {
   try {
     // eslint-disable-next-line no-new-func
     if (new Function('return this === self')()) {
-      return 'worker';
+      return true;
     }
   } catch (error) {}
+  return false;
+}();
+
+var isNode = !isBrowser && !isWorker && function () {
   try {
     // eslint-disable-next-line no-new-func
     if (new Function('return this === global')()) {
-      return 'node';
+      return true;
     }
   } catch (error) {}
+  return false;
+}();
+
+var globalScope = function () {
+  if (isBrowser) {
+    return window;
+  }
+  if (isWorker) {
+    // eslint-disable-next-line no-restricted-globals
+    return self;
+  }
+  if (isNode) {
+    return global;
+  }
   return undefined;
 }();
 
-var environmentSelf = void 0;
-switch (environmentType) {
-  case 'browser':
-    environmentSelf = window;
-    break;
-  case 'worker':
-    // eslint-disable-next-line no-restricted-globals
-    environmentSelf = self;
-    break;
-  case 'node':
-    environmentSelf = global;
-    break;
-  default:
-    break;
-}
-
-var Environment = {
-  type: environmentType,
-  self: environmentSelf
+var Global = {
+  isBrowser: isBrowser,
+  isWorker: isWorker,
+  isNode: isNode,
+  scope: globalScope
 };
 
 //
@@ -559,10 +557,10 @@ function branchingImport(arg) {
     name = arg[id];
   }
   if (process.browser) {
-    return Environment.self[name];
+    return globalScope[name];
     // eslint-disable-next-line no-else-return
   } else {
-    if (Environment.type !== 'node') {
+    if (!isNode) {
       return undefined;
     }
     try {
@@ -576,13 +574,13 @@ function branchingImport(arg) {
 function runtimeImport(id) {
   // This will throw error on browser, in which `process` is typically not
   // defined in the global scope. Re-importing after defining `process.browser`
-  // in the global scope will evaluate the conditional in `branchingImport` for
-  // rollup's bundles.
+  // in the global scope will evaluate the conditional in
+  // `branchingImport` for rollup's bundles.
   try {
     return branchingImport(id);
   } catch (e) {
-    Environment.self.process = {
-      browser: Environment.type !== 'node'
+    globalScope.process = {
+      browser: !isNode
     };
   }
   return branchingImport(id);
@@ -599,7 +597,7 @@ function importOptional(id) {
 function importRequired(id) {
   var module = runtimeImport(id);
   if (module === undefined) {
-    if (Environment.type === 'node') {
+    if (isNode) {
       throw new Error('Could not resolve module "' + id + '"');
     } else {
       throw new Error('"' + id + '" isn\u2019t defined in the global scope');
@@ -611,7 +609,7 @@ function importRequired(id) {
 function importNode(id) {
   var module = runtimeImport(id);
   if (module === undefined) {
-    if (Environment.type === 'node') {
+    if (isNode) {
       throw new Error('Could not resolve module "' + id + '"');
     }
     return {};
@@ -622,7 +620,7 @@ function importNode(id) {
 function importBrowser(id) {
   var module = runtimeImport(id);
   if (module === undefined) {
-    if (Environment.type !== 'node') {
+    if (!isNode) {
       throw new Error('"' + id + '" isn\u2019t defined in the global scope');
     }
     return {};
@@ -630,12 +628,12 @@ function importBrowser(id) {
   return module;
 }
 
-var External = {
+Object.assign(runtimeImport, {
   optional: importOptional,
   required: importRequired,
-  browser: importBrowser,
-  node: importNode
-};
+  node: importNode,
+  browser: importBrowser
+});
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -647,7 +645,7 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var index = createCommonjsModule(function (module, exports) {
+var pathBrowserify = createCommonjsModule(function (module, exports) {
   // Copyright Joyent, Inc. and other Node contributors.
   //
   // Permission is hereby granted, free of charge, to any person obtaining a
@@ -869,16 +867,16 @@ var index = createCommonjsModule(function (module, exports) {
   };
 });
 
-var index_1 = index.resolve;
-var index_2 = index.normalize;
-var index_3 = index.isAbsolute;
-var index_4 = index.join;
-var index_5 = index.relative;
-var index_6 = index.sep;
-var index_7 = index.delimiter;
-var index_8 = index.dirname;
-var index_9 = index.basename;
-var index_10 = index.extname;
+var pathBrowserify_1 = pathBrowserify.resolve;
+var pathBrowserify_2 = pathBrowserify.normalize;
+var pathBrowserify_3 = pathBrowserify.isAbsolute;
+var pathBrowserify_4 = pathBrowserify.join;
+var pathBrowserify_5 = pathBrowserify.relative;
+var pathBrowserify_6 = pathBrowserify.sep;
+var pathBrowserify_7 = pathBrowserify.delimiter;
+var pathBrowserify_8 = pathBrowserify.dirname;
+var pathBrowserify_9 = pathBrowserify.basename;
+var pathBrowserify_10 = pathBrowserify.extname;
 
 //
 //  The MIT License
@@ -904,72 +902,63 @@ var index_10 = index.extname;
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var nodePath = External.node('path');
+var nodePath = importNode('path');
 
-function currentScriptPath() {
-  switch (Environment.type) {
-    case 'browser':
-      {
-        // eslint-disable-next-line no-underscore-dangle
-        var currentScript = document.currentScript || document._currentScript;
-        return currentScript && currentScript.src || undefined;
-      }
-    case 'worker':
-      // eslint-disable-next-line no-restricted-globals
-      return self.location.href;
-    case 'node':
-      return __filename;
-    default:
-      break;
-  }
-  return undefined;
-}
 
-var initialScriptPath = currentScriptPath();
 
-var aliases = void 0;
-if (Environment.type === 'node') {
-  aliases = {
-    resolve: nodePath.resolve,
-    normalize: nodePath.normalize,
-    join: nodePath.join,
-    relative: nodePath.relative,
-    dirname: nodePath.dirname,
-    basename: nodePath.basename,
-    extname: nodePath.extname,
-    separator: nodePath.sep,
-    delimiter: nodePath.delimiter
+var resolve = function () {
+  return isNode ? nodePath.resolve : function resolve() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return pathBrowserify.resolve.apply(pathBrowserify, ['/'].concat(args));
   };
-} else {
-  aliases = {
-    resolve: function resolve() {
-      for (var _len = arguments.length, paths = Array(_len), _key = 0; _key < _len; _key++) {
-        paths[_key] = arguments[_key];
-      }
+}();
 
-      return index.resolve.apply(index, ['/'].concat(paths));
-    },
+var normalize = function () {
+  return isNode ? nodePath.normalize : pathBrowserify.normalize;
+}();
 
+var join = function () {
+  return isNode ? nodePath.join : pathBrowserify.join;
+}();
 
-    normalize: index.normalize,
-    join: index.join,
-    relative: index.relative,
-    dirname: index.dirname,
-    basename: index.basename,
-    extname: index.extname,
-    separator: index.sep,
-    delimiter: index.delimiter
-  };
-}
+var relative = function () {
+  return isNode ? nodePath.relative : pathBrowserify.relative;
+}();
 
-var FilePath = _extends({
-  self: initialScriptPath,
+var dirname = function () {
+  return isNode ? nodePath.dirname : pathBrowserify.dirname;
+}();
 
-  get current() {
-    return currentScriptPath();
-  }
+var basename = function () {
+  return isNode ? nodePath.basename : pathBrowserify.basename;
+}();
 
-}, aliases);
+var extname = function () {
+  return isNode ? nodePath.extname : pathBrowserify.extname;
+}();
+
+var delimiter = function () {
+  return isNode ? nodePath.delimiter : pathBrowserify.delimiter;
+}();
+
+var sep = function () {
+  return isNode ? nodePath.sep : pathBrowserify.sep;
+}();
+
+var FilePath = {
+  resolve: resolve,
+  normalize: normalize,
+  join: join,
+  relative: relative,
+  dirname: dirname,
+  basename: basename,
+  extname: extname,
+  delimiter: delimiter,
+  sep: sep
+};
 
 var crypt = createCommonjsModule(function (module) {
   (function () {
@@ -1106,7 +1095,7 @@ var charenc_1 = charenc;
 
 // The _isBuffer check is for Safari 5-7 support, because it's missing
 // Object.prototype.constructor. Remove this eventually
-var index$1 = function index(obj) {
+var isBuffer_1 = function isBuffer_1(obj) {
   return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer);
 };
 
@@ -1123,7 +1112,7 @@ var md5 = createCommonjsModule(function (module) {
   (function () {
     var crypt$$1 = crypt,
         utf8 = charenc_1.utf8,
-        isBuffer = index$1,
+        isBuffer = isBuffer_1,
         bin = charenc_1.bin,
 
 
@@ -1691,14 +1680,14 @@ var stringify$2 = function stringify(value, replacer, space) {
 var parse = parse$1;
 var stringify$1 = stringify$2;
 
-var index$4 = {
+var jsonify = {
 	parse: parse,
 	stringify: stringify$1
 };
 
-var json = typeof JSON !== 'undefined' ? JSON : index$4;
+var json = typeof JSON !== 'undefined' ? JSON : jsonify;
 
-var index$3 = function index(obj, opts) {
+var jsonStableStringify = function jsonStableStringify(obj, opts) {
     if (!opts) opts = {};
     if (typeof opts === 'function') opts = { cmp: opts };
     var space = opts.space || '';
@@ -1805,8 +1794,8 @@ var objectKeys = Object.keys || function (obj) {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-function Hash(object) {
-  return md5(index$3(object));
+function generateHash(object) {
+  return md5(jsonStableStringify(object));
 }
 
 //
@@ -1886,17 +1875,17 @@ function wrap(value, min, max) {
   return min + (value - min) % (max - min);
 }
 
-// GLSL functions
+// GLSL-fravored functions
 
-var RADIANS = Math.PI / 180;
-var DEGREES = 180 / Math.PI;
+var degreesToRadians = Math.PI / 180;
+var radiansToDegrees = 180 / Math.PI;
 
 function radians(degrees) {
-  return degrees * RADIANS;
+  return degrees * degreesToRadians;
 }
 
 function degrees(radians) {
-  return radians * DEGREES;
+  return radians * radiansToDegrees;
 }
 
 function fract(value) {
@@ -1907,6 +1896,9 @@ function mod(value, divisor) {
   return value - divisor * Math.floor(value / divisor);
 }
 
+var clamp = constrain;
+var mix = lerp;
+
 function step(edge, value) {
   return value < edge ? 0 : 1;
 }
@@ -1916,7 +1908,7 @@ function smoothstep(edge0, edge1, value) {
   return t * t * (3 - 2 * t);
 }
 
-var _Math = {
+var Math$1 = {
   lerp: lerp,
   constrain: constrain,
   map: map,
@@ -1925,6 +1917,8 @@ var _Math = {
   degrees: degrees,
   fract: fract,
   mod: mod,
+  clamp: clamp,
+  mix: mix,
   step: step,
   smoothstep: smoothstep
 };
@@ -2083,7 +2077,7 @@ var tsvParse = tsv.parse;
  * @api private
  */
 
-var index$7 = function required(port, protocol) {
+var requiresPort = function required(port, protocol) {
   protocol = protocol.split(':')[0];
   port = +port;
 
@@ -2179,7 +2173,7 @@ function querystringify(obj, prefix) {
 var stringify$4 = querystringify;
 var parse$3 = querystring;
 
-var index$9 = {
+var querystringify_1 = {
   stringify: stringify$4,
   parse: parse$3
 };
@@ -2291,7 +2285,7 @@ function extractProtocol(address) {
  * @return {String} Resolved pathname.
  * @api private
  */
-function resolve(relative, base) {
+function resolve$1(relative, base) {
   var path = (base || '/').split('/').slice(0, -1).concat(relative.split('/')),
       i = path.length,
       last = path[i - 1],
@@ -2360,7 +2354,7 @@ function URL$1(address, location, parser) {
     location = null;
   }
 
-  if (parser && 'function' !== typeof parser) parser = index$9.parse;
+  if (parser && 'function' !== typeof parser) parser = querystringify_1.parse;
 
   location = lolcation(location);
 
@@ -2421,7 +2415,7 @@ function URL$1(address, location, parser) {
   // If the URL is relative, resolve the pathname against the base URL.
   //
   if (relative && location.slashes && url.pathname.charAt(0) !== '/' && (url.pathname !== '' || location.pathname !== '')) {
-    url.pathname = resolve(url.pathname, location.pathname);
+    url.pathname = resolve$1(url.pathname, location.pathname);
   }
 
   //
@@ -2429,7 +2423,7 @@ function URL$1(address, location, parser) {
   // for a given protocol. As the host also contains the port number we're going
   // override it with the hostname which contains no port number.
   //
-  if (!index$7(url.port, url.protocol)) {
+  if (!requiresPort(url.port, url.protocol)) {
     url.host = url.hostname;
     url.port = '';
   }
@@ -2471,7 +2465,7 @@ function set$1(part, value, fn) {
   switch (part) {
     case 'query':
       if ('string' === typeof value && value.length) {
-        value = (fn || index$9.parse)(value);
+        value = (fn || querystringify_1.parse)(value);
       }
 
       url[part] = value;
@@ -2480,7 +2474,7 @@ function set$1(part, value, fn) {
     case 'port':
       url[part] = value;
 
-      if (!index$7(value, url.protocol)) {
+      if (!requiresPort(value, url.protocol)) {
         url.host = url.hostname;
         url[part] = '';
       } else if (value) {
@@ -2550,7 +2544,7 @@ function set$1(part, value, fn) {
  * @api public
  */
 function toString(stringify) {
-  if (!stringify || 'function' !== typeof stringify) stringify = index$9.stringify;
+  if (!stringify || 'function' !== typeof stringify) stringify = querystringify_1.stringify;
 
   var query,
       url = this,
@@ -2584,33 +2578,9 @@ URL$1.prototype = { set: set$1, toString: toString };
 //
 URL$1.extractProtocol = extractProtocol;
 URL$1.location = lolcation;
-URL$1.qs = index$9;
+URL$1.qs = querystringify_1;
 
-var index$6 = URL$1;
-
-//
-//  The MIT License
-//
-//  Copyright (C) 2016-Present Shota Matsuda
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
+var urlParse = URL$1;
 
 //
 //  The MIT License
@@ -2636,10 +2606,34 @@ var index$6 = URL$1;
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var _External$node = External.node('fs');
-var readFile = _External$node.readFile;
+//
+//  The MIT License
+//
+//  Copyright (C) 2016-Present Shota Matsuda
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a
+//  copy of this software and associated documentation files (the "Software"),
+//  to deal in the Software without restriction, including without limitation
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//  DEALINGS IN THE SOFTWARE.
+//
 
-var request = External.node('request');
+var _importNode = importNode('fs');
+var readFile = _importNode.readFile;
+
+var request = importNode('request');
 
 
 
@@ -2654,7 +2648,7 @@ function browserRequest(url, options) {
     resolve = args[0];
     reject = args[1];
   });
-  var parsed = new index$6(url, true);
+  var parsed = new urlParse(url, true);
   if (options.query) {
     parsed.set('query', Object.assign({}, parsed.query, options.query));
   }
@@ -2732,7 +2726,7 @@ function nodeRequest(url, options) {
 }
 
 function performRequest(url, options) {
-  if (Environment.type === 'node') {
+  if (isNode) {
     var _request = nodeRequest(url, options);
     if (options.type === 'json') {
       var promise = _request.then(function (response) {
@@ -2790,66 +2784,76 @@ function parseArguments() {
   return [url, options];
 }
 
-var Request = {
-  text: function text() {
-    var _parseArguments = parseArguments.apply(undefined, arguments),
-        _parseArguments2 = slicedToArray(_parseArguments, 2),
-        url = _parseArguments2[0],
-        options = _parseArguments2[1];
+function requestText() {
+  var _parseArguments = parseArguments.apply(undefined, arguments),
+      _parseArguments2 = slicedToArray(_parseArguments, 2),
+      url = _parseArguments2[0],
+      options = _parseArguments2[1];
 
-    options.type = 'text';
-    return performRequest(url, options);
-  },
-  json: function json() {
-    var _parseArguments3 = parseArguments.apply(undefined, arguments),
-        _parseArguments4 = slicedToArray(_parseArguments3, 2),
-        url = _parseArguments4[0],
-        options = _parseArguments4[1];
+  options.type = 'text';
+  return performRequest(url, options);
+}
 
-    options.type = 'json';
-    return performRequest(url, options);
-  },
-  buffer: function buffer() {
-    var _parseArguments5 = parseArguments.apply(undefined, arguments),
-        _parseArguments6 = slicedToArray(_parseArguments5, 2),
-        url = _parseArguments6[0],
-        options = _parseArguments6[1];
+function requestJSON() {
+  var _parseArguments3 = parseArguments.apply(undefined, arguments),
+      _parseArguments4 = slicedToArray(_parseArguments3, 2),
+      url = _parseArguments4[0],
+      options = _parseArguments4[1];
 
-    options.type = 'arraybuffer';
-    options.encoding = null;
-    return performRequest(url, options);
-  },
-  csv: function csv() {
-    var _parseArguments7 = parseArguments.apply(undefined, arguments),
-        _parseArguments8 = slicedToArray(_parseArguments7, 2),
-        url = _parseArguments8[0],
-        options = _parseArguments8[1];
+  options.type = 'json';
+  return performRequest(url, options);
+}
 
-    var request = this.text(url, options);
-    var promise = request.then(function (response) {
-      return csvParse(response, options.row);
-    });
-    promise.abort = function () {
-      request.abort();
-    };
-    return promise;
-  },
-  tsv: function tsv() {
-    var _parseArguments9 = parseArguments.apply(undefined, arguments),
-        _parseArguments10 = slicedToArray(_parseArguments9, 2),
-        url = _parseArguments10[0],
-        options = _parseArguments10[1];
+function requestBuffer() {
+  var _parseArguments5 = parseArguments.apply(undefined, arguments),
+      _parseArguments6 = slicedToArray(_parseArguments5, 2),
+      url = _parseArguments6[0],
+      options = _parseArguments6[1];
 
-    var request = this.text(url, options);
-    var promise = request.then(function (response) {
-      return tsvParse(response, options.row);
-    });
-    promise.abort = function () {
-      request.abort();
-    };
-    return promise;
-  }
-};
+  options.type = 'arraybuffer';
+  options.encoding = null;
+  return performRequest(url, options);
+}
+
+function requestCSV() {
+  var _parseArguments7 = parseArguments.apply(undefined, arguments),
+      _parseArguments8 = slicedToArray(_parseArguments7, 2),
+      url = _parseArguments8[0],
+      options = _parseArguments8[1];
+
+  var request = this.text(url, options);
+  var promise = request.then(function (response) {
+    return csvParse(response, options.row);
+  });
+  promise.abort = function () {
+    request.abort();
+  };
+  return promise;
+}
+
+function requestTSV() {
+  var _parseArguments9 = parseArguments.apply(undefined, arguments),
+      _parseArguments10 = slicedToArray(_parseArguments9, 2),
+      url = _parseArguments10[0],
+      options = _parseArguments10[1];
+
+  var request = this.text(url, options);
+  var promise = request.then(function (response) {
+    return tsvParse(response, options.row);
+  });
+  promise.abort = function () {
+    request.abort();
+  };
+  return promise;
+}
+
+Object.assign(performRequest, {
+  text: requestText,
+  json: requestJSON,
+  buffer: requestBuffer,
+  csv: requestCSV,
+  tsv: requestTSV
+});
 
 //
 //  The MIT License
@@ -2875,7 +2879,7 @@ var Request = {
 //  DEALINGS IN THE SOFTWARE.
 //
 
-var internal$3 = Namespace('Semaphore');
+var internal$3 = createNamespace('Semaphore');
 
 var Task = function Task(semaphore, callback) {
   var _this = this;
@@ -2984,259 +2988,91 @@ function subarray(array, start, end) {
   return array.subarray(start, end);
 }
 
-var Stride = {
-  forEach: function forEach(array, stride, callback) {
-    var func = isTypedArray(array) ? subarray : slice;
-    var end = array.length - array.length % stride;
-    for (var start = 0, index = 0; start < end; start += stride, ++index) {
-      callback(func(array, start, start + stride), index);
-    }
-  },
-  some: function some(array, stride, callback) {
-    var end = array.length - array.length % stride;
-    var func = isTypedArray(array) ? subarray : slice;
-    for (var start = 0, index = 0; start < end; start += stride, ++index) {
-      if (callback(func(array, start, start + stride), index)) {
-        return true;
-      }
-    }
-    return false;
-  },
-  every: function every(array, stride, callback) {
-    var end = array.length - array.length % stride;
-    var func = isTypedArray(array) ? subarray : slice;
-    for (var start = 0, index = 0; start < end; start += stride, ++index) {
-      if (!callback(func(array, start, start + stride), index)) {
-        return false;
-      }
-    }
-    return true;
-  },
-  reduce: function reduce(array, stride, callback, initial) {
-    var result = initial;
-    var end = array.length - array.length % stride;
-    var func = isTypedArray(array) ? subarray : slice;
-    for (var start = 0, index = 0; start < end; start += stride, ++index) {
-      result = callback(result, func(array, start, start + stride), index);
-    }
-    return result;
-  },
-  set: function set(array, stride, item) {
-    var end = array.length - array.length % stride;
-    if (isTypedArray(array)) {
-      for (var start = 0; start < end; start += stride) {
-        array.set(item, start);
-      }
-    } else {
-      for (var _start = 0; _start < end; _start += stride) {
-        for (var offset = 0; offset < stride; ++offset) {
-          // eslint-disable-next-line no-param-reassign
-          array[_start + offset] = item[offset];
-        }
-      }
-    }
-    return array;
-  },
-  transform: function transform(array, stride, callback) {
-    var end = array.length - array.length % stride;
-    if (isTypedArray(array)) {
-      for (var start = 0, index = 0; start < end; start += stride, ++index) {
-        var item = callback(array.slice(start, start + stride), index);
-        array.set(item, start);
-      }
-    } else {
-      for (var _start2 = 0, _index = 0; _start2 < end; _start2 += stride, ++_index) {
-        for (var offset = 0; offset < stride; ++offset) {
-          var _item = callback(array.slice(_start2, _start2 + stride), _index);
-          // eslint-disable-next-line no-param-reassign
-          array[_start2 + offset] = _item[offset];
-        }
-      }
-    }
-    return array;
+function forEach(array, stride, callback) {
+  var func = isTypedArray(array) ? subarray : slice;
+  var end = array.length - array.length % stride;
+  for (var start = 0, index = 0; start < end; start += stride, ++index) {
+    callback(func(array, start, start + stride), index);
   }
+}
+
+function some(array, stride, callback) {
+  var end = array.length - array.length % stride;
+  var func = isTypedArray(array) ? subarray : slice;
+  for (var start = 0, index = 0; start < end; start += stride, ++index) {
+    if (callback(func(array, start, start + stride), index)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function every(array, stride, callback) {
+  var end = array.length - array.length % stride;
+  var func = isTypedArray(array) ? subarray : slice;
+  for (var start = 0, index = 0; start < end; start += stride, ++index) {
+    if (!callback(func(array, start, start + stride), index)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function reduce(array, stride, callback, initial) {
+  var result = initial;
+  var end = array.length - array.length % stride;
+  var func = isTypedArray(array) ? subarray : slice;
+  for (var start = 0, index = 0; start < end; start += stride, ++index) {
+    result = callback(result, func(array, start, start + stride), index);
+  }
+  return result;
+}
+
+function set$2(array, stride, item) {
+  var end = array.length - array.length % stride;
+  if (isTypedArray(array)) {
+    for (var start = 0; start < end; start += stride) {
+      array.set(item, start);
+    }
+  } else {
+    for (var _start = 0; _start < end; _start += stride) {
+      for (var offset = 0; offset < stride; ++offset) {
+        // eslint-disable-next-line no-param-reassign
+        array[_start + offset] = item[offset];
+      }
+    }
+  }
+  return array;
+}
+
+function transform(array, stride, callback) {
+  var end = array.length - array.length % stride;
+  if (isTypedArray(array)) {
+    for (var start = 0, index = 0; start < end; start += stride, ++index) {
+      var item = callback(array.slice(start, start + stride), index);
+      array.set(item, start);
+    }
+  } else {
+    for (var _start2 = 0, _index = 0; _start2 < end; _start2 += stride, ++_index) {
+      for (var offset = 0; offset < stride; ++offset) {
+        var _item = callback(array.slice(_start2, _start2 + stride), _index);
+        // eslint-disable-next-line no-param-reassign
+        array[_start2 + offset] = _item[offset];
+      }
+    }
+  }
+  return array;
+}
+
+var Stride = {
+  forEach: forEach,
+  some: some,
+  every: every,
+  reduce: reduce,
+  set: set$2,
+  transform: transform
 };
 
-// Unique ID creation requires a high quality random # generator.  In the
-// browser this is a little complicated due to unknown quality of Math.random()
-// and inconsistent support for the `crypto` API.  We do the best we can via
-// feature-detection
-var rng;
-
-var crypto = commonjsGlobal.crypto || commonjsGlobal.msCrypto; // for IE 11
-if (crypto && crypto.getRandomValues) {
-  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
-  var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
-  rng = function whatwgRNG() {
-    crypto.getRandomValues(rnds8);
-    return rnds8;
-  };
-}
-
-if (!rng) {
-  // Math.random()-based (RNG)
-  //
-  // If all else fails, use Math.random().  It's fast, but is of unspecified
-  // quality.
-  var rnds = new Array(16);
-  rng = function rng() {
-    for (var i = 0, r; i < 16; i++) {
-      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
-      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
-    }
-
-    return rnds;
-  };
-}
-
-var rngBrowser = rng;
-
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-var byteToHex = [];
-for (var i = 0; i < 256; ++i) {
-  byteToHex[i] = (i + 0x100).toString(16).substr(1);
-}
-
-function bytesToUuid(buf, offset) {
-  var i = offset || 0;
-  var bth = byteToHex;
-  return bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + '-' + bth[buf[i++]] + bth[buf[i++]] + '-' + bth[buf[i++]] + bth[buf[i++]] + '-' + bth[buf[i++]] + bth[buf[i++]] + '-' + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]];
-}
-
-var bytesToUuid_1 = bytesToUuid;
-
-// **`v1()` - Generate time-based UUID**
-//
-// Inspired by https://github.com/LiosK/UUID.js
-// and http://docs.python.org/library/uuid.html
-
-// random #'s we need to init node and clockseq
-var _seedBytes = rngBrowser();
-
-// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-var _nodeId = [_seedBytes[0] | 0x01, _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]];
-
-// Per 4.2.2, randomize (14 bit) clockseq
-var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
-
-// Previous uuid creation time
-var _lastMSecs = 0;
-var _lastNSecs = 0;
-
-// See https://github.com/broofa/node-uuid for API details
-function v1(options, buf, offset) {
-  var i = buf && offset || 0;
-  var b = buf || [];
-
-  options = options || {};
-
-  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
-
-  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
-
-  // Per 4.2.1.2, use count of uuid's generated during the current clock
-  // cycle to simulate higher resolution clock
-  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
-
-  // Time since last uuid creation (in msecs)
-  var dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000;
-
-  // Per 4.2.1.2, Bump clockseq on clock regression
-  if (dt < 0 && options.clockseq === undefined) {
-    clockseq = clockseq + 1 & 0x3fff;
-  }
-
-  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-  // time interval
-  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
-    nsecs = 0;
-  }
-
-  // Per 4.2.1.2 Throw error if too many uuids are requested
-  if (nsecs >= 10000) {
-    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
-  }
-
-  _lastMSecs = msecs;
-  _lastNSecs = nsecs;
-  _clockseq = clockseq;
-
-  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-  msecs += 12219292800000;
-
-  // `time_low`
-  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-  b[i++] = tl >>> 24 & 0xff;
-  b[i++] = tl >>> 16 & 0xff;
-  b[i++] = tl >>> 8 & 0xff;
-  b[i++] = tl & 0xff;
-
-  // `time_mid`
-  var tmh = msecs / 0x100000000 * 10000 & 0xfffffff;
-  b[i++] = tmh >>> 8 & 0xff;
-  b[i++] = tmh & 0xff;
-
-  // `time_high_and_version`
-  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-  b[i++] = tmh >>> 16 & 0xff;
-
-  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-  b[i++] = clockseq >>> 8 | 0x80;
-
-  // `clock_seq_low`
-  b[i++] = clockseq & 0xff;
-
-  // `node`
-  var node = options.node || _nodeId;
-  for (var n = 0; n < 6; ++n) {
-    b[i + n] = node[n];
-  }
-
-  return buf ? buf : bytesToUuid_1(b);
-}
-
-var v1_1 = v1;
-
-function v4(options, buf, offset) {
-  var i = buf && offset || 0;
-
-  if (typeof options == 'string') {
-    buf = options == 'binary' ? new Array(16) : null;
-    options = null;
-  }
-  options = options || {};
-
-  var rnds = options.random || (options.rng || rngBrowser)();
-
-  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-  rnds[6] = rnds[6] & 0x0f | 0x40;
-  rnds[8] = rnds[8] & 0x3f | 0x80;
-
-  // Copy bytes to buffer, if provided
-  if (buf) {
-    for (var ii = 0; ii < 16; ++ii) {
-      buf[i + ii] = rnds[ii];
-    }
-  }
-
-  return buf || bytesToUuid_1(rnds);
-}
-
-var v4_1 = v4;
-
-var uuid = v4_1;
-uuid.v1 = v1_1;
-uuid.v4 = v4_1;
-
-var index$11 = uuid;
-
 //
 //  The MIT License
 //
@@ -3261,49 +3097,40 @@ var index$11 = uuid;
 //  DEALINGS IN THE SOFTWARE.
 //
 
-// Just use uuid v4 for now
-var UUID = index$11.v4;
-
-//
-//  The MIT License
-//
-//  Copyright (C) 2016-Present Shota Matsuda
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//  DEALINGS IN THE SOFTWARE.
-//
+var planckCore_module = {
+  Aggregate: Aggregate,
+  AggregateFunction: AggregateFunction,
+  Array: Array$1,
+  AssertionError: AssertionError,
+  External: runtimeImport,
+  FilePath: FilePath,
+  Global: Global,
+  Hash: generateHash,
+  ImplementationError: ImplementationError,
+  Math: Math$1,
+  Namespace: createNamespace,
+  Request: performRequest,
+  Semaphore: Semaphore,
+  Stride: Stride,
+  URL: urlParse
+};
 
 exports.Aggregate = Aggregate;
 exports.AggregateFunction = AggregateFunction;
-exports.Array = _Array;
+exports.Array = Array$1;
 exports.AssertionError = AssertionError;
-exports.Environment = Environment;
-exports.External = External;
+exports.External = runtimeImport;
 exports.FilePath = FilePath;
-exports.Hash = Hash;
+exports.Global = Global;
+exports.Hash = generateHash;
 exports.ImplementationError = ImplementationError;
-exports.Math = _Math;
-exports.Namespace = Namespace;
-exports.Request = Request;
+exports.Math = Math$1;
+exports.Namespace = createNamespace;
+exports.Request = performRequest;
 exports.Semaphore = Semaphore;
 exports.Stride = Stride;
-exports.URL = index$6;
-exports.UUID = UUID;
+exports.URL = urlParse;
+exports['default'] = planckCore_module;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
