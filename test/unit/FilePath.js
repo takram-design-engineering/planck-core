@@ -26,50 +26,26 @@ import 'source-map-support/register'
 
 import chai from 'chai'
 
-import { Environment, External, FilePath, URL } from '../..'
+import { External, Global, FilePath } from '../..'
 
 const path = External.node('path')
 
 const { expect } = chai
-const { current } = FilePath
 
 describe('FilePath', () => {
-  describe('#self', () => {
-    it('matches the original script url', () => {
-      const url = new URL(FilePath.self)
-      if (Environment.type !== 'node') {
-        if (BUNDLER === 'rollup') {
-          expect(url.pathname).equal('/dist/planck-core.js')
-        }
-        if (BUNDLER === 'webpack') {
-          expect(url.pathname).equal('/dist/test/unit/webpack.js')
-        }
-      }
-    })
-  })
-
-  describe('#current', () => {
-    it('matches the current script url', () => {
-      const url = new URL(current)
-      if (Environment.type !== 'node') {
-        expect(url.pathname).equal(`/dist/test/unit/${BUNDLER}.js`)
-      }
-    })
-  })
-
-  describe('separator', () => {
+  describe('sep', () => {
     it('works', () => {
-      if (Environment.type === 'node') {
-        expect(FilePath.separator).equal(path.sep)
+      if (Global.isNode) {
+        expect(FilePath.sep).equal(path.sep)
       } else {
-        expect(FilePath.separator).equal('/')
+        expect(FilePath.sep).equal('/')
       }
     })
   })
 
   describe('delimiter', () => {
     it('works', () => {
-      if (Environment.type === 'node') {
+      if (Global.isNode) {
         expect(FilePath.delimiter).equal(path.delimiter)
       } else {
         expect(FilePath.delimiter).equal(':')
@@ -83,7 +59,7 @@ describe('FilePath', () => {
         .equal('/foo/bar/baz')
       expect(FilePath.resolve('/foo/bar', '/tmp/file/'))
         .equal('/tmp/file')
-      if (Environment.type === 'node') {
+      if (Global.isNode) {
         expect(FilePath.resolve('www', 'static/png/', '../gif/image.gif'))
           .equal(FilePath.join(process.cwd(), 'www/static/gif/image.gif'))
       } else {

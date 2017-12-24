@@ -22,19 +22,54 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-export { default as Aggregate } from '../src/Aggregate'
-export { default as AggregateFunction } from '../src/AggregateFunction'
-export { default as Array } from '../src/Array'
-export { default as AssertionError } from '../src/AssertionError'
-export { default as Environment } from '../src/Environment'
-export { default as External } from '../src/External'
-export { default as FilePath } from '../src/FilePath'
-export { default as Hash } from '../src/Hash'
-export { default as ImplementationError } from '../src/ImplementationError'
-export { default as Math } from '../src/Math'
-export { default as Namespace } from '../src/Namespace'
-export { default as Request } from '../src/Request'
-export { default as Semaphore } from '../src/Semaphore'
-export { default as Stride } from '../src/Stride'
-export { default as URL } from '../src/URL'
-export { default as UUID } from '../src/UUID'
+import Aggregate from '../src/Aggregate'
+import AggregateFunction from '../src/AggregateFunction'
+import Array from '../src/Array'
+import AssertionError from '../src/AssertionError'
+import External from '../src/External'
+import FilePath from '../src/FilePath'
+import Global from '../src/Global'
+import Hash from '../src/Hash'
+import ImplementationError from '../src/ImplementationError'
+import Math from '../src/Math'
+import Namespace from '../src/Namespace'
+import Request from '../src/Request'
+import Semaphore from '../src/Semaphore'
+import Stride from '../src/Stride'
+import URL from '../src/URL'
+
+export {
+  Aggregate,
+  AggregateFunction,
+  Array,
+  AssertionError,
+  External,
+  FilePath,
+  Global,
+  Hash,
+  ImplementationError,
+  Math,
+  Namespace,
+  Request,
+  Semaphore,
+  Stride,
+  URL,
+}
+
+export default {
+  Aggregate,
+  AggregateFunction,
+  Array,
+  AssertionError,
+  External,
+  FilePath,
+  Global,
+  Hash,
+  ImplementationError,
+  Math,
+  Namespace,
+  Request,
+  Semaphore,
+  Stride,
+  URL,
+}

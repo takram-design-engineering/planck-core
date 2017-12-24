@@ -26,11 +26,11 @@ import 'source-map-support/register'
 
 import chai from 'chai'
 
-import { Environment, External } from '../..'
+import { External, Global } from '../..'
 
 const { expect } = chai
 
-Environment.self.d3 = {}
+Global.scope.d3 = {}
 
 describe('External', () => {
   describe('#required', () => {
@@ -69,15 +69,15 @@ describe('External', () => {
     })
 
     it('throws error if cannot resolve module on node', () => {
-      if (Environment.type !== 'node') {
+      if (!Global.isNode) {
         expect(() => {
           External.browser('non-existent')
         }).throws(Error)
       }
     })
 
-    it('returns empty object on environment other than node', () => {
-      if (Environment.type === 'node') {
+    it('returns empty object on Global other than node', () => {
+      if (Global.isNode) {
         expect(External.browser('non-existent')).deep.equal({})
         const { named } = External.browser('non-existent')
         expect(named).undefined
@@ -91,15 +91,15 @@ describe('External', () => {
     })
 
     it('throws error if cannot resolve module on node', () => {
-      if (Environment.type === 'node') {
+      if (Global.isNode) {
         expect(() => {
           External.node('non-existent')
         }).throws(Error)
       }
     })
 
-    it('returns empty object on environment other than node', () => {
-      if (Environment.type !== 'node') {
+    it('returns empty object on Global other than node', () => {
+      if (!Global.isNode) {
         expect(External.node('non-existent')).deep.equal({})
         const { named } = External.node('non-existent')
         expect(named).undefined
