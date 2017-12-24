@@ -57,12 +57,12 @@ describe('FilePath', () => {
     })
   })
 
-  describe('separator', () => {
+  describe('sep', () => {
     it('works', () => {
       if (Environment.isNode) {
-        expect(FilePath.separator).equal(path.sep)
+        expect(FilePath.sep).equal(path.sep)
       } else {
-        expect(FilePath.separator).equal('/')
+        expect(FilePath.sep).equal('/')
       }
     })
   })

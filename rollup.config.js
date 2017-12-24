@@ -45,12 +45,11 @@ export default {
       babelrc: false,
     }),
   ],
-  output: [
-    {
-      format: 'umd',
-      extend: true,
-      name: 'Planck',
-      file: './dist/planck-core.js',
-    },
-  ],
+  output: {
+    format: 'umd',
+    exports: 'named',
+    extend: true,
+    name: 'Planck',
+    file: './dist/planck-core.js',
+  },
 }

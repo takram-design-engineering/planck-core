@@ -29,7 +29,7 @@ import { isBrowser, isWorker, isNode } from './Environment'
 
 const nodePath = importNode('path')
 
-function currentScriptPath() {
+export function currentFilePath() {
   if (isBrowser) {
     // eslint-disable-next-line no-underscore-dangle
     const currentScript = document.currentScript || document._currentScript
@@ -45,46 +45,52 @@ function currentScriptPath() {
   return undefined
 }
 
-const initialScriptPath = currentScriptPath()
+export const resolve = (() => {
+  return isNode ? nodePath.resolve : function resolve(...args) {
+    return browserPath.resolve.bind('/', ...args)
+  }
+})()
 
-let aliases
-if (isNode) {
-  aliases = {
-    resolve: nodePath.resolve,
-    normalize: nodePath.normalize,
-    join: nodePath.join,
-    relative: nodePath.relative,
-    dirname: nodePath.dirname,
-    basename: nodePath.basename,
-    extname: nodePath.extname,
-    separator: nodePath.sep,
-    delimiter: nodePath.delimiter,
-  }
-} else {
-  aliases = {
-    resolve(...paths) {
-      return browserPath.resolve('/', ...paths)
-    },
-    normalize: browserPath.normalize,
-    join: browserPath.join,
-    relative: browserPath.relative,
-    dirname: browserPath.dirname,
-    basename: browserPath.basename,
-    extname: browserPath.extname,
-    separator: browserPath.sep,
-    delimiter: browserPath.delimiter,
-  }
-}
+export const normalize = (() => {
+  return isNode ? nodePath.normalize : browserPath.normalize
+})()
+
+export const join = (() => {
+  return isNode ? nodePath.join : browserPath.join
+})()
+
+export const relative = (() => {
+  return isNode ? nodePath.relative : browserPath.relative
+})()
+
+export const dirname = (() => {
+  return isNode ? nodePath.dirname : browserPath.dirname
+})()
+
+export const basename = (() => {
+  return isNode ? nodePath.basename : browserPath.basename
+})()
+
+export const extname = (() => {
+  return isNode ? nodePath.extname : browserPath.extname
+})()
+
+export const delimiter = (() => {
+  return isNode ? nodePath.delimiter : browserPath.delimiter
+})()
+
+export const sep = (() => {
+  return isNode ? nodePath.sep : browserPath.sep
+})()
 
 export default {
-  self: initialScriptPath,
-
-  get current() {
-    return currentScriptPath()
-  },
-
-  // Object rest spread must be placed at the last because this will be
-  // transpiled to Object.assign with the above and aliases. Othewise current()
-  // will become a static variable, not a getter function.
-  ...aliases,
+  resolve,
+  normalize,
+  join,
+  relative,
+  dirname,
+  basename,
+  extname,
+  delimiter,
+  sep,
 }
