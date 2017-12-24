@@ -63,7 +63,6 @@ export function mod(value, divisor) {
 }
 
 export const clamp = constrain
-
 export const mix = lerp
 
 export function step(edge, value) {
