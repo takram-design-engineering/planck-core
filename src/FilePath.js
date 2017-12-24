@@ -24,25 +24,23 @@
 
 import browserPath from 'path-browserify'
 
-import Environment from './Environment'
-import External from './External'
+import { importNode } from './External'
+import { isBrowser, isWorker, isNode } from './Environment'
 
-const nodePath = External.node('path')
+const nodePath = importNode('path')
 
 function currentScriptPath() {
-  switch (Environment.type) {
-    case 'browser': {
-      // eslint-disable-next-line no-underscore-dangle
-      const currentScript = document.currentScript || document._currentScript
-      return (currentScript && currentScript.src) || undefined
-    }
-    case 'worker':
-      // eslint-disable-next-line no-restricted-globals
-      return self.location.href
-    case 'node':
-      return __filename
-    default:
-      break
+  if (isBrowser) {
+    // eslint-disable-next-line no-underscore-dangle
+    const currentScript = document.currentScript || document._currentScript
+    return (currentScript && currentScript.src) || undefined
+  }
+  if (isWorker) {
+    // eslint-disable-next-line no-restricted-globals
+    return self.location.href
+  }
+  if (isNode) {
+    return __filename
   }
   return undefined
 }
@@ -50,7 +48,7 @@ function currentScriptPath() {
 const initialScriptPath = currentScriptPath()
 
 let aliases
-if (Environment.type === 'node') {
+if (isNode) {
   aliases = {
     resolve: nodePath.resolve,
     normalize: nodePath.normalize,
@@ -67,7 +65,6 @@ if (Environment.type === 'node') {
     resolve(...paths) {
       return browserPath.resolve('/', ...paths)
     },
-
     normalize: browserPath.normalize,
     join: browserPath.join,
     relative: browserPath.relative,

@@ -30,7 +30,7 @@ import { Environment, External } from '../..'
 
 const { expect } = chai
 
-Environment.self.d3 = {}
+Environment.scope.d3 = {}
 
 describe('External', () => {
   describe('#required', () => {
@@ -69,7 +69,7 @@ describe('External', () => {
     })
 
     it('throws error if cannot resolve module on node', () => {
-      if (Environment.type !== 'node') {
+      if (!Environment.isNode) {
         expect(() => {
           External.browser('non-existent')
         }).throws(Error)
@@ -77,7 +77,7 @@ describe('External', () => {
     })
 
     it('returns empty object on environment other than node', () => {
-      if (Environment.type === 'node') {
+      if (Environment.isNode) {
         expect(External.browser('non-existent')).deep.equal({})
         const { named } = External.browser('non-existent')
         expect(named).undefined
@@ -91,7 +91,7 @@ describe('External', () => {
     })
 
     it('throws error if cannot resolve module on node', () => {
-      if (Environment.type === 'node') {
+      if (Environment.isNode) {
         expect(() => {
           External.node('non-existent')
         }).throws(Error)
@@ -99,7 +99,7 @@ describe('External', () => {
     })
 
     it('returns empty object on environment other than node', () => {
-      if (Environment.type !== 'node') {
+      if (!Environment.isNode) {
         expect(External.node('non-existent')).deep.equal({})
         const { named } = External.node('non-existent')
         expect(named).undefined

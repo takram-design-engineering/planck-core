@@ -37,7 +37,7 @@ describe('FilePath', () => {
   describe('#self', () => {
     it('matches the original script url', () => {
       const url = new URL(FilePath.self)
-      if (Environment.type !== 'node') {
+      if (!Environment.isNode) {
         if (BUNDLER === 'rollup') {
           expect(url.pathname).equal('/dist/planck-core.js')
         }
@@ -51,7 +51,7 @@ describe('FilePath', () => {
   describe('#current', () => {
     it('matches the current script url', () => {
       const url = new URL(current)
-      if (Environment.type !== 'node') {
+      if (!Environment.isNode) {
         expect(url.pathname).equal(`/dist/test/unit/${BUNDLER}.js`)
       }
     })
@@ -59,7 +59,7 @@ describe('FilePath', () => {
 
   describe('separator', () => {
     it('works', () => {
-      if (Environment.type === 'node') {
+      if (Environment.isNode) {
         expect(FilePath.separator).equal(path.sep)
       } else {
         expect(FilePath.separator).equal('/')
@@ -69,7 +69,7 @@ describe('FilePath', () => {
 
   describe('delimiter', () => {
     it('works', () => {
-      if (Environment.type === 'node') {
+      if (Environment.isNode) {
         expect(FilePath.delimiter).equal(path.delimiter)
       } else {
         expect(FilePath.delimiter).equal(':')
@@ -83,7 +83,7 @@ describe('FilePath', () => {
         .equal('/foo/bar/baz')
       expect(FilePath.resolve('/foo/bar', '/tmp/file/'))
         .equal('/tmp/file')
-      if (Environment.type === 'node') {
+      if (Environment.isNode) {
         expect(FilePath.resolve('www', 'static/png/', '../gif/image.gif'))
           .equal(FilePath.join(process.cwd(), 'www/static/gif/image.gif'))
       } else {
