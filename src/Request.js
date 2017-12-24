@@ -25,7 +25,7 @@
 import { csvParse, tsvParse } from 'd3-dsv'
 
 import { importNode } from './External'
-import { isNode } from './Environment'
+import { isNode } from './Global'
 import Namespace from './Namespace'
 import URL from './URL'
 

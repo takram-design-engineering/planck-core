@@ -26,9 +26,9 @@ import Aggregate from '../src/Aggregate'
 import AggregateFunction from '../src/AggregateFunction'
 import Array from '../src/Array'
 import AssertionError from '../src/AssertionError'
-import Environment from '../src/Environment'
 import External from '../src/External'
 import FilePath from '../src/FilePath'
+import Global from '../src/Global'
 import Hash from '../src/Hash'
 import ImplementationError from '../src/ImplementationError'
 import Math from '../src/Math'
@@ -43,9 +43,9 @@ export {
   AggregateFunction,
   Array,
   AssertionError,
-  Environment,
   External,
   FilePath,
+  Global,
   Hash,
   ImplementationError,
   Math,
@@ -61,9 +61,9 @@ export default {
   AggregateFunction,
   Array,
   AssertionError,
-  Environment,
   External,
   FilePath,
+  Global,
   Hash,
   ImplementationError,
   Math,

@@ -26,7 +26,7 @@ import 'source-map-support/register'
 
 import chai from 'chai'
 
-import { Environment, External, FilePath, URL } from '../..'
+import { Global, External, FilePath, URL } from '../..'
 
 const path = External.node('path')
 
@@ -35,7 +35,7 @@ const { expect } = chai
 describe('FilePath', () => {
   describe('sep', () => {
     it('works', () => {
-      if (Environment.isNode) {
+      if (Global.isNode) {
         expect(FilePath.sep).equal(path.sep)
       } else {
         expect(FilePath.sep).equal('/')
@@ -45,7 +45,7 @@ describe('FilePath', () => {
 
   describe('delimiter', () => {
     it('works', () => {
-      if (Environment.isNode) {
+      if (Global.isNode) {
         expect(FilePath.delimiter).equal(path.delimiter)
       } else {
         expect(FilePath.delimiter).equal(':')
@@ -59,7 +59,7 @@ describe('FilePath', () => {
         .equal('/foo/bar/baz')
       expect(FilePath.resolve('/foo/bar', '/tmp/file/'))
         .equal('/tmp/file')
-      if (Environment.isNode) {
+      if (Global.isNode) {
         expect(FilePath.resolve('www', 'static/png/', '../gif/image.gif'))
           .equal(FilePath.join(process.cwd(), 'www/static/gif/image.gif'))
       } else {

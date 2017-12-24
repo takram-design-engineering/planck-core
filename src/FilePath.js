@@ -25,7 +25,7 @@
 import browserPath from 'path-browserify'
 
 import { importNode } from './External'
-import { isBrowser, isWorker, isNode } from './Environment'
+import { isBrowser, isWorker, isNode } from './Global'
 
 const nodePath = importNode('path')
 
