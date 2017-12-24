@@ -26,7 +26,7 @@ import 'source-map-support/register'
 
 import chai from 'chai'
 
-import { Global, External } from '../..'
+import { External, Global } from '../..'
 
 const { expect } = chai
 

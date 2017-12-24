@@ -26,7 +26,7 @@ import 'source-map-support/register'
 
 import chai from 'chai'
 
-import { Global, External, FilePath, URL } from '../..'
+import { External, Global, FilePath } from '../..'
 
 const path = External.node('path')
 
