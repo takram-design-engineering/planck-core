@@ -22,45 +22,53 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-const environmentType = (() => {
+export const isBrowser = (() => {
   try {
     // eslint-disable-next-line no-new-func
     if (new Function('return this === window')()) {
-      return 'browser'
+      return true
     }
   } catch (error) {}
+  return false
+})()
+
+export const isWorker = !isBrowser && (() => {
   try {
     // eslint-disable-next-line no-new-func
     if (new Function('return this === self')()) {
-      return 'worker'
+      return true
     }
   } catch (error) {}
+  return false
+})()
+
+export const isNode = !isBrowser && !isWorker && (() => {
   try {
     // eslint-disable-next-line no-new-func
     if (new Function('return this === global')()) {
-      return 'node'
+      return true
     }
   } catch (error) {}
+  return false
+})()
+
+export const globalScope = (() => {
+  if (isBrowser) {
+    return window
+  }
+  if (isWorker) {
+    // eslint-disable-next-line no-restricted-globals
+    return self
+  }
+  if (isNode) {
+    return global
+  }
   return undefined
 })()
 
-let environmentSelf
-switch (environmentType) {
-  case 'browser':
-    environmentSelf = window
-    break
-  case 'worker':
-    // eslint-disable-next-line no-restricted-globals
-    environmentSelf = self
-    break
-  case 'node':
-    environmentSelf = global
-    break
-  default:
-    break
-}
-
 export default {
-  type: environmentType,
-  self: environmentSelf,
+  isBrowser,
+  isWorker,
+  isNode,
+  scope: globalScope,
 }
