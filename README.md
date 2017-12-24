@@ -71,21 +71,21 @@ console.log(aggregate.func())  // ['a', 'b']
 
 ### Environment Detection
 
-`Environment` has 2 properties `type` and `self`. The `type` is either “browser”, “worker” or “node”, and `self` is either `window`, `self` or `global` in their respective environments.
+`Global` distinguishes browsers, workers and node processes by `isBrowser`, `isWorker` and `isNode` respectively, and provides unified way to access the global scopes via `scope`.
 
 #### Example
 
 ```js
-import { Environment } from '@takram/planck-core'
+import { Global } from '@takram/planck-core'
 
-if (Environment.type === 'node') {
-  Environment.self.module = require('module')
-} else if (Environment.type === 'worker') {
-  Environment.self.module = importScripts('/js/module.js')
+if (Global.isNode) {
+  Global.scope.module = require('module')
+} else if (Global.isWorker) {
+  Global.scope.module = importScripts('/js/module.js')
 }
 // Assume the module is already loaded in browser
 
-Environment.self.module()
+Global.scope.module()
 ```
 
 ### Promise-based Semaphore
@@ -124,7 +124,7 @@ function load(url) {
 
 ### Aggregate
 
-<a id="aggregate-class-new" href="#aggregate-class-new">#</a>
+<a id="aggregate-new" href="#aggregate-new">#</a>
 Aggregate.**new**(*target1* [, *target2* [, ...]])
 
 <a id="aggregate-get" href="#aggregate-get">#</a>
@@ -135,7 +135,7 @@ Aggregate.**new**(*target1* [, *target2* [, ...]])
 
 ### AggregateFunction
 
-<a id="aggregatefunction-class-new" href="#aggregatefunction-class-new">#</a>
+<a id="aggregatefunction-new" href="#aggregatefunction-new">#</a>
 AggregateFunction.**new**(*target1* [, *target2* [, ...]])
 
 <a id="aggregatefunction-apply" href="#aggregatefunction-apply">#</a>
@@ -143,10 +143,10 @@ AggregateFunction.**new**(*target1* [, *target2* [, ...]])
 
 ### Array
 
-<a id="array-class-min" href="#array-class-min">#</a>
+<a id="array-min" href="#array-min">#</a>
 Array.**min**(*array*, *transform*)
 
-<a id="array-class-max" href="#array-class-max">#</a>
+<a id="array-max" href="#array-max">#</a>
 Array.**max**(*array*, *transform*)
 
 ### AssertionError
@@ -154,62 +154,62 @@ Array.**max**(*array*, *transform*)
 <a id="new-assertionerror" href="#new-assertionerror">#</a>
 new **AssertionError**([*message*])
 
-### Environment
-
-<a id="environment-class-type" href="#environment-class-type">#</a>
-Environment.**type**
-
-<a id="environment-class-self" href="#environment-class-self">#</a>
-Environment.**self**
-
 ### External
 
-<a id="external-class-optional" href="#external-class-optional">#</a>
+<a id="external-optional" href="#external-optional">#</a>
 External.**optional**(*id*)
 
-<a id="external-class-required" href="#external-class-required">#</a>
+<a id="external-required" href="#external-required">#</a>
 External.**required**(*id*)
 
-<a id="external-class-browser" href="#external-class-browser">#</a>
+<a id="external-browser" href="#external-browser">#</a>
 External.**browser**(*id*)
 
-<a id="external-class-node" href="#external-class-node">#</a>
+<a id="external-node" href="#external-node">#</a>
 External.**node**(*id*)
 
 ### FilePath
 
-<a id="filepath-class-self" href="#filepath-class-self">#</a>
-FilePath.**self**
-
-<a id="filepath-class-current" href="#filepath-class-current">#</a>
-FilePath.**current**
-
-<a id="filepath-class-resolve" href="#filepath-class-resolve">#</a>
+<a id="filepath-resolve" href="#filepath-resolve">#</a>
 FilePath.**resolve**([*path1* [, *path2* [, ...]]])
 
-<a id="filepath-class-normalize" href="#filepath-class-normalize">#</a>
+<a id="filepath-normalize" href="#filepath-normalize">#</a>
 FilePath.**normalize**(*path*)
 
-<a id="filepath-class-join" href="#filepath-class-join">#</a>
+<a id="filepath-join" href="#filepath-join">#</a>
 FilePath.**join**([*path1* [, *path2* [, ...]]])
 
-<a id="filepath-class-relative" href="#filepath-class-relative">#</a>
+<a id="filepath-relative" href="#filepath-relative">#</a>
 FilePath.**relative**(*from*, *to*)
 
-<a id="filepath-class-dirname" href="#filepath-class-dirname">#</a>
+<a id="filepath-dirname" href="#filepath-dirname">#</a>
 FilePath.**dirname**(*path*)
 
-<a id="filepath-class-basename" href="#filepath-class-basename">#</a>
+<a id="filepath-basename" href="#filepath-basename">#</a>
 FilePath.**basename**(*path* [, *ext*])
 
-<a id="filepath-class-extname" href="#filepath-class-extname">#</a>
+<a id="filepath-extname" href="#filepath-extname">#</a>
 FilePath.**extname**(*path*)
 
-<a id="filepath-class-separator" href="#filepath-class-separator">#</a>
-FilePath.**separator**
+<a id="filepath-sep" href="#filepath-sep">#</a>
+FilePath.**sep**
 
-<a id="filepath-class-delimiter" href="#filepath-class-delimiter">#</a>
+<a id="filepath-delimiter" href="#filepath-delimiter">#</a>
 FilePath.**delimiter**
+
+### Global
+
+<a id="global-isbrowser" href="#global-isbrowser">#</a>
+Global.**isBrowser**
+
+<a id="global-isworker" href="#global-isworker">#</a>
+Global.**isWorker**
+
+<a id="global-isnode" href="#global-isnode">#</a>
+Global.**isNode**
+
+<a id="global-scope" href="#global-scope">#</a>
+Global.**scope**
 
 ### Hash
 
@@ -220,6 +220,38 @@ FilePath.**delimiter**
 
 <a id="new-implementationerror" href="#new-implementationerror">#</a>
 new **ImplementationError**([*message*])
+
+### Math
+
+<a id="math-lerp" href="#math-lerp">#</a>
+Math.**lerp**(*start*, *stop*, *amount*)
+
+<a id="math-constrain" href="#math-constrain">#</a>
+Math.**constrain**(*value*, *min*, *max*)
+
+<a id="math-map" href="#math-map">#</a>
+Math.**map**(*value*, *min1*, *max1*, *min2*, *max2*)
+
+<a id="math-wrap" href="#math-wrap">#</a>
+Math.**wrap**(*value*, *min*, *max*)
+
+<a id="math-radians" href="#math-radians">#</a>
+Math.**radians**(*degrees*)
+
+<a id="math-degrees" href="#math-degrees">#</a>
+Math.**degrees**(*radians*)
+
+<a id="math-fract" href="#math-fract">#</a>
+Math.**fract**(*value*)
+
+<a id="math-mod" href="#math-mod">#</a>
+Math.**mod**(*value*, *divisor*)
+
+<a id="math-step" href="#math-step">#</a>
+Math.**step**(*edge*, *value*)
+
+<a id="math-smoothstep" href="#math-smoothstep">#</a>
+Math.**smoothstep**(*edge0*, *edge1*, *value*)
 
 ### Namespace
 
@@ -278,22 +310,23 @@ new **Semaphore**(*capacity*)
 
 ### Stride
 
-<a id="stride-class-foreach" href="#stride-class-foreach">#</a>
+<a id="stride-foreach" href="#stride-foreach">#</a>
 Stride.**forEach**(*array*, *stride*, *callback*)
 
-<a id="stride-class-some" href="#stride-class-some">#</a>
+<a id="stride-some" href="#stride-some">#</a>
 Stride.**some**(*array*, *stride*, *callback*)
 
-<a id="stride-class-every" href="#stride-class-every">#</a>
+<a id="stride-every" href="#stride-every">#</a>
 Stride.**every**(*array*, *stride*, *callback*)
 
-<a id="stride-class-reduce" href="#stride-class-reduce">#</a>
+<a id="stride-reduce" href="#stride-reduce">#</a>
 Stride.**reduce**(*array*, *stride*, *callback*, *initial*)
 
-### String
+<a id="stride-set" href="#stride-set">#</a>
+Stride.**set**(*array*, *stride*, *item*)
 
-<a id="string-class-template" href="#string-class-template">#</a>
-String.**template**(*string*, *variables*)
+<a id="stride-transform" href="#stride-transform">#</a>
+Stride.**transform**(*array*, *stride*, *callback*)
 
 ### URL
 
@@ -343,11 +376,6 @@ new **URL**(*url*, *baseUrl* [, *parser*])
 
 <a id="url-toString" href="#url-toString">#</a>
 *url*.**toString**()
-
-### UUID
-
-<a id="uuid-function-apply" href="#uuid-function-apply">#</a>
-**UUID**()
 
 ## License
 

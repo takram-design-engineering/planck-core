@@ -4,5 +4,9 @@ self.importScripts(
 );
 
 self.onmessage = function(message) {
-  self.postMessage(Planck.Environment.type);
+  self.postMessage({
+    isBrowser: Planck.Global.isBrowser,
+    isWorker: Planck.Global.isWorker,
+    isNode: Planck.Global.isNode,
+  });
 };

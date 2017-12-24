@@ -22,22 +22,53 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-import 'source-map-support/register'
+export const isBrowser = (() => {
+  try {
+    // eslint-disable-next-line no-new-func
+    if (new Function('return this === window')()) {
+      return true
+    }
+  } catch (error) {}
+  return false
+})()
 
-import chai from 'chai'
+export const isWorker = !isBrowser && (() => {
+  try {
+    // eslint-disable-next-line no-new-func
+    if (new Function('return this === self')()) {
+      return true
+    }
+  } catch (error) {}
+  return false
+})()
 
-import { UUID } from '../..'
+export const isNode = !isBrowser && !isWorker && (() => {
+  try {
+    // eslint-disable-next-line no-new-func
+    if (new Function('return this === global')()) {
+      return true
+    }
+  } catch (error) {}
+  return false
+})()
 
-const { expect } = chai
+export const globalScope = (() => {
+  if (isBrowser) {
+    return window
+  }
+  if (isWorker) {
+    // eslint-disable-next-line no-restricted-globals
+    return self
+  }
+  if (isNode) {
+    return global
+  }
+  return undefined
+})()
 
-describe('UUID', () => {
-  it('generates universally unique identifier', () => {
-    expect(UUID()).a('string')
-    const lengths = [8, 4, 4, 4, 12]
-    UUID().split('-').forEach((group, index) => {
-      expect(group.length).equal(lengths[index])
-      expect(/^[0-9a-z]+$/.test(group)).true
-    })
-    expect(UUID()).not.equal(UUID())
-  })
-})
+export default {
+  isBrowser,
+  isWorker,
+  isNode,
+  scope: globalScope,
+}
