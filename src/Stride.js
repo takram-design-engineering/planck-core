@@ -44,80 +44,87 @@ function subarray(array, start, end) {
   return array.subarray(start, end)
 }
 
-export default {
-  forEach(array, stride, callback) {
-    const func = isTypedArray(array) ? subarray : slice
-    const end = array.length - (array.length % stride)
-    for (let start = 0, index = 0; start < end; start += stride, ++index) {
-      callback(func(array, start, start + stride), index)
-    }
-  },
+export function forEach(array, stride, callback) {
+  const func = isTypedArray(array) ? subarray : slice
+  const end = array.length - (array.length % stride)
+  for (let start = 0, index = 0; start < end; start += stride, ++index) {
+    callback(func(array, start, start + stride), index)
+  }
+}
 
-  some(array, stride, callback) {
-    const end = array.length - (array.length % stride)
-    const func = isTypedArray(array) ? subarray : slice
-    for (let start = 0, index = 0; start < end; start += stride, ++index) {
-      if (callback(func(array, start, start + stride), index)) {
-        return true
+export function some(array, stride, callback) {
+  const end = array.length - (array.length % stride)
+  const func = isTypedArray(array) ? subarray : slice
+  for (let start = 0, index = 0; start < end; start += stride, ++index) {
+    if (callback(func(array, start, start + stride), index)) {
+      return true
+    }
+  }
+  return false
+}
+
+export function every(array, stride, callback) {
+  const end = array.length - (array.length % stride)
+  const func = isTypedArray(array) ? subarray : slice
+  for (let start = 0, index = 0; start < end; start += stride, ++index) {
+    if (!callback(func(array, start, start + stride), index)) {
+      return false
+    }
+  }
+  return true
+}
+
+export function reduce(array, stride, callback, initial) {
+  let result = initial
+  const end = array.length - (array.length % stride)
+  const func = isTypedArray(array) ? subarray : slice
+  for (let start = 0, index = 0; start < end; start += stride, ++index) {
+    result = callback(result, func(array, start, start + stride), index)
+  }
+  return result
+}
+
+export function set(array, stride, item) {
+  const end = array.length - (array.length % stride)
+  if (isTypedArray(array)) {
+    for (let start = 0; start < end; start += stride) {
+      array.set(item, start)
+    }
+  } else {
+    for (let start = 0; start < end; start += stride) {
+      for (let offset = 0; offset < stride; ++offset) {
+        // eslint-disable-next-line no-param-reassign
+        array[start + offset] = item[offset]
       }
     }
-    return false
-  },
+  }
+  return array
+}
 
-  every(array, stride, callback) {
-    const end = array.length - (array.length % stride)
-    const func = isTypedArray(array) ? subarray : slice
+export function transform(array, stride, callback) {
+  const end = array.length - (array.length % stride)
+  if (isTypedArray(array)) {
     for (let start = 0, index = 0; start < end; start += stride, ++index) {
-      if (!callback(func(array, start, start + stride), index)) {
-        return false
-      }
+      const item = callback(array.slice(start, start + stride), index)
+      array.set(item, start)
     }
-    return true
-  },
-
-  reduce(array, stride, callback, initial) {
-    let result = initial
-    const end = array.length - (array.length % stride)
-    const func = isTypedArray(array) ? subarray : slice
+  } else {
     for (let start = 0, index = 0; start < end; start += stride, ++index) {
-      result = callback(result, func(array, start, start + stride), index)
-    }
-    return result
-  },
-
-  set(array, stride, item) {
-    const end = array.length - (array.length % stride)
-    if (isTypedArray(array)) {
-      for (let start = 0; start < end; start += stride) {
-        array.set(item, start)
-      }
-    } else {
-      for (let start = 0; start < end; start += stride) {
-        for (let offset = 0; offset < stride; ++offset) {
-          // eslint-disable-next-line no-param-reassign
-          array[start + offset] = item[offset]
-        }
-      }
-    }
-    return array
-  },
-
-  transform(array, stride, callback) {
-    const end = array.length - (array.length % stride)
-    if (isTypedArray(array)) {
-      for (let start = 0, index = 0; start < end; start += stride, ++index) {
+      for (let offset = 0; offset < stride; ++offset) {
         const item = callback(array.slice(start, start + stride), index)
-        array.set(item, start)
-      }
-    } else {
-      for (let start = 0, index = 0; start < end; start += stride, ++index) {
-        for (let offset = 0; offset < stride; ++offset) {
-          const item = callback(array.slice(start, start + stride), index)
-          // eslint-disable-next-line no-param-reassign
-          array[start + offset] = item[offset]
-        }
+        // eslint-disable-next-line no-param-reassign
+        array[start + offset] = item[offset]
       }
     }
-    return array
-  },
+  }
+  return array
+}
+
+export default {
+  forEach,
+  some,
+  every,
+  reduce,
+  set,
+  transform,
 }
