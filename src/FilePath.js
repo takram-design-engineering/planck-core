@@ -47,7 +47,7 @@ export function currentFilePath() {
 
 export const resolve = (() => {
   return isNode ? nodePath.resolve : function resolve(...args) {
-    return browserPath.resolve.bind('/', ...args)
+    return browserPath.resolve('/', ...args)
   }
 })()
 

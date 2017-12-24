@@ -31,32 +31,8 @@ import { Environment, External, FilePath, URL } from '../..'
 const path = External.node('path')
 
 const { expect } = chai
-const { current } = FilePath
 
 describe('FilePath', () => {
-  describe('#self', () => {
-    it('matches the original script url', () => {
-      const url = new URL(FilePath.self)
-      if (!Environment.isNode) {
-        if (BUNDLER === 'rollup') {
-          expect(url.pathname).equal('/dist/planck-core.js')
-        }
-        if (BUNDLER === 'webpack') {
-          expect(url.pathname).equal('/dist/test/unit/webpack.js')
-        }
-      }
-    })
-  })
-
-  describe('#current', () => {
-    it('matches the current script url', () => {
-      const url = new URL(current)
-      if (!Environment.isNode) {
-        expect(url.pathname).equal(`/dist/test/unit/${BUNDLER}.js`)
-      }
-    })
-  })
-
   describe('sep', () => {
     it('works', () => {
       if (Environment.isNode) {
