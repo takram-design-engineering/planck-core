@@ -35,16 +35,50 @@ const { expect } = chai
 describe('Environment', function () {
   this.timeout(30000)
 
-  describe('#type', () => {
-    it('returns environment name', done => {
+  describe('#isBrowser', () => {
+    it('is true when running on a browser', done => {
       if (detectNode) {
-        expect(Environment.type).equal('node')
+        expect(Environment.isBrowser).equal(false)
         done()
       } else {
-        expect(Environment.type).equal('browser')
+        expect(Environment.isBrowser).equal(true)
         const worker = new Worker('/test/unit/data/worker')
         worker.addEventListener('message', event => {
-          expect(event.data).equal('worker')
+          expect(event.data.isBrowser).equal(false)
+          done()
+        }, false)
+        worker.postMessage('')
+      }
+    })
+  })
+
+  describe('#isWorker', () => {
+    it('is true when running on a worker', done => {
+      if (detectNode) {
+        expect(Environment.isWorker).equal(false)
+        done()
+      } else {
+        expect(Environment.isWorker).equal(false)
+        const worker = new Worker('/test/unit/data/worker')
+        worker.addEventListener('message', event => {
+          expect(event.data.isWorker).equal(true)
+          done()
+        }, false)
+        worker.postMessage('')
+      }
+    })
+  })
+
+  describe('#isNode', () => {
+    it('is true when running on node', done => {
+      if (detectNode) {
+        expect(Environment.isNode).equal(true)
+        done()
+      } else {
+        expect(Environment.isNode).equal(false)
+        const worker = new Worker('/test/unit/data/worker')
+        worker.addEventListener('message', event => {
+          expect(event.data.isNode).equal(false)
           done()
         }, false)
         worker.postMessage('')
