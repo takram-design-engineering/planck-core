@@ -153,7 +153,7 @@ function parseArguments(...args) {
   let [url, options] = args
   if (typeof url !== 'string') {
     options = url
-    ;({ url } = options.url)
+    ;({ url } = options)
   }
   if (typeof url !== 'string') {
     throw new Error('The first argument or options.url must be a string')
