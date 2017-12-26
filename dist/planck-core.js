@@ -2771,7 +2771,8 @@ function parseArguments() {
       options = args[1];
 
   if (typeof url !== 'string') {
-    options = url;url = options.url.url;
+    options = url;var _options = options;
+    url = _options.url;
   }
   if (typeof url !== 'string') {
     throw new Error('The first argument or options.url must be a string');
