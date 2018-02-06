@@ -7,7 +7,6 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 
 export default {
   input: './dist/planck-core.module.js',
-  sourcemap: true,
   plugins: [
     nodeResolve({ browser: true }),
     commonjs(),
@@ -30,5 +29,6 @@ export default {
     extend: true,
     name: 'Planck',
     file: './dist/planck-core.js',
+    sourcemap: true,
   },
 }

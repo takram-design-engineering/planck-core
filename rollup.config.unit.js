@@ -10,7 +10,6 @@ const pkg = require('./package.json')
 
 export default {
   input: './test/unit.js',
-  sourcemap: true,
   plugins: [
     nodeResolve({ browser: true }),
     commonjs(),
@@ -27,7 +26,6 @@ export default {
       babelrc: false,
     }),
   ],
-  intro: 'var BUNDLER = "rollup";',
   external: [
     'source-map-support/register',
     'd3-dsv',
@@ -37,16 +35,18 @@ export default {
     'nock',
     'sinon',
   ],
-  globals: {
-    'd3-dsv': 'd3',
-    [path.resolve(pkg.browser)]: 'Planck',
-    'chai': 'chai',
-    'mocha': 'mocha',
-    'nock': 'nock',
-    'sinon': 'sinon',
-  },
   output: {
+    intro: 'var BUNDLER = "rollup";',
+    globals: {
+      'd3-dsv': 'd3',
+      [path.resolve(pkg.browser)]: 'Planck',
+      'chai': 'chai',
+      'mocha': 'mocha',
+      'nock': 'nock',
+      'sinon': 'sinon',
+    },
     format: 'iife',
     file: './dist/test/unit/rollup.js',
+    sourcemap: true,
   },
 }
