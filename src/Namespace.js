@@ -1,7 +1,7 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-export default function Namespace(name = undefined) {
+export function createNamespace(name = undefined) {
   const symbol = Symbol(name)
   return function namespace(object, init = data => data) {
     if (object[symbol] === undefined) {
@@ -11,3 +11,5 @@ export default function Namespace(name = undefined) {
     return object[symbol]
   }
 }
+
+export default createNamespace
