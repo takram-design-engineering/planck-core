@@ -128,28 +128,6 @@ var slicedToArray = function () {
   };
 }();
 
-
-
-
-
-
-
-
-
-
-
-
-
-var toConsumableArray = function (arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  } else {
-    return Array.from(arr);
-  }
-};
-
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
@@ -2384,7 +2362,8 @@ function browserRequest(url, options) {
   if (options.headers) {
     var names = Object.keys(options.headers);
     for (var i = 0; i < names.length; ++i) {
-      request.setRequestHeader.apply(request, toConsumableArray(options.headers[names[i]]));
+      var name = names[i];
+      request.setRequestHeader(name, options.headers[name]);
     }
   }
   request.responseType = options.type;
