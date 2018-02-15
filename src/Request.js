@@ -28,7 +28,8 @@ function browserRequest(url, options) {
   if (options.headers) {
     const names = Object.keys(options.headers)
     for (let i = 0; i < names.length; ++i) {
-      request.setRequestHeader(...options.headers[names[i]])
+      const name = names[i]
+      request.setRequestHeader(name, options.headers[name])
     }
   }
   request.responseType = options.type
