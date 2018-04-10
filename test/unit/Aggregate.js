@@ -23,6 +23,11 @@ describe('Aggregate', () => {
     }).throw(Error)
   })
 
+  it('returns undefined if no there’s no targets', () => {
+    const aggregate = Aggregate.new()
+    expect(aggregate.value).undefined
+  })
+
   it('stores property', () => {
     const targets = [new T(), new T(), new T()]
     const aggregate = Aggregate.new(...targets)
