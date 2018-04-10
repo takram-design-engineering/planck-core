@@ -11,13 +11,11 @@ export default class AggregateFunction {
     if (namespace !== internal) {
       throw new Error()
     }
-    const scope = internal(this)
-    scope.targets = targets
+    internal(this).targets = targets
   }
 
   apply(target, bound, args) {
-    const scope = internal(this)
-    const { targets } = scope
+    const { targets } = internal(this)
     const result = []
     for (let i = 0; i < targets.length; ++i) {
       result.push(targets[i].apply(bound, args))
@@ -26,7 +24,6 @@ export default class AggregateFunction {
   }
 
   static new(...args) {
-    const instance = new this(internal, ...args)
-    return new Proxy(() => {}, instance)
+    return new Proxy(() => {}, new this(internal, ...args))
   }
 }
