@@ -38,7 +38,7 @@ function browserRequest(url, options) {
       reject(request.status)
       return
     }
-    if (request.response === null && options.type === 'json') {
+    if (request.response == null && options.type === 'json') {
       reject(new Error('Could not parse JSON'))
       return
     }
