@@ -7,17 +7,17 @@ const webpack = require('webpack')
 const pkg = require('./package.json')
 
 module.exports = {
+  mode: 'development',
   entry: [
-    path.resolve(__dirname, 'test', 'unit.js'),
+    path.resolve(__dirname, 'test/unit.js'),
   ],
   output: {
+    path: path.resolve(__dirname, 'dist/test/unit'),
     filename: 'webpack.js',
-    path: path.resolve(__dirname, 'dist', 'test', 'unit'),
   },
   devtool: 'source-map',
   externals: {
     'source-map-support/register': 'null',
-    'd3-dsv': 'd3',
     'chai': 'chai',
     'mocha': 'mocha',
     'nock': 'nock',
@@ -37,6 +37,7 @@ module.exports = {
                 'es2016',
                 'es2017',
                 'stage-3',
+                'stage-2',
               ],
             },
           },

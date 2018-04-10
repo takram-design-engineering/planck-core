@@ -28,7 +28,6 @@ export default {
   ],
   external: [
     'source-map-support/register',
-    'd3-dsv',
     path.resolve(pkg.browser),
     'chai',
     'mocha',
