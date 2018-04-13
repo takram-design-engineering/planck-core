@@ -31,10 +31,11 @@ class Task {
 
 export default class Semaphore {
   constructor(capacity) {
-    const scope = internal(this)
-    scope.capacity = capacity
-    scope.available = capacity
-    scope.queue = []
+    internal(this, {
+      capacity,
+      available: capacity,
+      queue: [],
+    })
   }
 
   wait(callback) {
@@ -59,12 +60,10 @@ export default class Semaphore {
   }
 
   get capacity() {
-    const scope = internal(this)
-    return scope.capacity
+    return internal(this).capacity
   }
 
   get available() {
-    const scope = internal(this)
-    return scope.available
+    return internal(this).available
   }
 }
