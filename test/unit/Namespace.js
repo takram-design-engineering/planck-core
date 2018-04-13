@@ -22,7 +22,7 @@ describe('Namespace', () => {
     expect(scope.a).equal('a')
   })
 
-  it('accepts init and is called once', () => {
+  it('accepts init function and is called once', () => {
     const init = sinon.stub().returns({
       a: 'a',
     })
@@ -34,5 +34,15 @@ describe('Namespace', () => {
     const scope = namespace(object)
     scope.a = 'a'
     expect(scope.a).equal('a')
+  })
+
+  it('accepts init object', () => {
+    const init = { b: 'b' }
+    const namespace = Namespace()
+    const object = {}
+    const scope = namespace(object, init)
+    scope.a = 'a'
+    expect(init.a).undefined
+    expect(scope.b).equal('b')
   })
 })
