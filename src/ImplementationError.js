@@ -1,7 +1,7 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-export default function ImplementationError(message) {
+export default function ImplementationError (message) {
   this.message = message
 }
 

@@ -7,14 +7,14 @@ export const internal = Namespace('AggregateFunction')
 
 export default class AggregateFunction {
   // This constructor provides for inheritance only
-  constructor(namespace, ...targets) {
+  constructor (namespace, ...targets) {
     if (namespace !== internal) {
       throw new Error()
     }
     internal(this).targets = targets
   }
 
-  apply(target, bound, args) {
+  apply (target, bound, args) {
     const { targets } = internal(this)
     const result = []
     for (let i = 0; i < targets.length; ++i) {
@@ -23,7 +23,7 @@ export default class AggregateFunction {
     return result
   }
 
-  static new(...args) {
+  static new (...args) {
     return new Proxy(() => {}, new this(internal, ...args))
   }
 }

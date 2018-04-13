@@ -1,7 +1,7 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-export default function AssertionError(message) {
+export default function AssertionError (message) {
   this.message = message
 }
 

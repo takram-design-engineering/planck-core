@@ -1,6 +1,8 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
+/* eslint-env worker */
+
 import browserPath from 'path-browserify'
 
 import { importNode } from './External'
@@ -8,14 +10,12 @@ import { isBrowser, isWorker, isNode } from './Global'
 
 const nodePath = importNode('path')
 
-export function currentFilePath() {
+export function currentFilePath () {
   if (isBrowser) {
-    // eslint-disable-next-line no-underscore-dangle
     const currentScript = document.currentScript || document._currentScript
     return (currentScript && currentScript.src) || undefined
   }
   if (isWorker) {
-    // eslint-disable-next-line no-restricted-globals
     return self.location.href
   }
   if (isNode) {
@@ -25,7 +25,7 @@ export function currentFilePath() {
 }
 
 export const resolve = (() => {
-  return isNode ? nodePath.resolve : function resolve(...args) {
+  return isNode ? nodePath.resolve : function resolve (...args) {
     return browserPath.resolve('/', ...args)
   }
 })()
@@ -71,5 +71,5 @@ export default {
   basename,
   extname,
   delimiter,
-  sep,
+  sep
 }

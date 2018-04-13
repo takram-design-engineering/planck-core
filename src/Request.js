@@ -1,6 +1,8 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
+/* eslint-env worker */
+
 import { csvParse, tsvParse } from 'd3-dsv'
 
 import { importNode } from './External'
@@ -13,9 +15,10 @@ const request = importNode('request')
 
 export const internal = Namespace('Request')
 
-function browserRequest(url, options) {
+function browserRequest (url, options) {
   let resolve
   let reject
+  // eslint-disable-next-line promise/param-names
   const promise = new Promise((...args) => {
     [resolve, reject] = args
   })
@@ -51,9 +54,10 @@ function browserRequest(url, options) {
   return promise
 }
 
-function nodeRequest(url, options) {
+function nodeRequest (url, options) {
   let resolve
   let reject
+  // eslint-disable-next-line promise/param-names
   const promise = new Promise((...args) => {
     [resolve, reject] = args
   })
@@ -71,7 +75,7 @@ function nodeRequest(url, options) {
       url,
       headers: options.headers || {},
       qs: options.query || {},
-      encoding: options.encoding,
+      encoding: options.encoding
     }, (error, response) => {
       if (error) {
         reject(error)
@@ -92,7 +96,7 @@ function nodeRequest(url, options) {
   return promise
 }
 
-function performRequest(url, options) {
+function performRequest (url, options) {
   if (isNode) {
     const request = nodeRequest(url, options)
     if (options.type === 'json') {
@@ -129,7 +133,7 @@ function performRequest(url, options) {
   return browserRequest(url, options)
 }
 
-function parseArguments(...args) {
+function parseArguments (...args) {
   let [url, options] = args
   if (typeof url !== 'string') {
     options = url
@@ -141,31 +145,31 @@ function parseArguments(...args) {
   options = Object.assign({}, {
     type: 'text',
     local: false,
-    encoding: 'utf-8',
+    encoding: 'utf-8'
   }, options)
   return [url, options]
 }
 
-export function requestText(...args) {
+export function requestText (...args) {
   const [url, options] = parseArguments(...args)
   options.type = 'text'
   return performRequest(url, options)
 }
 
-export function requestJSON(...args) {
+export function requestJSON (...args) {
   const [url, options] = parseArguments(...args)
   options.type = 'json'
   return performRequest(url, options)
 }
 
-export function requestBuffer(...args) {
+export function requestBuffer (...args) {
   const [url, options] = parseArguments(...args)
   options.type = 'arraybuffer'
   options.encoding = null
   return performRequest(url, options)
 }
 
-export function requestCSV(...args) {
+export function requestCSV (...args) {
   const [url, options] = parseArguments(...args)
   const request = this.text(url, options)
   const promise = request.then(response => {
@@ -177,7 +181,7 @@ export function requestCSV(...args) {
   return promise
 }
 
-export function requestTSV(...args) {
+export function requestTSV (...args) {
   const [url, options] = parseArguments(...args)
   const request = this.text(url, options)
   const promise = request.then(response => {
@@ -194,7 +198,7 @@ Object.assign(performRequest, {
   json: requestJSON,
   buffer: requestBuffer,
   csv: requestCSV,
-  tsv: requestTSV,
+  tsv: requestTSV
 })
 
 export default performRequest

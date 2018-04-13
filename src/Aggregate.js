@@ -8,23 +8,23 @@ export const internal = Namespace('Aggregate')
 
 export default class Aggregate {
   // This constructor provides for inheritance only
-  constructor(namespace, ...targets) {
+  constructor (namespace, ...targets) {
     if (namespace !== internal) {
       throw new Error()
     }
     internal(this).targets = targets
   }
 
-  set(target, property, value, receiver) {
+  set (target, property, value, receiver) {
     const { targets } = internal(this)
     for (let i = 0; i < targets.length; ++i) {
       targets[i][property] = value
     }
-    target[property] = value // eslint-disable-line no-param-reassign
+    target[property] = value
     return true
   }
 
-  get(target, property, receiver) {
+  get (target, property, receiver) {
     const { targets } = internal(this)
     // Return the first target's property if the given property is not a
     // function for the given target.
@@ -40,7 +40,7 @@ export default class Aggregate {
     return AggregateFunction.new(...args)
   }
 
-  static new(...args) {
+  static new (...args) {
     // Passing the internal forces users to call new instead of constructor
     return new Proxy({}, new this(internal, ...args))
   }
