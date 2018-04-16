@@ -227,13 +227,13 @@ new **ImplementationError**([*message*])
 Math.**lerp**(*start*, *stop*, *amount*)
 
 <a id="math-constrain" href="#math-constrain">#</a>
-Math.**constrain**(*value*, *min*, *max*)
+Math.**constrain**(*x*, *min*, *max*)
 
 <a id="math-map" href="#math-map">#</a>
-Math.**map**(*value*, *min1*, *max1*, *min2*, *max2*)
+Math.**map**(*x*, *min1*, *max1*, *min2*, *max2*)
 
 <a id="math-wrap" href="#math-wrap">#</a>
-Math.**wrap**(*value*, *min*, *max*)
+Math.**wrap**(*x*, *min*, *max*)
 
 <a id="math-radians" href="#math-radians">#</a>
 Math.**radians**(*degrees*)
@@ -241,17 +241,104 @@ Math.**radians**(*degrees*)
 <a id="math-degrees" href="#math-degrees">#</a>
 Math.**degrees**(*radians*)
 
+<a id="math-sin" href="#math-sin">#</a>
+Math.**sin**(*angle*)
+
+<a id="math-cos" href="#math-cos">#</a>
+Math.**cos**(*angle*)
+
+<a id="math-tan" href="#math-tan">#</a>
+Math.**tan**(*angle*)
+
+<a id="math-asin" href="#math-asin">#</a>
+Math.**asin**(*x*)
+
+<a id="math-acos" href="#math-acos">#</a>
+Math.**acos**(*x*)
+
+<a id="math-atan" href="#math-atan">#</a>
+Math.**atan**(y [, x])
+
+<a id="math-pow" href="#math-pow">#</a>
+Math.**pow**(*x*, *y*)
+
+<a id="math-exp" href="#math-exp">#</a>
+Math.**exp**(*x*)
+
+<a id="math-log" href="#math-log">#</a>
+Math.**log**(*x*)
+
+<a id="math-exp2" href="#math-exp2">#</a>
+Math.**exp2**(*x*)
+
+<a id="math-log2" href="#math-log2">#</a>
+Math.**log2**(*x*)
+
+<a id="math-sqrt" href="#math-sqrt">#</a>
+Math.**sqrt**(*x*)
+
+<a id="math-inversesqrt" href="#math-inversesqrt">#</a>
+Math.**inversesqrt**(*x*)
+
+<a id="math-abs" href="#math-abs">#</a>
+Math.**abs**(*x*)
+
+<a id="math-sign" href="#math-sign">#</a>
+Math.**sign**(*x*)
+
+<a id="math-floor" href="#math-floor">#</a>
+Math.**floor**(*x*)
+
+<a id="math-ceil" href="#math-ceil">#</a>
+Math.**ceil**(*x*)
+
 <a id="math-fract" href="#math-fract">#</a>
-Math.**fract**(*value*)
+Math.**fract**(*x*)
 
 <a id="math-mod" href="#math-mod">#</a>
-Math.**mod**(*value*, *divisor*)
+Math.**mod**(*x*, *y*)
+
+<a id="math-min" href="#math-min">#</a>
+Math.**min**(*x*, *y*)
+
+<a id="math-max" href="#math-max">#</a>
+Math.**max**(*x*, *y*)
+
+<a id="math-clamp" href="#math-clamp">#</a>
+Math.**clamp**(*x*, *min*, *max*)
+
+<a id="math-mix" href="#math-mix">#</a>
+Math.**mix**(*x*, *y*, *a*)
 
 <a id="math-step" href="#math-step">#</a>
-Math.**step**(*edge*, *value*)
+Math.**step**(*edge*, *x*)
 
 <a id="math-smoothstep" href="#math-smoothstep">#</a>
-Math.**smoothstep**(*edge0*, *edge1*, *value*)
+Math.**smoothstep**(*edge0*, *edge1*, *x*)
+
+<a id="math-length" href="#math-length">#</a>
+Math.**length**(*x*)
+
+<a id="math-distance" href="#math-distance">#</a>
+Math.**distance**(*x*, *y*)
+
+<a id="math-dot" href="#math-dot">#</a>
+Math.**dot**(*x*, *y*)
+
+<a id="math-cross" href="#math-cross">#</a>
+Math.**cross**(*x*, *y*)
+
+<a id="math-normalize" href="#math-normalize">#</a>
+Math.**normalize**(*x*)
+
+<a id="math-faceforward" href="#math-faceforward">#</a>
+Math.**faceforward**(*N*, *I* [, *Nref*])
+
+<a id="math-reflect" href="#math-reflect">#</a>
+Math.**reflect**(*I*, *N*)
+
+<a id="math-refract" href="#math-refract">#</a>
+Math.**refract**(*I*, *N*, *eta*)
 
 ### Namespace
 
