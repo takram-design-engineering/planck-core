@@ -10,7 +10,7 @@ export default class Aggregate {
   // This constructor provides for inheritance only
   constructor (namespace, ...targets) {
     if (namespace !== internal) {
-      throw new Error()
+      throw new Error('Use the static new function instead of new operator')
     }
     internal(this).targets = targets
   }

@@ -13,7 +13,7 @@ class Task {
         this.reject = reject
       }),
       new Promise(resolve => {
-        this.let = resolve
+        this.permit = resolve
       }).then(() => {
         callback(this.resolve, this.reject)
       })
@@ -45,7 +45,7 @@ export default class Semaphore {
       scope.queue.push(task)
     } else {
       --scope.available
-      task.let()
+      task.permit()
     }
     return task.promise
   }
@@ -55,7 +55,7 @@ export default class Semaphore {
     if (scope.queue.length === 0) {
       ++scope.available
     } else {
-      scope.queue.shift().let()
+      scope.queue.shift().permit()
     }
   }
 
