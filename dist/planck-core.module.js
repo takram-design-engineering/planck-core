@@ -32,7 +32,7 @@ export {
   Request,
   Semaphore,
   Stride,
-  URL,
+  URL
 }
 
 export default {
@@ -50,5 +50,5 @@ export default {
   Request,
   Semaphore,
   Stride,
-  URL,
+  URL
 }
