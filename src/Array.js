@@ -1,7 +1,7 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-export function min(array, transform) {
+export function min (array, transform) {
   let result
   let min = Number.POSITIVE_INFINITY
   if (typeof transform !== 'function') {
@@ -25,7 +25,7 @@ export function min(array, transform) {
   return result
 }
 
-export function max(array, transform) {
+export function max (array, transform) {
   let result
   let max = Number.NEGATIVE_INFINITY
   if (typeof transform !== 'function') {
@@ -51,5 +51,5 @@ export function max(array, transform) {
 
 export default {
   min,
-  max,
+  max
 }

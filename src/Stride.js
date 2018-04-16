@@ -1,7 +1,7 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-function isTypedArray(array) {
+function isTypedArray (array) {
   return (
     array instanceof Int8Array ||
     array instanceof Uint8Array ||
@@ -15,15 +15,15 @@ function isTypedArray(array) {
   )
 }
 
-function slice(array, start, end) {
+function slice (array, start, end) {
   return array.slice(start, end)
 }
 
-function subarray(array, start, end) {
+function subarray (array, start, end) {
   return array.subarray(start, end)
 }
 
-export function forEach(array, stride, callback) {
+export function forEach (array, stride, callback) {
   const func = isTypedArray(array) ? subarray : slice
   const end = array.length - (array.length % stride)
   for (let start = 0, index = 0; start < end; start += stride, ++index) {
@@ -31,7 +31,7 @@ export function forEach(array, stride, callback) {
   }
 }
 
-export function some(array, stride, callback) {
+export function some (array, stride, callback) {
   const end = array.length - (array.length % stride)
   const func = isTypedArray(array) ? subarray : slice
   for (let start = 0, index = 0; start < end; start += stride, ++index) {
@@ -42,7 +42,7 @@ export function some(array, stride, callback) {
   return false
 }
 
-export function every(array, stride, callback) {
+export function every (array, stride, callback) {
   const end = array.length - (array.length % stride)
   const func = isTypedArray(array) ? subarray : slice
   for (let start = 0, index = 0; start < end; start += stride, ++index) {
@@ -53,7 +53,7 @@ export function every(array, stride, callback) {
   return true
 }
 
-export function reduce(array, stride, callback, initial) {
+export function reduce (array, stride, callback, initial) {
   let result = initial
   const end = array.length - (array.length % stride)
   const func = isTypedArray(array) ? subarray : slice
@@ -63,7 +63,7 @@ export function reduce(array, stride, callback, initial) {
   return result
 }
 
-export function set(array, stride, item) {
+export function set (array, stride, item) {
   const end = array.length - (array.length % stride)
   if (isTypedArray(array)) {
     for (let start = 0; start < end; start += stride) {
@@ -72,7 +72,6 @@ export function set(array, stride, item) {
   } else {
     for (let start = 0; start < end; start += stride) {
       for (let offset = 0; offset < stride; ++offset) {
-        // eslint-disable-next-line no-param-reassign
         array[start + offset] = item[offset]
       }
     }
@@ -80,7 +79,7 @@ export function set(array, stride, item) {
   return array
 }
 
-export function transform(array, stride, callback) {
+export function transform (array, stride, callback) {
   const end = array.length - (array.length % stride)
   if (isTypedArray(array)) {
     for (let start = 0, index = 0; start < end; start += stride, ++index) {
@@ -91,7 +90,6 @@ export function transform(array, stride, callback) {
     for (let start = 0, index = 0; start < end; start += stride, ++index) {
       for (let offset = 0; offset < stride; ++offset) {
         const item = callback(array.slice(start, start + stride), index)
-        // eslint-disable-next-line no-param-reassign
         array[start + offset] = item[offset]
       }
     }
@@ -105,5 +103,5 @@ export default {
   every,
   reduce,
   set,
-  transform,
+  transform
 }
