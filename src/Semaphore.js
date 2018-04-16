@@ -6,17 +6,17 @@ import Namespace from './Namespace'
 export const internal = Namespace('Semaphore')
 
 class Task {
-  constructor(semaphore, callback) {
+  constructor (semaphore, callback) {
     const promises = [
       new Promise((resolve, reject) => {
         this.resolve = resolve
         this.reject = reject
       }),
       new Promise(resolve => {
-        this.let = resolve
+        this.permit = resolve
       }).then(() => {
         callback(this.resolve, this.reject)
-      }),
+      })
     ]
     this.promise = Promise.all(promises)
       .then(values => {
@@ -30,41 +30,40 @@ class Task {
 }
 
 export default class Semaphore {
-  constructor(capacity) {
-    const scope = internal(this)
-    scope.capacity = capacity
-    scope.available = capacity
-    scope.queue = []
+  constructor (capacity) {
+    internal(this, {
+      capacity,
+      available: capacity,
+      queue: []
+    })
   }
 
-  wait(callback) {
+  wait (callback) {
     const scope = internal(this)
     const task = new Task(this, callback)
     if (scope.available === 0) {
       scope.queue.push(task)
     } else {
       --scope.available
-      task.let()
+      task.permit()
     }
     return task.promise
   }
 
-  signal() {
+  signal () {
     const scope = internal(this)
     if (scope.queue.length === 0) {
       ++scope.available
     } else {
-      scope.queue.shift().let()
+      scope.queue.shift().permit()
     }
   }
 
-  get capacity() {
-    const scope = internal(this)
-    return scope.capacity
+  get capacity () {
+    return internal(this).capacity
   }
 
-  get available() {
-    const scope = internal(this)
-    return scope.available
+  get available () {
+    return internal(this).available
   }
 }

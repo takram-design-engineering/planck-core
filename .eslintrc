@@ -1,6 +1,0 @@
-{
-  'extends': '@takram/planck',
-  'env': {
-    'browser': true,
-  },
-}

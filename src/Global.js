@@ -1,9 +1,11 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
+/* eslint-env worker */
+/* eslint-disable no-new-func */
+
 export const isBrowser = (() => {
   try {
-    // eslint-disable-next-line no-new-func
     if (new Function('return this === window')()) {
       return true
     }
@@ -13,7 +15,6 @@ export const isBrowser = (() => {
 
 export const isWorker = !isBrowser && (() => {
   try {
-    // eslint-disable-next-line no-new-func
     if (new Function('return this === self')()) {
       return true
     }
@@ -23,7 +24,6 @@ export const isWorker = !isBrowser && (() => {
 
 export const isNode = !isBrowser && !isWorker && (() => {
   try {
-    // eslint-disable-next-line no-new-func
     if (new Function('return this === global')()) {
       return true
     }
@@ -36,7 +36,6 @@ export const globalScope = (() => {
     return window
   }
   if (isWorker) {
-    // eslint-disable-next-line no-restricted-globals
     return self
   }
   if (isNode) {
@@ -49,5 +48,5 @@ export default {
   isBrowser,
   isWorker,
   isNode,
-  scope: globalScope,
+  scope: globalScope
 }

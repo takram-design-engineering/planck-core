@@ -8,32 +8,29 @@ export const internal = Namespace('Aggregate')
 
 export default class Aggregate {
   // This constructor provides for inheritance only
-  constructor(namespace, ...targets) {
+  constructor (namespace, ...targets) {
     if (namespace !== internal) {
-      throw new Error()
+      throw new Error('Use the static new function instead of new operator')
     }
-    const scope = internal(this)
-    scope.targets = targets
+    internal(this).targets = targets
   }
 
-  set(target, property, value, receiver) {
-    const scope = internal(this)
-    const { targets } = scope
+  set (target, property, value, receiver) {
+    const { targets } = internal(this)
     for (let i = 0; i < targets.length; ++i) {
       targets[i][property] = value
     }
-    // eslint-disable-next-line no-param-reassign
     target[property] = value
     return true
   }
 
-  get(target, property, receiver) {
-    const scope = internal(this)
-    const { targets } = scope
-    for (let i = 0; i < targets.length; ++i) {
-      if (typeof target[property] !== 'function') {
-        return scope.targets[0][property]
-      }
+  get (target, property, receiver) {
+    const { targets } = internal(this)
+    // Return the first target's property if the given property is not a
+    // function for the given target.
+    if (typeof target[property] !== 'function') {
+      const [firstTarget] = targets
+      return firstTarget && firstTarget[property]
     }
     const args = []
     for (let i = 0; i < targets.length; ++i) {
@@ -43,8 +40,8 @@ export default class Aggregate {
     return AggregateFunction.new(...args)
   }
 
-  static new(...args) {
-    const instance = new this(internal, ...args)
-    return new Proxy({}, instance)
+  static new (...args) {
+    // Passing the internal forces users to call new instead of constructor
+    return new Proxy({}, new this(internal, ...args))
   }
 }

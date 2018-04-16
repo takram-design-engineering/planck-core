@@ -16,7 +16,7 @@ describe('Array', () => {
         { value: 3 },
         { value: 4 },
         { value: 1 },
-        { value: 2 },
+        { value: 2 }
       ]
       expect(Array.min(array, element => element.value)).equal(array[2])
     })
@@ -28,7 +28,7 @@ describe('Array', () => {
         { value: 3 },
         { value: 4 },
         { value: 1 },
-        { value: 2 },
+        { value: 2 }
       ]
       expect(Array.max(array, element => element.value)).equal(array[1])
     })

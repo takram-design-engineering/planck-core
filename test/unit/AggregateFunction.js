@@ -15,8 +15,7 @@ chai.use(sinonChai)
 describe('AggregateFunction', () => {
   it('throws an error when new operator is used', () => {
     expect(() => {
-      // eslint-disable-next-line no-new
-      new AggregateFunction()
+      return new AggregateFunction()
     }).throw(Error)
   })
 
@@ -24,7 +23,7 @@ describe('AggregateFunction', () => {
     const targets = [
       sinon.stub().returns('a'),
       sinon.stub().returns('b'),
-      sinon.stub().returns('c'),
+      sinon.stub().returns('c')
     ]
     const aggregate = AggregateFunction.new(...targets)
     const result = aggregate()
