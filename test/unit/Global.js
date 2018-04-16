@@ -1,6 +1,8 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
+/* eslint-env worker */
+
 import 'source-map-support/register'
 
 import chai from 'chai'
@@ -10,7 +12,6 @@ import { Global } from '../..'
 
 const { expect } = chai
 
-// eslint-disable-next-line func-names
 describe('Global', function () {
   this.timeout(30000)
 

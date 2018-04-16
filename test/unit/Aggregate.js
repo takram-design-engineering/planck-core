@@ -1,6 +1,8 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
+/* eslint-disable no-unused-expressions */
+
 import 'source-map-support/register'
 
 import chai from 'chai'
@@ -11,15 +13,14 @@ const { expect } = chai
 
 describe('Aggregate', () => {
   class T {
-    set(other) {
+    set (other) {
       this.value = other
     }
   }
 
   it('throws an error when new operator is used', () => {
     expect(() => {
-      // eslint-disable-next-line no-new
-      new Aggregate()
+      return new Aggregate()
     }).throw(Error)
   })
 
@@ -39,7 +40,6 @@ describe('Aggregate', () => {
     const targets = [new T(), new T(), new T()]
     const aggregate = Aggregate.new(...targets)
     targets.forEach((target, index) => {
-      // eslint-disable-next-line no-param-reassign
       target.value = index
     })
     expect(aggregate.value).equal(0)

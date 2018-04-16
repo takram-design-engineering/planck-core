@@ -69,7 +69,7 @@ describe('FilePath', () => {
     it('works', () => {
       expect(FilePath.relative(
         '/data/orandea/test/aaa',
-        '/data/orandea/impl/bbb',
+        '/data/orandea/impl/bbb'
       )).equal('../../impl/bbb')
     })
   })

@@ -13,7 +13,6 @@ import { Global, Request } from '../..'
 const { expect } = chai
 chai.use(chaiAsPromised)
 
-// eslint-disable-next-line func-names
 describe('Request', function () {
   this.timeout(300000)
 

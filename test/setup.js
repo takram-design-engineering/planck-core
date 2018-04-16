@@ -1,8 +1,6 @@
 // The MIT License
 // Copyright (C) 2017-Present Shota Matsuda
 
-/* eslint-disable no-console */
-
 import chalk from 'chalk'
 import express from 'express'
 import SauceConnectLauncher from 'sauce-connect-launcher'
@@ -112,7 +110,6 @@ function stopTests(tests) {
   })
 }
 
-// eslint-disable-next-line func-names
 describe('', function () {
   this.timeout(1200000)
 
