@@ -125,71 +125,71 @@ function load(url) {
 ### Aggregate
 
 <a id="aggregate-new" href="#aggregate-new">#</a>
-Aggregate.**new**(*target1* [, *target2* [, ...]])
+Aggregate.**new**(_target1_ [, _target2_ [, ...]])
 
 <a id="aggregate-get" href="#aggregate-get">#</a>
-*aggregate*[**property**]
+_aggregate_[**property**]
 
 <a id="aggregate-set" href="#aggregate-set">#</a>
-*aggregate*[**property**] = *value*
+_aggregate_[**property**] = _value_
 
 ### AggregateFunction
 
 <a id="aggregatefunction-new" href="#aggregatefunction-new">#</a>
-AggregateFunction.**new**(*target1* [, *target2* [, ...]])
+AggregateFunction.**new**(_target1_ [, _target2_ [, ...]])
 
 <a id="aggregatefunction-apply" href="#aggregatefunction-apply">#</a>
-*aggregateFunction*([*arg1* [, *arg2* [, ...]]])
+_aggregateFunction_([_arg1_ [, _arg2_ [, ...]]])
 
 ### Array
 
 <a id="array-min" href="#array-min">#</a>
-Array.**min**(*array*, *transform*)
+Array.**min**(_array_, _transform_)
 
 <a id="array-max" href="#array-max">#</a>
-Array.**max**(*array*, *transform*)
+Array.**max**(_array_, _transform_)
 
 ### AssertionError
 
 <a id="new-assertionerror" href="#new-assertionerror">#</a>
-new **AssertionError**([*message*])
+new **AssertionError**([_message_])
 
 ### External
 
 <a id="external-optional" href="#external-optional">#</a>
-External.**optional**(*id*)
+External.**optional**(_id_)
 
 <a id="external-required" href="#external-required">#</a>
-External.**required**(*id*)
+External.**required**(_id_)
 
 <a id="external-browser" href="#external-browser">#</a>
-External.**browser**(*id*)
+External.**browser**(_id_)
 
 <a id="external-node" href="#external-node">#</a>
-External.**node**(*id*)
+External.**node**(_id_)
 
 ### FilePath
 
 <a id="filepath-resolve" href="#filepath-resolve">#</a>
-FilePath.**resolve**([*path1* [, *path2* [, ...]]])
+FilePath.**resolve**([_path1_ [, _path2_ [, ...]]])
 
 <a id="filepath-normalize" href="#filepath-normalize">#</a>
-FilePath.**normalize**(*path*)
+FilePath.**normalize**(_path_)
 
 <a id="filepath-join" href="#filepath-join">#</a>
-FilePath.**join**([*path1* [, *path2* [, ...]]])
+FilePath.**join**([_path1_ [, _path2_ [, ...]]])
 
 <a id="filepath-relative" href="#filepath-relative">#</a>
-FilePath.**relative**(*from*, *to*)
+FilePath.**relative**(_from_, _to_)
 
 <a id="filepath-dirname" href="#filepath-dirname">#</a>
-FilePath.**dirname**(*path*)
+FilePath.**dirname**(_path_)
 
 <a id="filepath-basename" href="#filepath-basename">#</a>
-FilePath.**basename**(*path* [, *ext*])
+FilePath.**basename**(_path_ [, _ext_])
 
 <a id="filepath-extname" href="#filepath-extname">#</a>
-FilePath.**extname**(*path*)
+FilePath.**extname**(_path_)
 
 <a id="filepath-sep" href="#filepath-sep">#</a>
 FilePath.**sep**
@@ -214,255 +214,255 @@ Global.**scope**
 ### Hash
 
 <a id="hash-function-apply" href="#hash-function-apply">#</a>
-**Hash**(*object*)
+**Hash**(_object_)
 
 ### ImplementationError
 
 <a id="new-implementationerror" href="#new-implementationerror">#</a>
-new **ImplementationError**([*message*])
+new **ImplementationError**([_message_])
 
 ### Math
 
 <a id="math-lerp" href="#math-lerp">#</a>
-Math.**lerp**(*start*, *stop*, *amount*)
+Math.**lerp**(_start_, _stop_, _amount_)
 
 <a id="math-constrain" href="#math-constrain">#</a>
-Math.**constrain**(*x*, *min*, *max*)
+Math.**constrain**(_x_, _min_, _max_)
 
 <a id="math-map" href="#math-map">#</a>
-Math.**map**(*x*, *min1*, *max1*, *min2*, *max2*)
+Math.**map**(_x_, _min1_, _max1_, _min2_, _max2_)
 
 <a id="math-wrap" href="#math-wrap">#</a>
-Math.**wrap**(*x*, *min*, *max*)
+Math.**wrap**(_x_, _min_, _max_)
 
 <a id="math-radians" href="#math-radians">#</a>
-Math.**radians**(*degrees*)
+Math.**radians**(_degrees_)
 
 <a id="math-degrees" href="#math-degrees">#</a>
-Math.**degrees**(*radians*)
+Math.**degrees**(_radians_)
 
 <a id="math-sin" href="#math-sin">#</a>
-Math.**sin**(*angle*)
+Math.**sin**(_angle_)
 
 <a id="math-cos" href="#math-cos">#</a>
-Math.**cos**(*angle*)
+Math.**cos**(_angle_)
 
 <a id="math-tan" href="#math-tan">#</a>
-Math.**tan**(*angle*)
+Math.**tan**(_angle_)
 
 <a id="math-asin" href="#math-asin">#</a>
-Math.**asin**(*x*)
+Math.**asin**(_x_)
 
 <a id="math-acos" href="#math-acos">#</a>
-Math.**acos**(*x*)
+Math.**acos**(_x_)
 
 <a id="math-atan" href="#math-atan">#</a>
 Math.**atan**(y [, x])
 
 <a id="math-pow" href="#math-pow">#</a>
-Math.**pow**(*x*, *y*)
+Math.**pow**(_x_, _y_)
 
 <a id="math-exp" href="#math-exp">#</a>
-Math.**exp**(*x*)
+Math.**exp**(_x_)
 
 <a id="math-log" href="#math-log">#</a>
-Math.**log**(*x*)
+Math.**log**(_x_)
 
 <a id="math-exp2" href="#math-exp2">#</a>
-Math.**exp2**(*x*)
+Math.**exp2**(_x_)
 
 <a id="math-log2" href="#math-log2">#</a>
-Math.**log2**(*x*)
+Math.**log2**(_x_)
 
 <a id="math-sqrt" href="#math-sqrt">#</a>
-Math.**sqrt**(*x*)
+Math.**sqrt**(_x_)
 
 <a id="math-inversesqrt" href="#math-inversesqrt">#</a>
-Math.**inversesqrt**(*x*)
+Math.**inversesqrt**(_x_)
 
 <a id="math-abs" href="#math-abs">#</a>
-Math.**abs**(*x*)
+Math.**abs**(_x_)
 
 <a id="math-sign" href="#math-sign">#</a>
-Math.**sign**(*x*)
+Math.**sign**(_x_)
 
 <a id="math-floor" href="#math-floor">#</a>
-Math.**floor**(*x*)
+Math.**floor**(_x_)
 
 <a id="math-ceil" href="#math-ceil">#</a>
-Math.**ceil**(*x*)
+Math.**ceil**(_x_)
 
 <a id="math-fract" href="#math-fract">#</a>
-Math.**fract**(*x*)
+Math.**fract**(_x_)
 
 <a id="math-mod" href="#math-mod">#</a>
-Math.**mod**(*x*, *y*)
+Math.**mod**(_x_, _y_)
 
 <a id="math-min" href="#math-min">#</a>
-Math.**min**(*x*, *y*)
+Math.**min**(_x_, _y_)
 
 <a id="math-max" href="#math-max">#</a>
-Math.**max**(*x*, *y*)
+Math.**max**(_x_, _y_)
 
 <a id="math-clamp" href="#math-clamp">#</a>
-Math.**clamp**(*x*, *min*, *max*)
+Math.**clamp**(_x_, _min_, _max_)
 
 <a id="math-mix" href="#math-mix">#</a>
-Math.**mix**(*x*, *y*, *a*)
+Math.**mix**(_x_, _y_, _a_)
 
 <a id="math-step" href="#math-step">#</a>
-Math.**step**(*edge*, *x*)
+Math.**step**(_edge_, _x_)
 
 <a id="math-smoothstep" href="#math-smoothstep">#</a>
-Math.**smoothstep**(*edge0*, *edge1*, *x*)
+Math.**smoothstep**(_edge0_, _edge1_, _x_)
 
 <a id="math-length" href="#math-length">#</a>
-Math.**length**(*x*)
+Math.**length**(_x_)
 
 <a id="math-distance" href="#math-distance">#</a>
-Math.**distance**(*x*, *y*)
+Math.**distance**(_x_, _y_)
 
 <a id="math-dot" href="#math-dot">#</a>
-Math.**dot**(*x*, *y*)
+Math.**dot**(_x_, _y_)
 
 <a id="math-cross" href="#math-cross">#</a>
-Math.**cross**(*x*, *y*)
+Math.**cross**(_x_, _y_)
 
 <a id="math-normalize" href="#math-normalize">#</a>
-Math.**normalize**(*x*)
+Math.**normalize**(_x_)
 
 <a id="math-faceforward" href="#math-faceforward">#</a>
-Math.**faceforward**(*N*, *I* [, *Nref*])
+Math.**faceforward**(_N_, _I_ [, _Nref_])
 
 <a id="math-reflect" href="#math-reflect">#</a>
-Math.**reflect**(*I*, *N*)
+Math.**reflect**(_I_, _N_)
 
 <a id="math-refract" href="#math-refract">#</a>
-Math.**refract**(*I*, *N*, *eta*)
+Math.**refract**(_I_, _N_, _eta_)
 
 ### Namespace
 
 <a id="namespace-function-apply" href="#namespace-function-apply">#</a>
-**Namespace**([*name*])
+**Namespace**([_name_])
 
 <a id="namespace-apply" href="#namespace-apply">#</a>
-*namespace*(*object* [, *init*])
+_namespace_(_object_ [, _init_])
 
 ### Request
 
 <a id="request-text-1" href="#request-text-1">#</a>
-Request.**text**(*url* [, *options*])<br>
+Request.**text**(_url_ [, _options_])<br>
 <a id="request-text-2" href="#request-text-2">#</a>
-Request.**text**(*options*)
+Request.**text**(_options_)
 
 <a id="request-json-1" href="#request-json-1">#</a>
-Request.**json**(*url* [, *options*])<br>
+Request.**json**(_url_ [, _options_])<br>
 <a id="request-json-2" href="#request-json-2">#</a>
-Request.**json**(*options*)
+Request.**json**(_options_)
 
 <a id="request-buffer-1" href="#request-buffer-1">#</a>
-Request.**buffer**(*url* [, *options*])<br>
+Request.**buffer**(_url_ [, _options_])<br>
 <a id="request-buffer-2" href="#request-buffer-2">#</a>
-Request.**buffer**(*options*)
+Request.**buffer**(_options_)
 
 <a id="request-csv-1" href="#request-csv-1">#</a>
-Request.**csv**(*url* [, *options*])<br>
+Request.**csv**(_url_ [, _options_])<br>
 <a id="request-csv-2" href="#request-csv-2">#</a>
-Request.**csv**(*options*)
+Request.**csv**(_options_)
 
 <a id="request-tsv-1" href="#request-tsv-1">#</a>
-Request.**tsv**(*url* [, *options*])<br>
+Request.**tsv**(_url_ [, _options_])<br>
 <a id="request-tsv-2" href="#request-tsv-2">#</a>
-Request.**tsv**(*options*)
+Request.**tsv**(_options_)
 
 <a id="request-abort" href="#request-abort">#</a>
-*request*.**abort**()
+_request_.**abort**()
 
 ### Semaphore
 
 <a id="new-semaphore" href="#new-semaphore">#</a>
-new **Semaphore**(*capacity*)
+new **Semaphore**(_capacity_)
 
 <a id="semaphore-wait" href="#semaphore-wait">#</a>
-*semaphore*.**wait**(*callback*)
+_semaphore_.**wait**(_callback_)
 
 <a id="semaphore-signal" href="#semaphore-signal">#</a>
-*semaphore*.**signal**()
+_semaphore_.**signal**()
 
 <a id="semaphore-capacity" href="#semaphore-capacity">#</a>
-*semaphore*.**capacity**
+_semaphore_.**capacity**
 
 <a id="semaphore-available" href="#semaphore-available">#</a>
-*semaphore*.**available**
+_semaphore_.**available**
 
 ### Stride
 
 <a id="stride-foreach" href="#stride-foreach">#</a>
-Stride.**forEach**(*array*, *stride*, *callback*)
+Stride.**forEach**(_array_, _stride_, _callback_)
 
 <a id="stride-some" href="#stride-some">#</a>
-Stride.**some**(*array*, *stride*, *callback*)
+Stride.**some**(_array_, _stride_, _callback_)
 
 <a id="stride-every" href="#stride-every">#</a>
-Stride.**every**(*array*, *stride*, *callback*)
+Stride.**every**(_array_, _stride_, _callback_)
 
 <a id="stride-reduce" href="#stride-reduce">#</a>
-Stride.**reduce**(*array*, *stride*, *callback*, *initial*)
+Stride.**reduce**(_array_, _stride_, _callback_, _initial_)
 
 <a id="stride-set" href="#stride-set">#</a>
-Stride.**set**(*array*, *stride*, *item*)
+Stride.**set**(_array_, _stride_, _item_)
 
 <a id="stride-transform" href="#stride-transform">#</a>
-Stride.**transform**(*array*, *stride*, *callback*)
+Stride.**transform**(_array_, _stride_, _callback_)
 
 ### URL
 
 <a id="new-url-1" href="#new-url-1">#</a>
-new **URL**(*url* [, *parser*])<br>
+new **URL**(_url_ [, _parser_])<br>
 <a id="new-url-2" href="#new-url-2">#</a>
-new **URL**(*url*, *baseUrl* [, *parser*])
+new **URL**(_url_, _baseUrl_ [, _parser_])
 
 <a id="url-protocol" href="#url-protocol">#</a>
-*url*.**protocol**
+_url_.**protocol**
 
 <a id="url-slashes" href="#url-slashes">#</a>
-*url*.**slashes**
+_url_.**slashes**
 
 <a id="url-auth" href="#url-auth">#</a>
-*url*.**auth**
+_url_.**auth**
 
 <a id="url-username" href="#url-username">#</a>
-*url*.**username**
+_url_.**username**
 
 <a id="url-password" href="#url-password">#</a>
-*url*.**password**
+_url_.**password**
 
 <a id="url-host" href="#url-host">#</a>
-*url*.**host**
+_url_.**host**
 
 <a id="url-hostname" href="#url-hostname">#</a>
-*url*.**hostname**
+_url_.**hostname**
 
 <a id="url-port" href="#url-port">#</a>
-*url*.**port**
+_url_.**port**
 
 <a id="url-pathname" href="#url-pathname">#</a>
-*url*.**pathname**
+_url_.**pathname**
 
 <a id="url-query" href="#url-query">#</a>
-*url*.**query**
+_url_.**query**
 
 <a id="url-hash" href="#url-hash">#</a>
-*url*.**hash**
+_url_.**hash**
 
 <a id="url-href" href="#url-href">#</a>
-*url*.**href**
+_url_.**href**
 
 <a id="url-origin" href="#url-origin">#</a>
-*url*.**origin**
+_url_.**origin**
 
 <a id="url-toString" href="#url-toString">#</a>
-*url*.**toString**()
+_url_.**toString**()
 
 ## License
 
