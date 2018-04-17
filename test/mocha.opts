@@ -1,1 +1,1 @@
---require babel-core/register
+--compilers js:babel-core/register --require babel-polyfill

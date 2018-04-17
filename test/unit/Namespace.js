@@ -37,14 +37,4 @@ describe('Namespace', () => {
     scope.a = 'a'
     expect(scope.a).equal('a')
   })
-
-  it('accepts init object', () => {
-    const init = { b: 'b' }
-    const namespace = Namespace()
-    const object = {}
-    const scope = namespace(object, init)
-    scope.a = 'a'
-    expect(init.a).undefined
-    expect(scope.b).equal('b')
-  })
 })
