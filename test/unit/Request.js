@@ -8,7 +8,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import nock from 'nock'
 
-import { Global, Request } from '../..'
+import { isNode, Request } from '../..'
 
 const { expect } = chai
 chai.use(chaiAsPromised)
@@ -17,7 +17,7 @@ describe('Request', function () {
   this.timeout(300000)
 
   let host = 'http://localhost'
-  if (!Global.isNode) {
+  if (!isNode) {
     host = window.location.origin
   }
 
@@ -25,7 +25,7 @@ describe('Request', function () {
     it('resolves a string when fulfilled', () => {
       const path = '/test/unit/data/text'
       const expected = 'response'
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(200, expected)
@@ -38,7 +38,7 @@ describe('Request', function () {
 
     it('rejects with status code other than 200', () => {
       const path = '/test/unit/data/404'
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(404)
@@ -52,7 +52,7 @@ describe('Request', function () {
     it('rejects with 0 status code when aborted', () => {
       const path = '/test/unit/data/text'
       const expected = 'response'
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(200, expected)
@@ -69,7 +69,7 @@ describe('Request', function () {
     it('resolves an object when fulfilled', () => {
       const path = '/test/unit/data/json'
       const expected = { a: 1, b: 'c' }
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(200, JSON.stringify(expected))
@@ -82,7 +82,7 @@ describe('Request', function () {
 
     it('rejects with error when the response is malformed', () => {
       const path = '/test/unit/data/malformed'
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(200, '!malformed')
@@ -95,7 +95,7 @@ describe('Request', function () {
 
     it('rejects with status code other than 200', () => {
       const path = '/test/unit/data/404'
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(404)
@@ -109,7 +109,7 @@ describe('Request', function () {
     it('rejects with 0 status code when aborted', () => {
       const path = '/test/unit/data/json'
       const expected = { a: 1, b: 'c' }
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(200, JSON.stringify(expected))
@@ -127,7 +127,7 @@ describe('Request', function () {
       const path = '/test/unit/data/buffer'
       const expected = new Float32Array([1, 2, 3, 4]).buffer
 
-      if (Global.isNode) {
+      if (isNode) {
         const buffer = Buffer.alloc(expected.byteLength)
         const view = new Uint8Array(expected)
         for (let i = 0; i < buffer.length; ++i) {
@@ -152,7 +152,7 @@ describe('Request', function () {
 
     it('rejects with status code other than 200', () => {
       const path = '/test/unit/data/404'
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(404)
@@ -167,7 +167,7 @@ describe('Request', function () {
       const path = '/test/unit/data/buffer'
       const expected = new Float32Array([1, 2, 3, 4]).buffer
 
-      if (Global.isNode) {
+      if (isNode) {
         const buffer = Buffer.alloc(expected.byteLength)
         const view = new Uint8Array(expected)
         for (let i = 0; i < buffer.length; ++i) {
@@ -190,7 +190,7 @@ describe('Request', function () {
     it('resolves a string when fulfilled', () => {
       const path = '/test/unit/data/csv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(200, d3.csvFormat(expected))
@@ -204,7 +204,7 @@ describe('Request', function () {
 
     it('rejects with status code other than 200', () => {
       const path = '/test/unit/data/404'
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(404)
@@ -218,7 +218,7 @@ describe('Request', function () {
     it('rejects with 0 status code when aborted', () => {
       const path = '/test/unit/data/csv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(200, d3.csvFormat(expected))
@@ -235,7 +235,7 @@ describe('Request', function () {
     it('resolves a string when fulfilled', () => {
       const path = '/test/unit/data/tsv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(200, d3.tsvFormat(expected))
@@ -249,7 +249,7 @@ describe('Request', function () {
 
     it('rejects with status code other than 200', () => {
       const path = '/test/unit/data/404'
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(404)
@@ -263,7 +263,7 @@ describe('Request', function () {
     it('rejects with 0 status code when aborted', () => {
       const path = '/test/unit/data/tsv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
-      if (Global.isNode) {
+      if (isNode) {
         nock(host)
           .get(path)
           .reply(200, d3.tsvFormat(expected))

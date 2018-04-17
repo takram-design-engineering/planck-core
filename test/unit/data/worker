@@ -5,8 +5,9 @@ self.importScripts(
 
 self.onmessage = function(message) {
   self.postMessage({
-    isBrowser: Planck.Global.isBrowser,
-    isWorker: Planck.Global.isWorker,
-    isNode: Planck.Global.isNode,
+    foundScope: Planck.Global.scope === self && Planck.globalScope === self,
+    isBrowser: Planck.Global.isBrowser && Planck.isBrowser,
+    isWorker: Planck.Global.isWorker && Planck.isWorker,
+    isNode: Planck.Global.isNode && Planck.isNode
   });
 };

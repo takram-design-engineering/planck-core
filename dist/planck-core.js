@@ -3050,6 +3050,14 @@
   exports.Stride = Stride;
   exports.URL = urlParse;
   exports.default = planckCore_module;
+  exports.importOptional = importOptional;
+  exports.importRequired = importRequired;
+  exports.importNode = importNode;
+  exports.importBrowser = importBrowser;
+  exports.isBrowser = isBrowser;
+  exports.isWorker = isWorker;
+  exports.isNode = isNode;
+  exports.globalScope = globalScope;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
