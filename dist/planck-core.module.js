@@ -17,6 +17,9 @@ import Semaphore from '../src/Semaphore'
 import Stride from '../src/Stride'
 import URL from '../src/URL'
 
+export * from '../src/External'
+export * from '../src/Global'
+
 export {
   Aggregate,
   AggregateFunction,
@@ -32,7 +35,7 @@ export {
   Request,
   Semaphore,
   Stride,
-  URL,
+  URL
 }
 
 export default {
@@ -50,5 +53,5 @@ export default {
   Request,
   Semaphore,
   Stride,
-  URL,
+  URL
 }

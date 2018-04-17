@@ -4,6 +4,23 @@
   (factory((global.Planck = global.Planck || {})));
 }(this, (function (exports) { 'use strict';
 
+  // The MIT License
+  // Copyright (C) 2016-Present Shota Matsuda
+
+  function createNamespace(name) {
+    var symbol = Symbol(name);
+    return function namespace(object, init) {
+      if (object[symbol] == null) {
+        if (typeof init === 'function') {
+          object[symbol] = init({});
+        } else {
+          object[symbol] = {};
+        }
+      }
+      return object[symbol];
+    };
+  }
+
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
   } : function (obj) {
@@ -85,25 +102,6 @@
       }
     };
   }();
-
-  // The MIT License
-  // Copyright (C) 2016-Present Shota Matsuda
-
-  function createNamespace(name) {
-    var symbol = Symbol(name);
-    return function namespace(object, init) {
-      if (object[symbol] == null) {
-        if (typeof init === 'function') {
-          object[symbol] = init({});
-        } else if ((typeof init === 'undefined' ? 'undefined' : _typeof(init)) === 'object') {
-          object[symbol] = _extends({}, init);
-        } else {
-          object[symbol] = {};
-        }
-      }
-      return object[symbol];
-    };
-  }
 
   // The MIT License
 
@@ -2875,11 +2873,10 @@
     function Semaphore(capacity) {
       classCallCheck(this, Semaphore);
 
-      internal$3(this, {
-        capacity: capacity,
-        available: capacity,
-        queue: []
-      });
+      var scope = internal$3(this);
+      scope.capacity = capacity;
+      scope.available = capacity;
+      scope.queue = [];
     }
 
     createClass(Semaphore, [{
@@ -3053,6 +3050,14 @@
   exports.Stride = Stride;
   exports.URL = urlParse;
   exports.default = planckCore_module;
+  exports.importOptional = importOptional;
+  exports.importRequired = importRequired;
+  exports.importNode = importNode;
+  exports.importBrowser = importBrowser;
+  exports.isBrowser = isBrowser;
+  exports.isWorker = isWorker;
+  exports.isNode = isNode;
+  exports.globalScope = globalScope;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

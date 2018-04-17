@@ -7,21 +7,33 @@ import 'source-map-support/register'
 
 import chai from 'chai'
 
-import { External, Global } from '../..'
+import {
+  isNode,
+  globalScope,
+  External,
+  importOptional,
+  importRequired,
+  importNode,
+  importBrowser
+} from '../..'
 
 const { expect } = chai
 
-Global.scope.d3 = {}
+globalScope.d3 = {}
 
 describe('External', () => {
   describe('#required', () => {
     it('returns module', () => {
       expect(External.required('chai')).equal(chai)
+      expect(importRequired('chai')).equal(chai)
     })
 
     it('supports global name', () => {
       expect(() => {
         External.required({ 'd3-dsv': 'd3' })
+      }).not.throws(Error)
+      expect(() => {
+        importRequired({ 'd3-dsv': 'd3' })
       }).not.throws(Error)
     })
 
@@ -29,39 +41,53 @@ describe('External', () => {
       expect(() => {
         External.required('non-existent')
       }).throws(Error)
+      expect(() => {
+        importRequired('non-existent')
+      }).throws(Error)
     })
   })
 
   describe('#optional', () => {
     it('returns module', () => {
       expect(External.optional('chai')).equal(chai)
+      expect(importOptional('chai')).equal(chai)
     })
 
     it('returns empty object if cannot resolve module', () => {
       expect(External.optional('non-existent')).deep.equal({})
-      const { named } = External.optional('non-existent')
-      expect(named).undefined
+      expect(importOptional('non-existent')).deep.equal({})
+      const { named1 } = External.optional('non-existent')
+      expect(named1).undefined
+      const { named2 } = importOptional('non-existent')
+      expect(named2).undefined
     })
   })
 
   describe('#browser', () => {
     it('returns module', () => {
       expect(External.browser('chai')).equal(chai)
+      expect(importBrowser('chai')).equal(chai)
     })
 
     it('throws error if cannot resolve module on node', () => {
-      if (!Global.isNode) {
+      if (!isNode) {
         expect(() => {
           External.browser('non-existent')
+        }).throws(Error)
+        expect(() => {
+          importBrowser('non-existent')
         }).throws(Error)
       }
     })
 
-    it('returns empty object on Global other than node', () => {
-      if (Global.isNode) {
+    it('returns empty object on environments other than node', () => {
+      if (isNode) {
         expect(External.browser('non-existent')).deep.equal({})
-        const { named } = External.browser('non-existent')
-        expect(named).undefined
+        expect(importBrowser('non-existent')).deep.equal({})
+        const { named1 } = External.browser('non-existent')
+        expect(named1).undefined
+        const { named2 } = importBrowser('non-existent')
+        expect(named2).undefined
       }
     })
   })
@@ -69,21 +95,28 @@ describe('External', () => {
   describe('#node', () => {
     it('returns module', () => {
       expect(External.node('chai')).equal(chai)
+      expect(importNode('chai')).equal(chai)
     })
 
     it('throws error if cannot resolve module on node', () => {
-      if (Global.isNode) {
+      if (isNode) {
         expect(() => {
           External.node('non-existent')
+        }).throws(Error)
+        expect(() => {
+          importNode('non-existent')
         }).throws(Error)
       }
     })
 
-    it('returns empty object on Global other than node', () => {
-      if (!Global.isNode) {
+    it('returns empty object on environments other than node', () => {
+      if (!isNode) {
         expect(External.node('non-existent')).deep.equal({})
-        const { named } = External.node('non-existent')
-        expect(named).undefined
+        expect(importNode('non-existent')).deep.equal({})
+        const { named1 } = External.node('non-existent')
+        expect(named1).undefined
+        const { named2 } = importNode('non-existent')
+        expect(named2).undefined
       }
     })
   })

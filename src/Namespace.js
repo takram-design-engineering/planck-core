@@ -7,8 +7,6 @@ export default function createNamespace (name) {
     if (object[symbol] == null) {
       if (typeof init === 'function') {
         object[symbol] = init({})
-      } else if (typeof init === 'object') {
-        object[symbol] = { ...init }
       } else {
         object[symbol] = {}
       }
