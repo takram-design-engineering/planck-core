@@ -1,6 +1,8 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
+/* global BUNDLER */
+
 import mocha from 'mocha'
 
 if (BUNDLER !== 'webpack') {
@@ -28,7 +30,7 @@ if (BUNDLER !== 'webpack') {
         results: false,
         message: error.message,
         stack: error.stack,
-        titles,
+        titles
       })
     })
   }, false)
