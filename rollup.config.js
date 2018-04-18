@@ -8,9 +8,9 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import pkg from './package.json'
 
 export default {
-  input: pkg.module,
+  input: './src/main.js',
   plugins: [
-    nodeResolve({ browser: true }),
+    nodeResolve(),
     commonjs(),
     babel({
       presets: [
@@ -26,12 +26,19 @@ export default {
       babelrc: false
     })
   ],
-  output: {
-    format: 'umd',
-    exports: 'named',
-    extend: true,
-    name: 'Planck',
-    file: pkg.main,
-    sourcemap: true
-  }
+  output: [
+    {
+      format: 'umd',
+      exports: 'named',
+      extend: true,
+      name: 'Planck',
+      file: pkg.main,
+      sourcemap: true
+    },
+    {
+      format: 'es',
+      file: pkg.module,
+      sourcemap: true
+    }
+  ]
 }
