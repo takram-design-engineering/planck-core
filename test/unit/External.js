@@ -56,10 +56,6 @@ describe('External', () => {
     it('returns empty object if cannot resolve module', () => {
       expect(External.optional('non-existent')).deep.equal({})
       expect(importOptional('non-existent')).deep.equal({})
-      const { named1 } = External.optional('non-existent')
-      expect(named1).undefined
-      const { named2 } = importOptional('non-existent')
-      expect(named2).undefined
     })
   })
 
@@ -77,6 +73,13 @@ describe('External', () => {
         expect(() => {
           importBrowser('non-existent')
         }).throws(Error)
+      } else {
+        expect(() => {
+          External.browser('non-existent')
+        }).not.throws(Error)
+        expect(() => {
+          importBrowser('non-existent')
+        }).not.throws(Error)
       }
     })
 
@@ -84,10 +87,6 @@ describe('External', () => {
       if (isNode) {
         expect(External.browser('non-existent')).deep.equal({})
         expect(importBrowser('non-existent')).deep.equal({})
-        const { named1 } = External.browser('non-existent')
-        expect(named1).undefined
-        const { named2 } = importBrowser('non-existent')
-        expect(named2).undefined
       }
     })
   })
@@ -106,6 +105,13 @@ describe('External', () => {
         expect(() => {
           importNode('non-existent')
         }).throws(Error)
+      } else {
+        expect(() => {
+          External.node('non-existent')
+        }).not.throws(Error)
+        expect(() => {
+          importNode('non-existent')
+        }).not.throws(Error)
       }
     })
 
@@ -113,10 +119,6 @@ describe('External', () => {
       if (!isNode) {
         expect(External.node('non-existent')).deep.equal({})
         expect(importNode('non-existent')).deep.equal({})
-        const { named1 } = External.node('non-existent')
-        expect(named1).undefined
-        const { named2 } = importNode('non-existent')
-        expect(named2).undefined
       }
     })
   })
