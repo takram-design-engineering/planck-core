@@ -807,6 +807,11 @@
     })();
   });
 
+  var crypt$1 = /*#__PURE__*/Object.freeze({
+    default: crypt,
+    __moduleExports: crypt
+  });
+
   var charenc = {
     // UTF-8 encoding
     utf8: {
@@ -841,6 +846,11 @@
 
   var charenc_1 = charenc;
 
+  var charenc$1 = /*#__PURE__*/Object.freeze({
+    default: charenc_1,
+    __moduleExports: charenc_1
+  });
+
   /*!
    * Determine if an object is a Buffer
    *
@@ -863,12 +873,23 @@
     return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0));
   }
 
+  var isBuffer$1 = /*#__PURE__*/Object.freeze({
+    default: isBuffer_1,
+    __moduleExports: isBuffer_1
+  });
+
+  var require$$0 = ( crypt$1 && crypt ) || crypt$1;
+
+  var require$$1 = ( charenc$1 && charenc_1 ) || charenc$1;
+
+  var require$$2 = ( isBuffer$1 && isBuffer_1 ) || isBuffer$1;
+
   var md5 = createCommonjsModule(function (module) {
     (function () {
-      var crypt$$1 = crypt,
-          utf8 = charenc_1.utf8,
-          isBuffer = isBuffer_1,
-          bin = charenc_1.bin,
+      var crypt = require$$0,
+          utf8 = require$$1.utf8,
+          isBuffer = require$$2,
+          bin = require$$1.bin,
 
 
       // The core
@@ -879,7 +900,7 @@
         } else if (isBuffer(message)) message = Array.prototype.slice.call(message, 0);else if (!Array.isArray(message)) message = message.toString();
         // else, assume byte array already
 
-        var m = crypt$$1.bytesToWords(message),
+        var m = crypt.bytesToWords(message),
             l = message.length * 8,
             a = 1732584193,
             b = -271733879,
@@ -982,7 +1003,7 @@
           d = d + dd >>> 0;
         }
 
-        return crypt$$1.endian([a, b, c, d]);
+        return crypt.endian([a, b, c, d]);
       };
 
       // Auxiliary functions
@@ -1010,8 +1031,8 @@
       module.exports = function (message, options) {
         if (message === undefined || message === null) throw new Error('Illegal argument ' + message);
 
-        var digestbytes = crypt$$1.wordsToBytes(md5(message, options));
-        return options && options.asBytes ? digestbytes : options && options.asString ? bin.bytesToString(digestbytes) : crypt$$1.bytesToHex(digestbytes);
+        var digestbytes = crypt.wordsToBytes(md5(message, options));
+        return options && options.asBytes ? digestbytes : options && options.asString ? bin.bytesToString(digestbytes) : crypt.bytesToHex(digestbytes);
       };
     })();
   });
@@ -1287,6 +1308,11 @@
       }({ '': result }, '') : result;
   };
 
+  var parse$1 = /*#__PURE__*/Object.freeze({
+    default: parse,
+    __moduleExports: parse
+  });
+
   var escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
       gap,
       indent,
@@ -1436,15 +1462,33 @@
       return str('', { '': value });
   };
 
-  var parse$1 = parse;
-  var stringify$1 = stringify;
+  var stringify$1 = /*#__PURE__*/Object.freeze({
+    default: stringify,
+    __moduleExports: stringify
+  });
+
+  var require$$0$1 = ( parse$1 && parse ) || parse$1;
+
+  var require$$1$1 = ( stringify$1 && stringify ) || stringify$1;
+
+  var parse$2 = require$$0$1;
+  var stringify$2 = require$$1$1;
 
   var jsonify = {
-  	parse: parse$1,
-  	stringify: stringify$1
+  	parse: parse$2,
+  	stringify: stringify$2
   };
 
-  var json = typeof JSON !== 'undefined' ? JSON : jsonify;
+  var jsonify$1 = /*#__PURE__*/Object.freeze({
+    default: jsonify,
+    __moduleExports: jsonify,
+    parse: parse$2,
+    stringify: stringify$2
+  });
+
+  var require$$0$2 = ( jsonify$1 && jsonify ) || jsonify$1;
+
+  var json = typeof JSON !== 'undefined' ? JSON : require$$0$2;
 
   var jsonStableStringify = function jsonStableStringify(obj, opts) {
       if (!opts) opts = {};
@@ -2135,6 +2179,11 @@
     return port !== 0;
   };
 
+  var requiresPort$1 = /*#__PURE__*/Object.freeze({
+    default: requiresPort,
+    __moduleExports: requiresPort
+  });
+
   var has = Object.prototype.hasOwnProperty;
 
   /**
@@ -2200,13 +2249,24 @@
   //
   // Expose the module.
   //
-  var stringify$2 = querystringify;
-  var parse$2 = querystring;
+  var stringify$3 = querystringify;
+  var parse$3 = querystring;
 
   var querystringify_1 = {
-    stringify: stringify$2,
-    parse: parse$2
+    stringify: stringify$3,
+    parse: parse$3
   };
+
+  var querystringify$1 = /*#__PURE__*/Object.freeze({
+    default: querystringify_1,
+    __moduleExports: querystringify_1,
+    stringify: stringify$3,
+    parse: parse$3
+  });
+
+  var required = ( requiresPort$1 && requiresPort ) || requiresPort$1;
+
+  var qs = ( querystringify$1 && querystringify_1 ) || querystringify$1;
 
   var protocolre = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i,
       slashes = /^[A-Za-z][A-Za-z0-9+-.]*:\/\//;
@@ -2384,7 +2444,7 @@
       location = null;
     }
 
-    if (parser && 'function' !== typeof parser) parser = querystringify_1.parse;
+    if (parser && 'function' !== typeof parser) parser = qs.parse;
 
     location = lolcation(location);
 
@@ -2453,7 +2513,7 @@
     // for a given protocol. As the host also contains the port number we're going
     // override it with the hostname which contains no port number.
     //
-    if (!requiresPort(url.port, url.protocol)) {
+    if (!required(url.port, url.protocol)) {
       url.host = url.hostname;
       url.port = '';
     }
@@ -2495,7 +2555,7 @@
     switch (part) {
       case 'query':
         if ('string' === typeof value && value.length) {
-          value = (fn || querystringify_1.parse)(value);
+          value = (fn || qs.parse)(value);
         }
 
         url[part] = value;
@@ -2504,7 +2564,7 @@
       case 'port':
         url[part] = value;
 
-        if (!requiresPort(value, url.protocol)) {
+        if (!required(value, url.protocol)) {
           url.host = url.hostname;
           url[part] = '';
         } else if (value) {
@@ -2574,7 +2634,7 @@
    * @api public
    */
   function toString(stringify) {
-    if (!stringify || 'function' !== typeof stringify) stringify = querystringify_1.stringify;
+    if (!stringify || 'function' !== typeof stringify) stringify = qs.stringify;
 
     var query,
         url = this,
@@ -2608,7 +2668,7 @@
   //
   URL.extractProtocol = extractProtocol;
   URL.location = lolcation;
-  URL.qs = querystringify_1;
+  URL.qs = qs;
 
   var urlParse = URL;
 
@@ -3016,7 +3076,7 @@
 
   // The MIT License
 
-  var planckCore_module = {
+  var main = {
     Aggregate: Aggregate,
     AggregateFunction: AggregateFunction,
     Array: Array$1,
@@ -3049,7 +3109,7 @@
   exports.Semaphore = Semaphore;
   exports.Stride = Stride;
   exports.URL = urlParse;
-  exports.default = planckCore_module;
+  exports.default = main;
   exports.importOptional = importOptional;
   exports.importRequired = importRequired;
   exports.importNode = importNode;

@@ -10,10 +10,10 @@ import pkg from '../package.json'
 
 const saucelabs = new Saucelabs({
   username: process.env.SAUCE_USERNAME,
-  password: process.env.SAUCE_ACCESS_KEY,
+  password: process.env.SAUCE_ACCESS_KEY
 })
 
-function startServer(port) {
+function startServer (port) {
   return new Promise((resolve, reject) => {
     const app = express()
     app.use(express.static('./'))
@@ -27,12 +27,12 @@ function startServer(port) {
   })
 }
 
-function createTunnel(port) {
+function createTunnel (port) {
   return new Promise((resolve, reject) => {
     SauceConnectLauncher({
       username: process.env.SAUCE_USERNAME,
       accessKey: process.env.SAUCE_ACCESS_KEY,
-      logger: console.log,
+      logger: console.log
     }, (error, tunnel) => {
       if (error) {
         reject(error)
@@ -43,12 +43,12 @@ function createTunnel(port) {
   })
 }
 
-function startTests(data) {
+function startTests (data) {
   return new Promise((resolve, reject) => {
     saucelabs.send({
       method: 'POST',
       path: ':username/js-tests',
-      data,
+      data
     }, (error, response) => {
       if (error) {
         reject(error)
@@ -61,14 +61,14 @@ function startTests(data) {
   })
 }
 
-function updateTestStatus(tests) {
+function updateTestStatus (tests) {
   return new Promise((resolve, reject) => {
     saucelabs.send({
       method: 'POST',
       path: ':username/js-tests/status',
       data: {
-        'js tests': tests.map(test => test.id),
-      },
+        'js tests': tests.map(test => test.id)
+      }
     }, (error, response) => {
       if (error) {
         reject(error)
@@ -90,14 +90,18 @@ function updateTestStatus(tests) {
   })
 }
 
-function stopTests(tests) {
+function stopTests (tests) {
   return Promise.all(tests.map(test => {
     const id = test.job_id
     if (!id || id === 'job not ready') {
       return Promise.resolve()
     }
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       saucelabs.stopJob(id, {}, (error, response) => {
+        if (error) {
+          reject(error)
+          return
+        }
         if (response) {
           const platform = test.platform.join(' ')
           console.error(chalk.red(`${platform}: interrupted`))
@@ -134,7 +138,7 @@ describe('', function () {
       name: pkg.name,
       build: `${pkg.version} (${Date.now()})`,
       url: `http://localhost:${port}/test/`,
-      idleTimeout: 30,
+      idleTimeout: 30
     })
   })
 
