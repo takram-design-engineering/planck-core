@@ -4,14 +4,12 @@
 /* eslint-env worker */
 
 import { csvParse, tsvParse } from 'd3-dsv'
+import fs from 'fs'
+import request from 'request'
 
-import { importNode } from './External'
 import { isNode } from './Global'
 import Namespace from './Namespace'
 import URL from './URL'
-
-const { readFile } = importNode('fs')
-const request = importNode('request')
 
 export const internal = Namespace('Request')
 
@@ -62,7 +60,7 @@ function nodeRequest (url, options) {
     [resolve, reject] = args
   })
   if (options.local) {
-    readFile(url, options.encoding, (error, response) => {
+    fs.readFile(url, options.encoding, (error, response) => {
       if (error) {
         reject(error)
         return
