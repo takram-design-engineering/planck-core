@@ -13,12 +13,14 @@
   "license": "MIT",
   "homepage": "http://takram.com/projects/planck",
   "files": [
-    "./package.json",
-    "./README.md",
-    "./dist/planck-core.js",
-    "./dist/planck-core.min.js",
-    "./dist/planck-core.module.js",
-    "./src"
+    "package.json",
+    "README.md",
+    "dist/planck-core.js",
+    "dist/planck-core.module.js",
+    "dist/planck-core.browser.js",
+    "dist/planck-core.browser.module.js",
+    "dist/planck-core.min.js",
+    "src"
   ],
   "scripts": {
     "build": "npm-run-all --parallel build:node build:browser",
