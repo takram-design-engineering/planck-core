@@ -25,7 +25,7 @@
     "build:node": "rollup -c",
     "build:browser": "npm-run-all build:browser:compile build:browser:compress",
     "build:browser:compile": "rollup -c rollup.config.browser.js",
-    "build:browser:compress": "uglifyjs --compress --mangle --output ${npm_package_main%.*}.browser.min.js ${npm_package_main%.*}.browser.js",
+    "build:browser:compress": "uglifyjs --compress --mangle --output ${npm_package_main%.*}.min.js ${npm_package_main%.*}.browser.js",
     "test": "npm-run-all lint test:compile test:node test:saucelabs",
     "test:compile": "npm-run-all --parallel test:compile:rollup test:compile:webpack",
     "test:compile:rollup": "rollup -c rollup.config.test.js",
