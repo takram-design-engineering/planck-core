@@ -5,6 +5,24 @@ import babel from 'rollup-plugin-babel'
 import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
 
+function nullify (modules) {
+  return {
+    resolveId (importee) {
+      if (modules.includes(importee)) {
+        return importee
+      }
+      return null
+    },
+
+    load (id) {
+      if (modules.includes(id)) {
+        return 'export default null'
+      }
+      return null
+    }
+  }
+}
+
 const globals = {
   'chai': 'chai',
   'mocha': 'mocha',
@@ -13,9 +31,10 @@ const globals = {
 }
 
 export default {
-  input: './test/unit.js',
+  input: './test/index.js',
   plugins: [
-    nodeResolve(),
+    nullify(['path']),
+    nodeResolve({ browser: true }),
     commonjs(),
     babel({
       presets: [
@@ -39,7 +58,7 @@ export default {
     globals,
     intro: 'var BUNDLER = "rollup";',
     format: 'iife',
-    file: './dist/test/unit/rollup.js',
+    file: './dist/test/rollup.js',
     sourcemap: true
   }
 }

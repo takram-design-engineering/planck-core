@@ -23,7 +23,7 @@ describe('Request', function () {
 
   describe('#text', () => {
     it('resolves a string when fulfilled', () => {
-      const path = '/test/unit/data/text'
+      const path = '/test/data/text'
       const expected = 'response'
       if (isNode) {
         nock(host)
@@ -37,7 +37,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/unit/data/404'
+      const path = '/test/data/404'
       if (isNode) {
         nock(host)
           .get(path)
@@ -50,7 +50,7 @@ describe('Request', function () {
     })
 
     it('rejects with 0 status code when aborted', () => {
-      const path = '/test/unit/data/text'
+      const path = '/test/data/text'
       const expected = 'response'
       if (isNode) {
         nock(host)
@@ -67,7 +67,7 @@ describe('Request', function () {
 
   describe('#json', () => {
     it('resolves an object when fulfilled', () => {
-      const path = '/test/unit/data/json'
+      const path = '/test/data/json'
       const expected = { a: 1, b: 'c' }
       if (isNode) {
         nock(host)
@@ -81,7 +81,7 @@ describe('Request', function () {
     })
 
     it('rejects with error when the response is malformed', () => {
-      const path = '/test/unit/data/malformed'
+      const path = '/test/data/malformed'
       if (isNode) {
         nock(host)
           .get(path)
@@ -94,7 +94,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/unit/data/404'
+      const path = '/test/data/404'
       if (isNode) {
         nock(host)
           .get(path)
@@ -107,7 +107,7 @@ describe('Request', function () {
     })
 
     it('rejects with 0 status code when aborted', () => {
-      const path = '/test/unit/data/json'
+      const path = '/test/data/json'
       const expected = { a: 1, b: 'c' }
       if (isNode) {
         nock(host)
@@ -124,7 +124,7 @@ describe('Request', function () {
 
   describe('#buffer', () => {
     it('resolves a buffer when fulfilled', () => {
-      const path = '/test/unit/data/buffer'
+      const path = '/test/data/buffer'
       const expected = new Float32Array([1, 2, 3, 4]).buffer
 
       if (isNode) {
@@ -151,7 +151,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/unit/data/404'
+      const path = '/test/data/404'
       if (isNode) {
         nock(host)
           .get(path)
@@ -164,7 +164,7 @@ describe('Request', function () {
     })
 
     it('rejects with 0 status code when aborted', () => {
-      const path = '/test/unit/data/buffer'
+      const path = '/test/data/buffer'
       const expected = new Float32Array([1, 2, 3, 4]).buffer
 
       if (isNode) {
@@ -188,7 +188,7 @@ describe('Request', function () {
 
   describe('#csv', () => {
     it('resolves a string when fulfilled', () => {
-      const path = '/test/unit/data/csv'
+      const path = '/test/data/csv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
       if (isNode) {
         nock(host)
@@ -203,7 +203,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/unit/data/404'
+      const path = '/test/data/404'
       if (isNode) {
         nock(host)
           .get(path)
@@ -216,7 +216,7 @@ describe('Request', function () {
     })
 
     it('rejects with 0 status code when aborted', () => {
-      const path = '/test/unit/data/csv'
+      const path = '/test/data/csv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
       if (isNode) {
         nock(host)
@@ -233,7 +233,7 @@ describe('Request', function () {
 
   describe('#tsv', () => {
     it('resolves a string when fulfilled', () => {
-      const path = '/test/unit/data/tsv'
+      const path = '/test/data/tsv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
       if (isNode) {
         nock(host)
@@ -248,7 +248,7 @@ describe('Request', function () {
     })
 
     it('rejects with status code other than 200', () => {
-      const path = '/test/unit/data/404'
+      const path = '/test/data/404'
       if (isNode) {
         nock(host)
           .get(path)
@@ -261,7 +261,7 @@ describe('Request', function () {
     })
 
     it('rejects with 0 status code when aborted', () => {
-      const path = '/test/unit/data/tsv'
+      const path = '/test/data/tsv'
       const expected = [{ a: '1', b: '2' }, { a: '3', b: '4' }]
       if (isNode) {
         nock(host)

@@ -7,11 +7,29 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 
 import pkg from './package.json'
 
+function nullify (modules) {
+  return {
+    resolveId (importee) {
+      if (modules.includes(importee)) {
+        return importee
+      }
+      return null
+    },
+
+    load (id) {
+      if (modules.includes(id)) {
+        return 'export default null'
+      }
+      return null
+    }
+  }
+}
+
 export default {
   input: './src/index.js',
-  external: ['fs', 'path', 'request'],
   plugins: [
-    nodeResolve(),
+    nullify(['fs', 'path', 'request']),
+    nodeResolve({ browser: true }),
     commonjs(),
     babel({
       presets: [
@@ -29,14 +47,16 @@ export default {
   ],
   output: [
     {
-      format: 'cjs',
+      format: 'umd',
       exports: 'named',
-      file: pkg.main,
+      extend: true,
+      name: 'Planck',
+      file: pkg.browser[pkg.main],
       sourcemap: true
     },
     {
       format: 'es',
-      file: pkg.module,
+      file: pkg.browser[pkg.module],
       sourcemap: true
     }
   ]
