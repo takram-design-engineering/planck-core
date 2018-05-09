@@ -1,3 +1,7 @@
+import nodePath from 'path';
+import fs from 'fs';
+import request from 'request';
+
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
@@ -279,156 +283,6 @@ AssertionError.prototype.name = 'AssertionError';
 AssertionError.prototype.message = '';
 AssertionError.prototype.constructor = AssertionError;
 
-// The MIT License
-// Copyright (C) 2016-Present Shota Matsuda
-
-/* eslint-env worker */
-/* eslint-disable no-new-func */
-
-var isBrowser = function () {
-  try {
-    if (new Function('return this === window')()) {
-      return true;
-    }
-  } catch (error) {}
-  return false;
-}();
-
-var isWorker = !isBrowser && function () {
-  try {
-    if (new Function('return this === self')()) {
-      return true;
-    }
-  } catch (error) {}
-  return false;
-}();
-
-var isNode = !isBrowser && !isWorker && function () {
-  try {
-    if (new Function('return this === global')()) {
-      return true;
-    }
-  } catch (error) {}
-  return false;
-}();
-
-var globalScope = function () {
-  if (isBrowser) {
-    return window;
-  }
-  if (isWorker) {
-    return self;
-  }
-  if (isNode) {
-    return global;
-  }
-  return undefined;
-}();
-
-var Global = {
-  isBrowser: isBrowser,
-  isWorker: isWorker,
-  isNode: isNode,
-  scope: globalScope
-};
-
-// The MIT License
-
-function branchingImport(arg) {
-  // Assuming `process.browser` is defined via DefinePlugin on webpack, this
-  // conditional will be determined at transpilation time, and `else` block will
-  // be completely removed in order to prevent webpack from bundling module.
-  var name = void 0;
-  var id = void 0;
-  if (typeof arg === 'string') {
-    id = arg;
-    name = arg;
-  } else {
-    var _Object$keys = Object.keys(arg);
-
-    var _Object$keys2 = slicedToArray(_Object$keys, 1);
-
-    id = _Object$keys2[0];
-
-    name = arg[id];
-  }
-  if (process.browser) {
-    return globalScope[name];
-  } else {
-    if (!isNode) {
-      return undefined;
-    }
-    try {
-      return require(id);
-    } catch (error) {}
-    return undefined;
-  }
-}
-
-function runtimeImport(id) {
-  // This will throw error on browser, in which `process` is typically not
-  // defined in the global scope. Re-importing after defining `process.browser`
-  // in the global scope will evaluate the conditional in
-  // `branchingImport` for rollup's bundles.
-  try {
-    return branchingImport(id);
-  } catch (e) {
-    globalScope.process = {
-      browser: !isNode
-    };
-  }
-  return branchingImport(id);
-}
-
-function importOptional(id) {
-  var module = runtimeImport(id);
-  if (module === undefined) {
-    return {};
-  }
-  return module;
-}
-
-function importRequired(id) {
-  var module = runtimeImport(id);
-  if (module === undefined) {
-    if (isNode) {
-      throw new Error('Could not resolve module "' + id + '"');
-    } else {
-      throw new Error('"' + id + '" isn\u2019t defined in the global scope');
-    }
-  }
-  return module;
-}
-
-function importNode(id) {
-  var module = runtimeImport(id);
-  if (module === undefined) {
-    if (isNode) {
-      throw new Error('Could not resolve module "' + id + '"');
-    }
-    return {};
-  }
-  return module;
-}
-
-function importBrowser(id) {
-  var module = runtimeImport(id);
-  if (module === undefined) {
-    if (!isNode) {
-      throw new Error('"' + id + '" isn\u2019t defined in the global scope');
-    }
-    return {};
-  }
-  return module;
-}
-
-Object.assign(runtimeImport, {
-  optional: importOptional,
-  required: importRequired,
-  node: importNode,
-  browser: importBrowser
-});
-
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn, module) {
@@ -668,8 +522,59 @@ var pathBrowserify_9 = pathBrowserify.basename;
 var pathBrowserify_10 = pathBrowserify.extname;
 
 // The MIT License
+// Copyright (C) 2016-Present Shota Matsuda
 
-var nodePath = importNode('path');
+/* eslint-env worker */
+/* eslint-disable no-new-func */
+
+var isBrowser = function () {
+  try {
+    if (new Function('return this === window')()) {
+      return true;
+    }
+  } catch (error) {}
+  return false;
+}();
+
+var isWorker = !isBrowser && function () {
+  try {
+    if (new Function('return this === self')()) {
+      return true;
+    }
+  } catch (error) {}
+  return false;
+}();
+
+var isNode = !isBrowser && !isWorker && function () {
+  try {
+    if (new Function('return this === global')()) {
+      return true;
+    }
+  } catch (error) {}
+  return false;
+}();
+
+var globalScope = function () {
+  if (isBrowser) {
+    return window;
+  }
+  if (isWorker) {
+    return self;
+  }
+  if (isNode) {
+    return global;
+  }
+  return undefined;
+}();
+
+var Global = {
+  isBrowser: isBrowser,
+  isWorker: isWorker,
+  isNode: isNode,
+  scope: globalScope
+};
+
+// The MIT License
 
 var _ref = function () {
   if (isNode) {
@@ -801,11 +706,6 @@ var crypt = createCommonjsModule(function (module) {
   })();
 });
 
-var crypt$1 = /*#__PURE__*/Object.freeze({
-  default: crypt,
-  __moduleExports: crypt
-});
-
 var charenc = {
   // UTF-8 encoding
   utf8: {
@@ -840,11 +740,6 @@ var charenc = {
 
 var charenc_1 = charenc;
 
-var charenc$1 = /*#__PURE__*/Object.freeze({
-  default: charenc_1,
-  __moduleExports: charenc_1
-});
-
 /*!
  * Determine if an object is a Buffer
  *
@@ -867,23 +762,12 @@ function isSlowBuffer(obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0));
 }
 
-var isBuffer$1 = /*#__PURE__*/Object.freeze({
-  default: isBuffer_1,
-  __moduleExports: isBuffer_1
-});
-
-var require$$0 = ( crypt$1 && crypt ) || crypt$1;
-
-var require$$1 = ( charenc$1 && charenc_1 ) || charenc$1;
-
-var require$$2 = ( isBuffer$1 && isBuffer_1 ) || isBuffer$1;
-
 var md5 = createCommonjsModule(function (module) {
   (function () {
-    var crypt = require$$0,
-        utf8 = require$$1.utf8,
-        isBuffer = require$$2,
-        bin = require$$1.bin,
+    var crypt$$1 = crypt,
+        utf8 = charenc_1.utf8,
+        isBuffer = isBuffer_1,
+        bin = charenc_1.bin,
 
 
     // The core
@@ -894,7 +778,7 @@ var md5 = createCommonjsModule(function (module) {
       } else if (isBuffer(message)) message = Array.prototype.slice.call(message, 0);else if (!Array.isArray(message)) message = message.toString();
       // else, assume byte array already
 
-      var m = crypt.bytesToWords(message),
+      var m = crypt$$1.bytesToWords(message),
           l = message.length * 8,
           a = 1732584193,
           b = -271733879,
@@ -997,7 +881,7 @@ var md5 = createCommonjsModule(function (module) {
         d = d + dd >>> 0;
       }
 
-      return crypt.endian([a, b, c, d]);
+      return crypt$$1.endian([a, b, c, d]);
     };
 
     // Auxiliary functions
@@ -1025,8 +909,8 @@ var md5 = createCommonjsModule(function (module) {
     module.exports = function (message, options) {
       if (message === undefined || message === null) throw new Error('Illegal argument ' + message);
 
-      var digestbytes = crypt.wordsToBytes(md5(message, options));
-      return options && options.asBytes ? digestbytes : options && options.asString ? bin.bytesToString(digestbytes) : crypt.bytesToHex(digestbytes);
+      var digestbytes = crypt$$1.wordsToBytes(md5(message, options));
+      return options && options.asBytes ? digestbytes : options && options.asString ? bin.bytesToString(digestbytes) : crypt$$1.bytesToHex(digestbytes);
     };
   })();
 });
@@ -1302,11 +1186,6 @@ var parse = function parse(source, reviver) {
     }({ '': result }, '') : result;
 };
 
-var parse$1 = /*#__PURE__*/Object.freeze({
-  default: parse,
-  __moduleExports: parse
-});
-
 var escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
     gap,
     indent,
@@ -1456,33 +1335,15 @@ var stringify = function stringify(value, replacer, space) {
     return str('', { '': value });
 };
 
-var stringify$1 = /*#__PURE__*/Object.freeze({
-  default: stringify,
-  __moduleExports: stringify
-});
-
-var require$$0$1 = ( parse$1 && parse ) || parse$1;
-
-var require$$1$1 = ( stringify$1 && stringify ) || stringify$1;
-
-var parse$2 = require$$0$1;
-var stringify$2 = require$$1$1;
+var parse$1 = parse;
+var stringify$1 = stringify;
 
 var jsonify = {
-	parse: parse$2,
-	stringify: stringify$2
+	parse: parse$1,
+	stringify: stringify$1
 };
 
-var jsonify$1 = /*#__PURE__*/Object.freeze({
-  default: jsonify,
-  __moduleExports: jsonify,
-  parse: parse$2,
-  stringify: stringify$2
-});
-
-var require$$0$2 = ( jsonify$1 && jsonify ) || jsonify$1;
-
-var json = typeof JSON !== 'undefined' ? JSON : require$$0$2;
+var json = typeof JSON !== 'undefined' ? JSON : jsonify;
 
 var jsonStableStringify = function jsonStableStringify(obj, opts) {
     if (!opts) opts = {};
@@ -2173,11 +2034,6 @@ var requiresPort = function required(port, protocol) {
   return port !== 0;
 };
 
-var requiresPort$1 = /*#__PURE__*/Object.freeze({
-  default: requiresPort,
-  __moduleExports: requiresPort
-});
-
 var has = Object.prototype.hasOwnProperty;
 
 /**
@@ -2203,12 +2059,18 @@ function querystring(query) {
       result = {},
       part;
 
-  //
-  // Little nifty parsing hack, leverage the fact that RegExp.exec increments
-  // the lastIndex property so we can continue executing this loop until we've
-  // parsed all results.
-  //
-  for (; part = parser.exec(query); result[decode(part[1])] = decode(part[2])) {}
+  while (part = parser.exec(query)) {
+    var key = decode(part[1]),
+        value = decode(part[2]);
+
+    //
+    // Prevent overriding of existing properties. This ensures that build-in
+    // methods like `toString` or __proto__ are not overriden by malicious
+    // querystrings.
+    //
+    if (key in result) continue;
+    result[key] = value;
+  }
 
   return result;
 }
@@ -2243,24 +2105,13 @@ function querystringify(obj, prefix) {
 //
 // Expose the module.
 //
-var stringify$3 = querystringify;
-var parse$3 = querystring;
+var stringify$2 = querystringify;
+var parse$2 = querystring;
 
 var querystringify_1 = {
-  stringify: stringify$3,
-  parse: parse$3
+  stringify: stringify$2,
+  parse: parse$2
 };
-
-var querystringify$1 = /*#__PURE__*/Object.freeze({
-  default: querystringify_1,
-  __moduleExports: querystringify_1,
-  stringify: stringify$3,
-  parse: parse$3
-});
-
-var required = ( requiresPort$1 && requiresPort ) || requiresPort$1;
-
-var qs = ( querystringify$1 && querystringify_1 ) || querystringify$1;
 
 var protocolre = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i,
     slashes = /^[A-Za-z][A-Za-z0-9+-.]*:\/\//;
@@ -2438,7 +2289,7 @@ function URL(address, location, parser) {
     location = null;
   }
 
-  if (parser && 'function' !== typeof parser) parser = qs.parse;
+  if (parser && 'function' !== typeof parser) parser = querystringify_1.parse;
 
   location = lolcation(location);
 
@@ -2507,7 +2358,7 @@ function URL(address, location, parser) {
   // for a given protocol. As the host also contains the port number we're going
   // override it with the hostname which contains no port number.
   //
-  if (!required(url.port, url.protocol)) {
+  if (!requiresPort(url.port, url.protocol)) {
     url.host = url.hostname;
     url.port = '';
   }
@@ -2549,7 +2400,7 @@ function set$1(part, value, fn) {
   switch (part) {
     case 'query':
       if ('string' === typeof value && value.length) {
-        value = (fn || qs.parse)(value);
+        value = (fn || querystringify_1.parse)(value);
       }
 
       url[part] = value;
@@ -2558,7 +2409,7 @@ function set$1(part, value, fn) {
     case 'port':
       url[part] = value;
 
-      if (!required(value, url.protocol)) {
+      if (!requiresPort(value, url.protocol)) {
         url.host = url.hostname;
         url[part] = '';
       } else if (value) {
@@ -2628,7 +2479,7 @@ function set$1(part, value, fn) {
  * @api public
  */
 function toString(stringify) {
-  if (!stringify || 'function' !== typeof stringify) stringify = qs.stringify;
+  if (!stringify || 'function' !== typeof stringify) stringify = querystringify_1.stringify;
 
   var query,
       url = this,
@@ -2662,18 +2513,13 @@ URL.prototype = { set: set$1, toString: toString };
 //
 URL.extractProtocol = extractProtocol;
 URL.location = lolcation;
-URL.qs = qs;
+URL.qs = querystringify_1;
 
 var urlParse = URL;
 
 // The MIT License
 
 // The MIT License
-
-var _importNode = importNode('fs'),
-    readFile = _importNode.readFile;
-
-var request = importNode('request');
 
 function browserRequest(url, options) {
   var resolve = void 0;
@@ -2691,30 +2537,30 @@ function browserRequest(url, options) {
   if (options.query) {
     parsed.set('query', Object.assign({}, parsed.query, options.query));
   }
-  var request = new XMLHttpRequest();
-  request.open('get', parsed.toString(), true);
+  var request$$1 = new XMLHttpRequest();
+  request$$1.open('get', parsed.toString(), true);
   if (options.headers) {
     var names = Object.keys(options.headers);
     for (var i = 0; i < names.length; ++i) {
       var name = names[i];
-      request.setRequestHeader(name, options.headers[name]);
+      request$$1.setRequestHeader(name, options.headers[name]);
     }
   }
-  request.responseType = options.type;
-  request.addEventListener('loadend', function (event) {
-    if (request.status < 200 || request.status >= 300) {
-      reject(request.status);
+  request$$1.responseType = options.type;
+  request$$1.addEventListener('loadend', function (event) {
+    if (request$$1.status < 200 || request$$1.status >= 300) {
+      reject(request$$1.status);
       return;
     }
-    if (request.response == null && options.type === 'json') {
+    if (request$$1.response == null && options.type === 'json') {
       reject(new Error('Could not parse JSON'));
       return;
     }
-    resolve(request.response);
+    resolve(request$$1.response);
   }, false);
-  request.send();
+  request$$1.send();
   promise.abort = function () {
-    request.abort();
+    request$$1.abort();
   };
   return promise;
 }
@@ -2732,7 +2578,7 @@ function nodeRequest(url, options) {
     reject = args[1];
   });
   if (options.local) {
-    readFile(url, options.encoding, function (error, response) {
+    fs.readFile(url, options.encoding, function (error, response) {
       if (error) {
         reject(error);
         return;
@@ -2863,12 +2709,12 @@ function requestCSV() {
       url = _parseArguments8[0],
       options = _parseArguments8[1];
 
-  var request = this.text(url, options);
-  var promise = request.then(function (response) {
+  var request$$1 = this.text(url, options);
+  var promise = request$$1.then(function (response) {
     return csvParse(response, options.row);
   });
   promise.abort = function () {
-    request.abort();
+    request$$1.abort();
   };
   return promise;
 }
@@ -2879,12 +2725,12 @@ function requestTSV() {
       url = _parseArguments10[0],
       options = _parseArguments10[1];
 
-  var request = this.text(url, options);
-  var promise = request.then(function (response) {
+  var request$$1 = this.text(url, options);
+  var promise = request$$1.then(function (response) {
     return tsvParse(response, options.row);
   });
   promise.abort = function () {
-    request.abort();
+    request$$1.abort();
   };
   return promise;
 }
@@ -3070,12 +2916,11 @@ var Stride = {
 
 // The MIT License
 
-var main = {
+var index = {
   Aggregate: Aggregate,
   AggregateFunction: AggregateFunction,
   Array: Array$1,
   AssertionError: AssertionError,
-  External: runtimeImport,
   FilePath: FilePath,
   Global: Global,
   Hash: generateHash,
@@ -3088,6 +2933,6 @@ var main = {
   URL: urlParse
 };
 
-export default main;
-export { Aggregate, AggregateFunction, Array$1 as Array, AssertionError, runtimeImport as External, FilePath, Global, generateHash as Hash, ImplementationError, Math$1 as Math, createNamespace as Namespace, performRequest as Request, Semaphore, Stride, urlParse as URL, importOptional, importRequired, importNode, importBrowser, isBrowser, isWorker, isNode, globalScope };
+export default index;
+export { Aggregate, AggregateFunction, Array$1 as Array, AssertionError, FilePath, Global, generateHash as Hash, ImplementationError, Math$1 as Math, createNamespace as Namespace, performRequest as Request, Semaphore, Stride, urlParse as URL, isBrowser, isWorker, isNode, globalScope };
 //# sourceMappingURL=planck-core.module.js.map

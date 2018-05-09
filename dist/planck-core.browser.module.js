@@ -1,13 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var nodePath = _interopDefault(require('path'));
-var fs = _interopDefault(require('fs'));
-var request = _interopDefault(require('request'));
-
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
@@ -526,6 +516,8 @@ var pathBrowserify_7 = pathBrowserify.delimiter;
 var pathBrowserify_8 = pathBrowserify.dirname;
 var pathBrowserify_9 = pathBrowserify.basename;
 var pathBrowserify_10 = pathBrowserify.extname;
+
+var nodePath = null;
 
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
@@ -2002,6 +1994,10 @@ var tsv = dsv("\t");
 
 var tsvParse = tsv.parse;
 
+var fs = null;
+
+var request = null;
+
 /**
  * Check if we're required to add a port number.
  *
@@ -2939,23 +2935,6 @@ var index = {
   URL: urlParse
 };
 
-exports.Aggregate = Aggregate;
-exports.AggregateFunction = AggregateFunction;
-exports.Array = Array$1;
-exports.AssertionError = AssertionError;
-exports.FilePath = FilePath;
-exports.Global = Global;
-exports.Hash = generateHash;
-exports.ImplementationError = ImplementationError;
-exports.Math = Math$1;
-exports.Namespace = createNamespace;
-exports.Request = performRequest;
-exports.Semaphore = Semaphore;
-exports.Stride = Stride;
-exports.URL = urlParse;
-exports.default = index;
-exports.isBrowser = isBrowser;
-exports.isWorker = isWorker;
-exports.isNode = isNode;
-exports.globalScope = globalScope;
-//# sourceMappingURL=planck-core.js.map
+export default index;
+export { Aggregate, AggregateFunction, Array$1 as Array, AssertionError, FilePath, Global, generateHash as Hash, ImplementationError, Math$1 as Math, createNamespace as Namespace, performRequest as Request, Semaphore, Stride, urlParse as URL, isBrowser, isWorker, isNode, globalScope };
+//# sourceMappingURL=planck-core.browser.module.js.map
