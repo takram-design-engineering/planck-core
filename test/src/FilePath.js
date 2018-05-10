@@ -4,10 +4,9 @@
 import 'source-map-support/register'
 
 import chai from 'chai'
+import path from 'path'
 
-import { isNode, importNode, FilePath } from '../..'
-
-const path = importNode('path')
+import { isNode, FilePath } from '../..'
 
 const { expect } = chai
 

@@ -4,11 +4,9 @@
 /* eslint-env worker */
 
 import browserPath from 'path-browserify'
+import nodePath from 'path'
 
-import { importNode } from './External'
 import { isBrowser, isWorker, isNode } from './Global'
-
-const nodePath = importNode('path')
 
 export function currentFilePath () {
   if (isBrowser) {

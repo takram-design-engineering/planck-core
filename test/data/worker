@@ -1,6 +1,6 @@
 self.importScripts(
   '/node_modules/babel-polyfill/dist/polyfill.js',
-  '/dist/planck-core.js'
+  '/dist/planck-core.browser.js'
 );
 
 self.onmessage = function(message) {
