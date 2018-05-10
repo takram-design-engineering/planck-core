@@ -9,7 +9,11 @@ import pkg from './package.json'
 
 export default {
   input: './src/index.js',
-  external: ['fs', 'path', 'request'],
+  external: [
+    'fs',
+    'path',
+    'request'
+  ],
   plugins: [
     nodeResolve(),
     commonjs(),

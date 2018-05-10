@@ -58,6 +58,7 @@
     "url-parse": "^1.4.0"
   },
   "devDependencies": {
+    "@shotamatsuda/rollup-plugin-nullify": "0.0.1",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-external-helpers": "^6.22.0",

@@ -4,31 +4,18 @@
 import babel from 'rollup-plugin-babel'
 import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
+import nullify from '@shotamatsuda/rollup-plugin-nullify'
 
 import pkg from './package.json'
-
-function nullify (modules) {
-  return {
-    resolveId (importee) {
-      if (modules.includes(importee)) {
-        return importee
-      }
-      return null
-    },
-
-    load (id) {
-      if (modules.includes(id)) {
-        return 'export default null'
-      }
-      return null
-    }
-  }
-}
 
 export default {
   input: './src/index.js',
   plugins: [
-    nullify(['fs', 'path', 'request']),
+    nullify([
+      'fs',
+      'path',
+      'request'
+    ]),
     nodeResolve({ browser: true }),
     commonjs(),
     babel({
