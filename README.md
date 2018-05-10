@@ -155,20 +155,6 @@ Array.**max**(_array_, _transform_)
 <a id="new-assertionerror" href="#new-assertionerror">#</a>
 new **AssertionError**([_message_])
 
-### External
-
-<a id="external-optional" href="#external-optional">#</a>
-External.**optional**(_id_)
-
-<a id="external-required" href="#external-required">#</a>
-External.**required**(_id_)
-
-<a id="external-browser" href="#external-browser">#</a>
-External.**browser**(_id_)
-
-<a id="external-node" href="#external-node">#</a>
-External.**node**(_id_)
-
 ### FilePath
 
 <a id="filepath-resolve" href="#filepath-resolve">#</a>
