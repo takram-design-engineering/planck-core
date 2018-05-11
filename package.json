@@ -35,6 +35,7 @@
     "test:node": "mocha --recursive test/src",
     "test:browser": "browser-sync start --server . --files dist --startPath test --no-open --no-notify",
     "test:saucelabs": "mocha test/saucelabs.js",
+    "coverage": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text --reporter=html mocha test/src/*.js",
     "lint": "npm-run-all lint:src lint:test",
     "lint:src": "standard -v *.js src/*.js src/**/*.js",
     "lint:test": "standard -v --env mocha test/*.js test/**/*.js",
@@ -73,6 +74,7 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chalk": "^2.4.1",
+    "cross-env": "^5.1.5",
     "detect-node": "^2.0.3",
     "eslint": "^4.19.1",
     "express": "^4.16.3",
@@ -80,9 +82,11 @@
     "nock": "^9.2.5",
     "nodemon": "^1.17.4",
     "npm-run-all": "^4.1.3",
+    "nyc": "^11.7.3",
     "rollup": "0.58.2",
     "rollup-plugin-babel": "^3.0.4",
     "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-istanbul": "^2.0.1",
     "rollup-plugin-node-resolve": "^3.3.0",
     "sauce-connect-launcher": "^1.2.4",
     "saucelabs": "^1.4.0",
@@ -92,6 +96,12 @@
     "standard": "^11.0.1",
     "webpack": "^4.8.1",
     "webpack-cli": "^2.1.3"
+  },
+  "nyc": {
+    "exclude": [
+      "dist",
+      "test"
+    ]
   },
   "saucelabs": {
     "framework": "mocha",

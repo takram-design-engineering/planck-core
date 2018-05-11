@@ -3,6 +3,7 @@
 
 import babel from 'rollup-plugin-babel'
 import commonjs from 'rollup-plugin-commonjs'
+import istanbul from 'rollup-plugin-istanbul'
 import nodeResolve from 'rollup-plugin-node-resolve'
 
 import pkg from './package.json'
@@ -26,7 +27,8 @@ export default {
         'stage-2'
       ],
       plugins: [
-        'external-helpers'
+        'external-helpers',
+        'istanbul'
       ],
       babelrc: false
     })
