@@ -24,7 +24,7 @@ describe('Global', function () {
       } else {
         expect(Global.isBrowser).equal(true)
         expect(isBrowser).equal(true)
-        const worker = new Worker('/test/unit/data/worker')
+        const worker = new Worker('/test/data/worker')
         worker.addEventListener('message', event => {
           expect(event.data.isBrowser).equal(false)
           done()
@@ -43,7 +43,7 @@ describe('Global', function () {
       } else {
         expect(Global.isWorker).equal(false)
         expect(isWorker).equal(false)
-        const worker = new Worker('/test/unit/data/worker')
+        const worker = new Worker('/test/data/worker')
         worker.addEventListener('message', event => {
           expect(event.data.isWorker).equal(true)
           done()
@@ -62,7 +62,7 @@ describe('Global', function () {
       } else {
         expect(Global.isNode).equal(false)
         expect(isNode).equal(false)
-        const worker = new Worker('/test/unit/data/worker')
+        const worker = new Worker('/test/data/worker')
         worker.addEventListener('message', event => {
           expect(event.data.isNode).equal(false)
           done()
@@ -81,7 +81,7 @@ describe('Global', function () {
       } else {
         expect(Global.scope).equal(window)
         expect(globalScope).equal(window)
-        const worker = new Worker('/test/unit/data/worker')
+        const worker = new Worker('/test/data/worker')
         worker.addEventListener('message', event => {
           expect(event.data.foundScope).equal(true)
           done()

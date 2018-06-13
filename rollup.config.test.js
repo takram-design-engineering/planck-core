@@ -4,18 +4,20 @@
 import babel from 'rollup-plugin-babel'
 import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
+import nullify from '@shotamatsuda/rollup-plugin-nullify'
 
-import pkg from './package.json'
+const globals = {
+  'chai': 'chai',
+  'mocha': 'mocha',
+  'nock': 'nock',
+  'sinon': 'sinon'
+}
 
 export default {
-  input: './src/index.js',
-  external: [
-    'fs',
-    'path',
-    'request'
-  ],
+  input: './test/index.js',
   plugins: [
-    nodeResolve(),
+    nullify(['path']),
+    nodeResolve({ browser: true }),
     commonjs(),
     babel({
       presets: [
@@ -31,17 +33,15 @@ export default {
       babelrc: false
     })
   ],
-  output: [
-    {
-      format: 'cjs',
-      exports: 'named',
-      file: pkg.main,
-      sourcemap: true
-    },
-    {
-      format: 'es',
-      file: pkg.module,
-      sourcemap: true
-    }
-  ]
+  external: [
+    ...Object.keys(globals),
+    'source-map-support/register'
+  ],
+  output: {
+    globals,
+    intro: 'var BUNDLER = "rollup";',
+    format: 'iife',
+    file: './dist/test/rollup.js',
+    sourcemap: true
+  }
 }
