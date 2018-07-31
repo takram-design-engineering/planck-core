@@ -1,10 +1,6 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-import Namespace from './Namespace'
-
-export const internal = Namespace('Semaphore')
-
 class Task {
   constructor (semaphore, callback) {
     const promises = [
@@ -19,50 +15,40 @@ class Task {
       })
     ]
     this.promise = Promise.all(promises)
-      .then(values => {
+      .then(([value]) => {
         semaphore.signal()
-        return values[0]
-      }, reason => {
+        return value
+      })
+      .catch(error => {
         semaphore.signal()
-        return Promise.reject(reason)
+        return Promise.reject(error)
       })
   }
 }
 
 export default class Semaphore {
   constructor (capacity) {
-    const scope = internal(this)
-    scope.capacity = capacity
-    scope.available = capacity
-    scope.queue = []
+    this.capacity = capacity
+    this.available = capacity
+    this.queue = []
   }
 
   wait (callback) {
-    const scope = internal(this)
     const task = new Task(this, callback)
-    if (scope.available === 0) {
-      scope.queue.push(task)
+    if (this.available === 0) {
+      this.queue.push(task)
     } else {
-      --scope.available
+      --this.available
       task.permit()
     }
     return task.promise
   }
 
   signal () {
-    const scope = internal(this)
-    if (scope.queue.length === 0) {
-      ++scope.available
+    if (this.queue.length === 0) {
+      ++this.available
     } else {
-      scope.queue.shift().permit()
+      this.queue.shift().permit()
     }
-  }
-
-  get capacity () {
-    return internal(this).capacity
-  }
-
-  get available () {
-    return internal(this).available
   }
 }
