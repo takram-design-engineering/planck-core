@@ -1,8 +1,6 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-import 'source-map-support/register'
-
 import * as d3 from 'd3-dsv'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -18,7 +16,7 @@ describe('Request', function () {
 
   let host = 'http://localhost'
   if (!isNode) {
-    host = window.location.origin
+    host = ''
   }
 
   describe('#text', () => {
