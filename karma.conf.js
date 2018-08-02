@@ -26,15 +26,6 @@ module.exports = function (config) {
       '/node_modules/': '/base/node_modules/',
       '/dist/': '/base/dist/'
     },
-    coverageReporter: {
-      dir: 'coverage/',
-      subdir: browser => browser.toLowerCase(),
-      reporters: [
-        { type: 'text' },
-        { type: 'text-summary' },
-        { type: 'lcov' }
-      ]
-    },
     coverageIstanbulReporter: {
       reports: ['text', 'text-summary', 'lcov'],
       dir: 'coverage/browser',
