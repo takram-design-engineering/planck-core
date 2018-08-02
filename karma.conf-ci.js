@@ -89,6 +89,7 @@ module.exports = function (config) {
     customLaunchers,
     browsers: Object.keys(customLaunchers),
     singleRun: true,
+    autoWatch: false,
 
     // SauceLabs provides a limited amount of browsers at once
     concurrency: 2,
