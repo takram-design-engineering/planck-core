@@ -1,0 +1,5 @@
+defaults
+chrome >= 49
+edge >= 13
+firefox >= 29
+safari >= 10

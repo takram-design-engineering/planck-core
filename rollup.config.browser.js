@@ -21,9 +21,7 @@ export default {
     commonjs(),
     babel({
       presets: [
-        ['es2015', { modules: false }],
-        'es2016',
-        'es2017',
+        ['env', { modules: false }],
         'stage-3',
         'stage-2'
       ],
