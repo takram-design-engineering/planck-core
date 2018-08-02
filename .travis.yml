@@ -2,6 +2,7 @@ before_script:
 - npm install -g karma
 script:
 - npm run test-ci
+- codecov
 language: node_js
 node_js:
 - 10
