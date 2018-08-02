@@ -1,7 +1,7 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-import Aggregate, { isAggregate } from './Aggregate'
+import Aggregate from './Aggregate'
 import Array from './Array'
 import AssertionError from './AssertionError'
 import FilePath from './FilePath'
@@ -19,7 +19,6 @@ export * from './Global'
 
 export {
   Aggregate,
-  isAggregate,
   Array,
   AssertionError,
   FilePath,
@@ -36,7 +35,6 @@ export {
 
 export default {
   Aggregate,
-  isAggregate,
   Array,
   AssertionError,
   FilePath,
