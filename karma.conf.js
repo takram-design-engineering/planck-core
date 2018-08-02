@@ -7,6 +7,14 @@ const webpack = require('./webpack.config.test.js')
 module.exports = function (config) {
   config.set({
     basePath: './',
+    plugins: [
+      require('karma-chrome-launcher'),
+      require('karma-coverage-istanbul-reporter'),
+      require('karma-mocha'),
+      require('karma-sourcemap-loader'),
+      require('karma-spec-reporter'),
+      require('karma-webpack')
+    ],
     frameworks: ['mocha'],
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
