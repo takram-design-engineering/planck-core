@@ -8,7 +8,7 @@ import { Hash } from '../..'
 const { expect } = chai
 
 describe('Hash', () => {
-  it('generates a stable hash for objects', () => {
+  it('generates stable hashes for objects', () => {
     const hash1 = Hash({ a: 'a', b: [1, 2, { a: 'a', b: 'b' }] })
     const hash2 = Hash({ b: [1, 2, { b: 'b', a: 'a' }], a: 'a' })
     const hash3 = Hash({ a: 'a', b: [{ a: 'a', b: 'b' }, 1, 2] })

@@ -19,6 +19,10 @@ describe('Semaphore', () => {
     }).throws(Error)
   })
 
+  it('initializes with 1 capacity by default', () => {
+    expect(new Semaphore().capacity).equal(1)
+  })
+
   it('resolves if a task finishes', () => {
     const semaphore = new Semaphore(10)
     return expect(semaphore.wait(resolve => {

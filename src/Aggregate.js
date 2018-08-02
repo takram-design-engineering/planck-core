@@ -1,47 +1,45 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-import AggregateFunction from './AggregateFunction'
-import Namespace from './Namespace'
+const symbol = Symbol()
 
-export const internal = Namespace('Aggregate')
-
-export default class Aggregate {
-  // This constructor provides for inheritance only
-  constructor (namespace, ...targets) {
-    if (namespace !== internal) {
-      throw new Error('Use the static new function instead of new operator')
-    }
-    internal(this).targets = targets
+export function isAggregate (object) {
+  if (object == null) {
+    return false
   }
-
-  set (target, property, value, receiver) {
-    const { targets } = internal(this)
-    for (let i = 0; i < targets.length; ++i) {
-      targets[i][property] = value
-    }
-    target[property] = value
-    return true
-  }
-
-  get (target, property, receiver) {
-    const { targets } = internal(this)
-    // Return the first target's property if the given property is not a
-    // function for the given target.
-    if (typeof target[property] !== 'function') {
-      const [firstTarget] = targets
-      return firstTarget && firstTarget[property]
-    }
-    const args = []
-    for (let i = 0; i < targets.length; ++i) {
-      const target = targets[i]
-      args.push(target[property].bind(target))
-    }
-    return AggregateFunction.new(...args)
-  }
-
-  static new (...args) {
-    // Passing the internal forces users to call new instead of constructor
-    return new Proxy({}, new this(internal, ...args))
-  }
+  return !!object[symbol]
 }
+
+export default function Aggregate (...targets) {
+  return new Proxy(Aggregate, {
+    set (target, property, value, receiver) {
+      targets.forEach(target => { target[property] = value })
+      return true
+    },
+
+    get (target, property, receiver) {
+      if (property === symbol) {
+        return true
+      }
+      let callable = targets.length > 0
+      let values = targets.map(target => {
+        const value = target[property]
+        if (typeof value === 'function') {
+          return value.bind(target)
+        }
+        callable = false
+        return value
+      })
+      if (callable) {
+        return Aggregate(...values)
+      }
+      return values
+    },
+
+    apply (target, bound, args) {
+      return targets.map(target => target(...args))
+    }
+  })
+}
+
+Aggregate.isAggregate = isAggregate
