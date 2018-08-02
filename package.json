@@ -41,7 +41,7 @@
     "test:node": "nyc mocha --recursive test/src",
     "test:browser": "karma start",
     "pretest-ci": "npm-run-all lint test:build",
-    "test-ci": "npm-run-all test:node test-ci:browser",
+    "test-ci": "npm-run-all test:node test-ci:browser test-ci:codecov",
     "test-ci:browser": "karma start karma.conf-ci.js",
     "test-ci:codecov": "codecov --token ${CODECOV_TOKEN}",
     "prewatch": "npm run test:build",
