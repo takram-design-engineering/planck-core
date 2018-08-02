@@ -52,6 +52,14 @@ module.exports = function (config) {
 
   config.set({
     basePath: './',
+    plugins: [
+      require('karma-coverage-istanbul-reporter'),
+      require('karma-mocha'),
+      require('karma-sauce-launcher'),
+      require('karma-sourcemap-loader'),
+      require('karma-spec-reporter'),
+      require('karma-webpack')
+    ],
     frameworks: ['mocha'],
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
