@@ -78,7 +78,7 @@ module.exports = function (config) {
       '/node_modules/': '/base/node_modules/',
       '/dist/': '/base/dist/'
     },
-    reporters: ['spec', 'coverage-istanbul'],
+    reporters: ['spec', 'saucelabs', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['text', 'text-summary', 'lcov'],
       dir: 'coverage/browser',
