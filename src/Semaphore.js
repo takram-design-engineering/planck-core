@@ -1,54 +1,58 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-class Task {
-  constructor (semaphore, callback) {
-    const promises = [
-      new Promise((resolve, reject) => {
-        this.resolve = resolve
-        this.reject = reject
-      }),
-      new Promise(resolve => {
-        this.permit = resolve
-      }).then(() => {
-        callback(this.resolve, this.reject)
-      })
-    ]
-    this.promise = Promise.all(promises)
-      .then(([value]) => {
-        semaphore.signal()
-        return value
-      })
-      .catch(error => {
-        semaphore.signal()
-        return Promise.reject(error)
-      })
-  }
-}
-
 export default class Semaphore {
-  constructor (capacity) {
-    this.capacity = capacity
-    this.available = capacity
+  constructor (capacity = 1) {
+    const number = +capacity
+    if (Number.isNaN(number) || number < 1) {
+      throw new Error(`Invalid number of capacity: ${capacity}`)
+    }
+    this.capacity = +capacity
+    this.available = +capacity
     this.queue = []
   }
 
-  wait (callback) {
-    const task = new Task(this, callback)
+  async wait (callback) {
+    let resolveTask
+    let rejectTask
+    let shift
+    const promises = [
+      new Promise((resolve, reject) => {
+        resolveTask = resolve
+        rejectTask = reject
+      }),
+      new Promise((resolve, reject) => {
+        shift = resolve
+      }).then(() => {
+        const result = callback(resolveTask, rejectTask)
+        if (result instanceof Promise) {
+          return result.then(resolveTask).catch(rejectTask)
+        }
+        return result
+      })
+    ]
     if (this.available === 0) {
-      this.queue.push(task)
+      this.queue.push(shift)
     } else {
       --this.available
-      task.permit()
+      shift()
     }
-    return task.promise
+    let result
+    try {
+      [result] = await Promise.all(promises)
+    } catch (error) {
+      this.signal()
+      throw error
+    }
+    this.signal()
+    return result
   }
 
   signal () {
     if (this.queue.length === 0) {
       ++this.available
     } else {
-      this.queue.shift().permit()
+      this.queue.shift()()
     }
   }
 }
