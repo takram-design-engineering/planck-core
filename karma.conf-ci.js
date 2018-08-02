@@ -87,8 +87,7 @@ module.exports = function (config) {
     webpack,
     sauceLabs: {
       testName: pkg.name,
-      build: `${pkg.version} (${Date.now()})`,
-      recordScreenshots: false
+      build: `${pkg.version} (${Date.now()})`
     },
     customLaunchers,
     browsers: Object.keys(customLaunchers),
