@@ -2,7 +2,6 @@
 // Copyright (C) 2016-Present Shota Matsuda
 
 import Aggregate from './Aggregate'
-import AggregateFunction from './AggregateFunction'
 import Array from './Array'
 import AssertionError from './AssertionError'
 import FilePath from './FilePath'
@@ -20,7 +19,6 @@ export * from './Global'
 
 export {
   Aggregate,
-  AggregateFunction,
   Array,
   AssertionError,
   FilePath,
@@ -37,7 +35,6 @@ export {
 
 export default {
   Aggregate,
-  AggregateFunction,
   Array,
   AssertionError,
   FilePath,

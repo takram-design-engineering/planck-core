@@ -1,28 +1,41 @@
 import nodePath from 'path';
+import util from 'util';
 import fs from 'fs';
 import request from 'request';
-
-// The MIT License
-// Copyright (C) 2016-Present Shota Matsuda
-
-function createNamespace(name) {
-  var symbol = Symbol(name);
-  return function namespace(object, init) {
-    if (object[symbol] == null) {
-      if (typeof init === 'function') {
-        object[symbol] = init({});
-      } else {
-        object[symbol] = {};
-      }
-    }
-    return object[symbol];
-  };
-}
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+var asyncToGenerator = function (fn) {
+  return function () {
+    var gen = fn.apply(this, arguments);
+    return new Promise(function (resolve, reject) {
+      function step(key, arg) {
+        try {
+          var info = gen[key](arg);
+          var value = info.value;
+        } catch (error) {
+          reject(error);
+          return;
+        }
+
+        if (info.done) {
+          resolve(value);
+        } else {
+          return Promise.resolve(value).then(function (value) {
+            step("next", value);
+          }, function (err) {
+            step("throw", err);
+          });
+        }
+      }
+
+      return step("next");
+    });
+  };
 };
 
 var classCallCheck = function (instance, Constructor) {
@@ -101,118 +114,67 @@ var slicedToArray = function () {
   };
 }();
 
-// The MIT License
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
 
-var internal = createNamespace('AggregateFunction');
-
-var AggregateFunction = function () {
-  // This constructor provides for inheritance only
-  function AggregateFunction(namespace) {
-    classCallCheck(this, AggregateFunction);
-
-    if (namespace !== internal) {
-      throw new Error('Use the static new function instead of new operator');
-    }
-
-    for (var _len = arguments.length, targets = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      targets[_key - 1] = arguments[_key];
-    }
-
-    internal(this).targets = targets;
+    return arr2;
+  } else {
+    return Array.from(arr);
   }
-
-  createClass(AggregateFunction, [{
-    key: 'apply',
-    value: function apply(target, bound, args) {
-      var _internal = internal(this),
-          targets = _internal.targets;
-
-      var result = [];
-      for (var i = 0; i < targets.length; ++i) {
-        result.push(targets[i].apply(bound, args));
-      }
-      return result;
-    }
-  }], [{
-    key: 'new',
-    value: function _new() {
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-
-      return new Proxy(function () {}, new (Function.prototype.bind.apply(this, [null].concat([internal], args)))());
-    }
-  }]);
-  return AggregateFunction;
-}();
+};
 
 // The MIT License
+// Copyright (C) 2016-Present Shota Matsuda
 
-var internal$1 = createNamespace('Aggregate');
+var isAggregateSymbol = Symbol('isAggregate');
 
-var Aggregate = function () {
-  // This constructor provides for inheritance only
-  function Aggregate(namespace) {
-    classCallCheck(this, Aggregate);
+function isAggregate(object) {
+  if (object == null) {
+    return false;
+  }
+  return !!object[isAggregateSymbol];
+}
 
-    if (namespace !== internal$1) {
-      throw new Error('Use the static new function instead of new operator');
-    }
-
-    for (var _len = arguments.length, targets = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      targets[_key - 1] = arguments[_key];
-    }
-
-    internal$1(this).targets = targets;
+function Aggregate() {
+  for (var _len = arguments.length, targets = Array(_len), _key = 0; _key < _len; _key++) {
+    targets[_key] = arguments[_key];
   }
 
-  createClass(Aggregate, [{
-    key: 'set',
-    value: function set$$1(target, property, value, receiver) {
-      var _internal = internal$1(this),
-          targets = _internal.targets;
-
-      for (var i = 0; i < targets.length; ++i) {
-        targets[i][property] = value;
-      }
-      target[property] = value;
+  return new Proxy(Aggregate, {
+    set: function set$$1(target, property, value, receiver) {
+      targets.forEach(function (target) {
+        target[property] = value;
+      });
       return true;
-    }
-  }, {
-    key: 'get',
-    value: function get$$1(target, property, receiver) {
-      var _internal2 = internal$1(this),
-          targets = _internal2.targets;
-      // Return the first target's property if the given property is not a
-      // function for the given target.
-
-
-      if (typeof target[property] !== 'function') {
-        var _targets = slicedToArray(targets, 1),
-            firstTarget = _targets[0];
-
-        return firstTarget && firstTarget[property];
+    },
+    get: function get$$1(target, property, receiver) {
+      if (property === isAggregateSymbol) {
+        return true;
       }
-      var args = [];
-      for (var i = 0; i < targets.length; ++i) {
-        var _target = targets[i];
-        args.push(_target[property].bind(_target));
+      var callable = targets.length > 0;
+      var values = targets.map(function (target) {
+        var value = target[property];
+        if (typeof value === 'function') {
+          return value.bind(target);
+        }
+        callable = false;
+        return value;
+      });
+      if (callable) {
+        return Aggregate.apply(undefined, toConsumableArray(values));
       }
-      return AggregateFunction.new.apply(AggregateFunction, args);
+      return values;
+    },
+    apply: function apply(target, bound, args) {
+      return targets.map(function (target) {
+        return target.apply(undefined, toConsumableArray(args));
+      });
     }
-  }], [{
-    key: 'new',
-    value: function _new() {
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
+  });
+}
 
-      // Passing the internal forces users to call new instead of constructor
-      return new Proxy({}, new (Function.prototype.bind.apply(this, [null].concat([internal$1], args)))());
-    }
-  }]);
-  return Aggregate;
-}();
+Aggregate.isAggregate = isAggregate;
 
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
@@ -844,312 +806,523 @@ var FilePath = {
   sep: sep
 };
 
+var minimalisticAssert = assert;
+
+function assert(val, msg) {
+  if (!val) throw new Error(msg || 'Assertion failed');
+}
+
+assert.equal = function assertEqual(l, r, msg) {
+  if (l != r) throw new Error(msg || 'Assertion failed: ' + l + ' != ' + r);
+};
+
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var crypt = createCommonjsModule(function (module) {
-  (function () {
-    var base64map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
-        crypt = {
-      // Bit-wise rotation left
-      rotl: function rotl(n, b) {
-        return n << b | n >>> 32 - b;
-      },
-
-      // Bit-wise rotation right
-      rotr: function rotr(n, b) {
-        return n << 32 - b | n >>> b;
-      },
-
-      // Swap big-endian to little-endian and vice versa
-      endian: function endian(n) {
-        // If number given, swap endian
-        if (n.constructor == Number) {
-          return crypt.rotl(n, 8) & 0x00FF00FF | crypt.rotl(n, 24) & 0xFF00FF00;
+var inherits_browser = createCommonjsModule(function (module) {
+  if (typeof Object.create === 'function') {
+    // implementation from standard node.js 'util' module
+    module.exports = function inherits(ctor, superCtor) {
+      ctor.super_ = superCtor;
+      ctor.prototype = Object.create(superCtor.prototype, {
+        constructor: {
+          value: ctor,
+          enumerable: false,
+          writable: true,
+          configurable: true
         }
-
-        // Else, assume array and swap all items
-        for (var i = 0; i < n.length; i++) {
-          n[i] = crypt.endian(n[i]);
-        }return n;
-      },
-
-      // Generate an array of any length of random bytes
-      randomBytes: function randomBytes(n) {
-        for (var bytes = []; n > 0; n--) {
-          bytes.push(Math.floor(Math.random() * 256));
-        }return bytes;
-      },
-
-      // Convert a byte array to big-endian 32-bit words
-      bytesToWords: function bytesToWords(bytes) {
-        for (var words = [], i = 0, b = 0; i < bytes.length; i++, b += 8) {
-          words[b >>> 5] |= bytes[i] << 24 - b % 32;
-        }return words;
-      },
-
-      // Convert big-endian 32-bit words to a byte array
-      wordsToBytes: function wordsToBytes(words) {
-        for (var bytes = [], b = 0; b < words.length * 32; b += 8) {
-          bytes.push(words[b >>> 5] >>> 24 - b % 32 & 0xFF);
-        }return bytes;
-      },
-
-      // Convert a byte array to a hex string
-      bytesToHex: function bytesToHex(bytes) {
-        for (var hex = [], i = 0; i < bytes.length; i++) {
-          hex.push((bytes[i] >>> 4).toString(16));
-          hex.push((bytes[i] & 0xF).toString(16));
-        }
-        return hex.join('');
-      },
-
-      // Convert a hex string to a byte array
-      hexToBytes: function hexToBytes(hex) {
-        for (var bytes = [], c = 0; c < hex.length; c += 2) {
-          bytes.push(parseInt(hex.substr(c, 2), 16));
-        }return bytes;
-      },
-
-      // Convert a byte array to a base-64 string
-      bytesToBase64: function bytesToBase64(bytes) {
-        for (var base64 = [], i = 0; i < bytes.length; i += 3) {
-          var triplet = bytes[i] << 16 | bytes[i + 1] << 8 | bytes[i + 2];
-          for (var j = 0; j < 4; j++) {
-            if (i * 8 + j * 6 <= bytes.length * 8) base64.push(base64map.charAt(triplet >>> 6 * (3 - j) & 0x3F));else base64.push('=');
-          }
-        }
-        return base64.join('');
-      },
-
-      // Convert a base-64 string to a byte array
-      base64ToBytes: function base64ToBytes(base64) {
-        // Remove non-base-64 characters
-        base64 = base64.replace(/[^A-Z0-9+\/]/ig, '');
-
-        for (var bytes = [], i = 0, imod4 = 0; i < base64.length; imod4 = ++i % 4) {
-          if (imod4 == 0) continue;
-          bytes.push((base64map.indexOf(base64.charAt(i - 1)) & Math.pow(2, -2 * imod4 + 8) - 1) << imod4 * 2 | base64map.indexOf(base64.charAt(i)) >>> 6 - imod4 * 2);
-        }
-        return bytes;
-      }
+      });
     };
-
-    module.exports = crypt;
-  })();
+  } else {
+    // old school shim for old browsers
+    module.exports = function inherits(ctor, superCtor) {
+      ctor.super_ = superCtor;
+      var TempCtor = function TempCtor() {};
+      TempCtor.prototype = superCtor.prototype;
+      ctor.prototype = new TempCtor();
+      ctor.prototype.constructor = ctor;
+    };
+  }
 });
 
-var charenc = {
-  // UTF-8 encoding
-  utf8: {
-    // Convert a string to a byte array
-    stringToBytes: function stringToBytes(str) {
-      return charenc.bin.stringToBytes(unescape(encodeURIComponent(str)));
-    },
+var inherits$1 = createCommonjsModule(function (module) {
+  try {
+    var util$$1 = util;
+    if (typeof util$$1.inherits !== 'function') throw '';
+    module.exports = util$$1.inherits;
+  } catch (e) {
+    module.exports = inherits_browser;
+  }
+});
 
-    // Convert a byte array to a string
-    bytesToString: function bytesToString(bytes) {
-      return decodeURIComponent(escape(charenc.bin.bytesToString(bytes)));
+var inherits_1 = inherits$1;
+
+function toArray$1(msg, enc) {
+  if (Array.isArray(msg)) return msg.slice();
+  if (!msg) return [];
+  var res = [];
+  if (typeof msg === 'string') {
+    if (!enc) {
+      for (var i = 0; i < msg.length; i++) {
+        var c = msg.charCodeAt(i);
+        var hi = c >> 8;
+        var lo = c & 0xff;
+        if (hi) res.push(hi, lo);else res.push(lo);
+      }
+    } else if (enc === 'hex') {
+      msg = msg.replace(/[^a-z0-9]+/ig, '');
+      if (msg.length % 2 !== 0) msg = '0' + msg;
+      for (i = 0; i < msg.length; i += 2) {
+        res.push(parseInt(msg[i] + msg[i + 1], 16));
+      }
     }
-  },
-
-  // Binary encoding
-  bin: {
-    // Convert a string to a byte array
-    stringToBytes: function stringToBytes(str) {
-      for (var bytes = [], i = 0; i < str.length; i++) {
-        bytes.push(str.charCodeAt(i) & 0xFF);
-      }return bytes;
-    },
-
-    // Convert a byte array to a string
-    bytesToString: function bytesToString(bytes) {
-      for (var str = [], i = 0; i < bytes.length; i++) {
-        str.push(String.fromCharCode(bytes[i]));
-      }return str.join('');
+  } else {
+    for (i = 0; i < msg.length; i++) {
+      res[i] = msg[i] | 0;
     }
   }
+  return res;
+}
+var toArray_1 = toArray$1;
+
+function toHex(msg) {
+  var res = '';
+  for (var i = 0; i < msg.length; i++) {
+    res += zero2(msg[i].toString(16));
+  }return res;
+}
+var toHex_1 = toHex;
+
+function htonl(w) {
+  var res = w >>> 24 | w >>> 8 & 0xff00 | w << 8 & 0xff0000 | (w & 0xff) << 24;
+  return res >>> 0;
+}
+var htonl_1 = htonl;
+
+function toHex32(msg, endian) {
+  var res = '';
+  for (var i = 0; i < msg.length; i++) {
+    var w = msg[i];
+    if (endian === 'little') w = htonl(w);
+    res += zero8(w.toString(16));
+  }
+  return res;
+}
+var toHex32_1 = toHex32;
+
+function zero2(word) {
+  if (word.length === 1) return '0' + word;else return word;
+}
+var zero2_1 = zero2;
+
+function zero8(word) {
+  if (word.length === 7) return '0' + word;else if (word.length === 6) return '00' + word;else if (word.length === 5) return '000' + word;else if (word.length === 4) return '0000' + word;else if (word.length === 3) return '00000' + word;else if (word.length === 2) return '000000' + word;else if (word.length === 1) return '0000000' + word;else return word;
+}
+var zero8_1 = zero8;
+
+function join32(msg, start, end, endian) {
+  var len = end - start;
+  minimalisticAssert(len % 4 === 0);
+  var res = new Array(len / 4);
+  for (var i = 0, k = start; i < res.length; i++, k += 4) {
+    var w;
+    if (endian === 'big') w = msg[k] << 24 | msg[k + 1] << 16 | msg[k + 2] << 8 | msg[k + 3];else w = msg[k + 3] << 24 | msg[k + 2] << 16 | msg[k + 1] << 8 | msg[k];
+    res[i] = w >>> 0;
+  }
+  return res;
+}
+var join32_1 = join32;
+
+function split32(msg, endian) {
+  var res = new Array(msg.length * 4);
+  for (var i = 0, k = 0; i < msg.length; i++, k += 4) {
+    var m = msg[i];
+    if (endian === 'big') {
+      res[k] = m >>> 24;
+      res[k + 1] = m >>> 16 & 0xff;
+      res[k + 2] = m >>> 8 & 0xff;
+      res[k + 3] = m & 0xff;
+    } else {
+      res[k + 3] = m >>> 24;
+      res[k + 2] = m >>> 16 & 0xff;
+      res[k + 1] = m >>> 8 & 0xff;
+      res[k] = m & 0xff;
+    }
+  }
+  return res;
+}
+var split32_1 = split32;
+
+function rotr32(w, b) {
+  return w >>> b | w << 32 - b;
+}
+var rotr32_1 = rotr32;
+
+function rotl32(w, b) {
+  return w << b | w >>> 32 - b;
+}
+var rotl32_1 = rotl32;
+
+function sum32(a, b) {
+  return a + b >>> 0;
+}
+var sum32_1 = sum32;
+
+function sum32_3(a, b, c) {
+  return a + b + c >>> 0;
+}
+var sum32_3_1 = sum32_3;
+
+function sum32_4(a, b, c, d) {
+  return a + b + c + d >>> 0;
+}
+var sum32_4_1 = sum32_4;
+
+function sum32_5(a, b, c, d, e) {
+  return a + b + c + d + e >>> 0;
+}
+var sum32_5_1 = sum32_5;
+
+function sum64(buf, pos, ah, al) {
+  var bh = buf[pos];
+  var bl = buf[pos + 1];
+
+  var lo = al + bl >>> 0;
+  var hi = (lo < al ? 1 : 0) + ah + bh;
+  buf[pos] = hi >>> 0;
+  buf[pos + 1] = lo;
+}
+var sum64_1 = sum64;
+
+function sum64_hi(ah, al, bh, bl) {
+  var lo = al + bl >>> 0;
+  var hi = (lo < al ? 1 : 0) + ah + bh;
+  return hi >>> 0;
+}
+var sum64_hi_1 = sum64_hi;
+
+function sum64_lo(ah, al, bh, bl) {
+  var lo = al + bl;
+  return lo >>> 0;
+}
+var sum64_lo_1 = sum64_lo;
+
+function sum64_4_hi(ah, al, bh, bl, ch, cl, dh, dl) {
+  var carry = 0;
+  var lo = al;
+  lo = lo + bl >>> 0;
+  carry += lo < al ? 1 : 0;
+  lo = lo + cl >>> 0;
+  carry += lo < cl ? 1 : 0;
+  lo = lo + dl >>> 0;
+  carry += lo < dl ? 1 : 0;
+
+  var hi = ah + bh + ch + dh + carry;
+  return hi >>> 0;
+}
+var sum64_4_hi_1 = sum64_4_hi;
+
+function sum64_4_lo(ah, al, bh, bl, ch, cl, dh, dl) {
+  var lo = al + bl + cl + dl;
+  return lo >>> 0;
+}
+var sum64_4_lo_1 = sum64_4_lo;
+
+function sum64_5_hi(ah, al, bh, bl, ch, cl, dh, dl, eh, el) {
+  var carry = 0;
+  var lo = al;
+  lo = lo + bl >>> 0;
+  carry += lo < al ? 1 : 0;
+  lo = lo + cl >>> 0;
+  carry += lo < cl ? 1 : 0;
+  lo = lo + dl >>> 0;
+  carry += lo < dl ? 1 : 0;
+  lo = lo + el >>> 0;
+  carry += lo < el ? 1 : 0;
+
+  var hi = ah + bh + ch + dh + eh + carry;
+  return hi >>> 0;
+}
+var sum64_5_hi_1 = sum64_5_hi;
+
+function sum64_5_lo(ah, al, bh, bl, ch, cl, dh, dl, eh, el) {
+  var lo = al + bl + cl + dl + el;
+
+  return lo >>> 0;
+}
+var sum64_5_lo_1 = sum64_5_lo;
+
+function rotr64_hi(ah, al, num) {
+  var r = al << 32 - num | ah >>> num;
+  return r >>> 0;
+}
+var rotr64_hi_1 = rotr64_hi;
+
+function rotr64_lo(ah, al, num) {
+  var r = ah << 32 - num | al >>> num;
+  return r >>> 0;
+}
+var rotr64_lo_1 = rotr64_lo;
+
+function shr64_hi(ah, al, num) {
+  return ah >>> num;
+}
+var shr64_hi_1 = shr64_hi;
+
+function shr64_lo(ah, al, num) {
+  var r = ah << 32 - num | al >>> num;
+  return r >>> 0;
+}
+var shr64_lo_1 = shr64_lo;
+
+var utils = {
+  inherits: inherits_1,
+  toArray: toArray_1,
+  toHex: toHex_1,
+  htonl: htonl_1,
+  toHex32: toHex32_1,
+  zero2: zero2_1,
+  zero8: zero8_1,
+  join32: join32_1,
+  split32: split32_1,
+  rotr32: rotr32_1,
+  rotl32: rotl32_1,
+  sum32: sum32_1,
+  sum32_3: sum32_3_1,
+  sum32_4: sum32_4_1,
+  sum32_5: sum32_5_1,
+  sum64: sum64_1,
+  sum64_hi: sum64_hi_1,
+  sum64_lo: sum64_lo_1,
+  sum64_4_hi: sum64_4_hi_1,
+  sum64_4_lo: sum64_4_lo_1,
+  sum64_5_hi: sum64_5_hi_1,
+  sum64_5_lo: sum64_5_lo_1,
+  rotr64_hi: rotr64_hi_1,
+  rotr64_lo: rotr64_lo_1,
+  shr64_hi: shr64_hi_1,
+  shr64_lo: shr64_lo_1
 };
 
-var charenc_1 = charenc;
+function BlockHash() {
+  this.pending = null;
+  this.pendingTotal = 0;
+  this.blockSize = this.constructor.blockSize;
+  this.outSize = this.constructor.outSize;
+  this.hmacStrength = this.constructor.hmacStrength;
+  this.padLength = this.constructor.padLength / 8;
+  this.endian = 'big';
 
-/*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
+  this._delta8 = this.blockSize / 8;
+  this._delta32 = this.blockSize / 32;
+}
+var BlockHash_1 = BlockHash;
 
-// The _isBuffer check is for Safari 5-7 support, because it's missing
-// Object.prototype.constructor. Remove this eventually
-var isBuffer_1 = function isBuffer_1(obj) {
-  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer);
+BlockHash.prototype.update = function update(msg, enc) {
+  // Convert message to array, pad it, and join into 32bit blocks
+  msg = utils.toArray(msg, enc);
+  if (!this.pending) this.pending = msg;else this.pending = this.pending.concat(msg);
+  this.pendingTotal += msg.length;
+
+  // Enough data, try updating
+  if (this.pending.length >= this._delta8) {
+    msg = this.pending;
+
+    // Process pending data in blocks
+    var r = msg.length % this._delta8;
+    this.pending = msg.slice(msg.length - r, msg.length);
+    if (this.pending.length === 0) this.pending = null;
+
+    msg = utils.join32(msg, 0, msg.length - r, this.endian);
+    for (var i = 0; i < msg.length; i += this._delta32) {
+      this._update(msg, i, i + this._delta32);
+    }
+  }
+
+  return this;
 };
 
-function isBuffer(obj) {
-  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj);
+BlockHash.prototype.digest = function digest(enc) {
+  this.update(this._pad());
+  minimalisticAssert(this.pending === null);
+
+  return this._digest(enc);
+};
+
+BlockHash.prototype._pad = function pad() {
+  var len = this.pendingTotal;
+  var bytes = this._delta8;
+  var k = bytes - (len + this.padLength) % bytes;
+  var res = new Array(k + this.padLength);
+  res[0] = 0x80;
+  for (var i = 1; i < k; i++) {
+    res[i] = 0;
+  } // Append length
+  len <<= 3;
+  if (this.endian === 'big') {
+    for (var t = 8; t < this.padLength; t++) {
+      res[i++] = 0;
+    }res[i++] = 0;
+    res[i++] = 0;
+    res[i++] = 0;
+    res[i++] = 0;
+    res[i++] = len >>> 24 & 0xff;
+    res[i++] = len >>> 16 & 0xff;
+    res[i++] = len >>> 8 & 0xff;
+    res[i++] = len & 0xff;
+  } else {
+    res[i++] = len & 0xff;
+    res[i++] = len >>> 8 & 0xff;
+    res[i++] = len >>> 16 & 0xff;
+    res[i++] = len >>> 24 & 0xff;
+    res[i++] = 0;
+    res[i++] = 0;
+    res[i++] = 0;
+    res[i++] = 0;
+
+    for (t = 8; t < this.padLength; t++) {
+      res[i++] = 0;
+    }
+  }
+
+  return res;
+};
+
+var common = {
+  BlockHash: BlockHash_1
+};
+
+var rotr32$1 = utils.rotr32;
+
+function ft_1(s, x, y, z) {
+  if (s === 0) return ch32(x, y, z);
+  if (s === 1 || s === 3) return p32(x, y, z);
+  if (s === 2) return maj32(x, y, z);
 }
+var ft_1_1 = ft_1;
 
-// For Node v0.10 support. Remove this eventually.
-function isSlowBuffer(obj) {
-  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0));
+function ch32(x, y, z) {
+  return x & y ^ ~x & z;
 }
+var ch32_1 = ch32;
 
-var md5 = createCommonjsModule(function (module) {
-  (function () {
-    var crypt$$1 = crypt,
-        utf8 = charenc_1.utf8,
-        isBuffer = isBuffer_1,
-        bin = charenc_1.bin,
+function maj32(x, y, z) {
+  return x & y ^ x & z ^ y & z;
+}
+var maj32_1 = maj32;
 
+function p32(x, y, z) {
+  return x ^ y ^ z;
+}
+var p32_1 = p32;
 
-    // The core
-    md5 = function md5(message, options) {
-      // Convert to byte array
-      if (message.constructor == String) {
-        if (options && options.encoding === 'binary') message = bin.stringToBytes(message);else message = utf8.stringToBytes(message);
-      } else if (isBuffer(message)) message = Array.prototype.slice.call(message, 0);else if (!Array.isArray(message)) message = message.toString();
-      // else, assume byte array already
+function s0_256(x) {
+  return rotr32$1(x, 2) ^ rotr32$1(x, 13) ^ rotr32$1(x, 22);
+}
+var s0_256_1 = s0_256;
 
-      var m = crypt$$1.bytesToWords(message),
-          l = message.length * 8,
-          a = 1732584193,
-          b = -271733879,
-          c = -1732584194,
-          d = 271733878;
+function s1_256(x) {
+  return rotr32$1(x, 6) ^ rotr32$1(x, 11) ^ rotr32$1(x, 25);
+}
+var s1_256_1 = s1_256;
 
-      // Swap endian
-      for (var i = 0; i < m.length; i++) {
-        m[i] = (m[i] << 8 | m[i] >>> 24) & 0x00FF00FF | (m[i] << 24 | m[i] >>> 8) & 0xFF00FF00;
-      }
+function g0_256(x) {
+  return rotr32$1(x, 7) ^ rotr32$1(x, 18) ^ x >>> 3;
+}
+var g0_256_1 = g0_256;
 
-      // Padding
-      m[l >>> 5] |= 0x80 << l % 32;
-      m[(l + 64 >>> 9 << 4) + 14] = l;
+function g1_256(x) {
+  return rotr32$1(x, 17) ^ rotr32$1(x, 19) ^ x >>> 10;
+}
+var g1_256_1 = g1_256;
 
-      // Method shortcuts
-      var FF = md5._ff,
-          GG = md5._gg,
-          HH = md5._hh,
-          II = md5._ii;
+var common$1 = {
+  ft_1: ft_1_1,
+  ch32: ch32_1,
+  maj32: maj32_1,
+  p32: p32_1,
+  s0_256: s0_256_1,
+  s1_256: s1_256_1,
+  g0_256: g0_256_1,
+  g1_256: g1_256_1
+};
 
-      for (var i = 0; i < m.length; i += 16) {
+var sum32$1 = utils.sum32;
+var sum32_4$1 = utils.sum32_4;
+var sum32_5$1 = utils.sum32_5;
+var ch32$1 = common$1.ch32;
+var maj32$1 = common$1.maj32;
+var s0_256$1 = common$1.s0_256;
+var s1_256$1 = common$1.s1_256;
+var g0_256$1 = common$1.g0_256;
+var g1_256$1 = common$1.g1_256;
 
-        var aa = a,
-            bb = b,
-            cc = c,
-            dd = d;
+var BlockHash$1 = common.BlockHash;
 
-        a = FF(a, b, c, d, m[i + 0], 7, -680876936);
-        d = FF(d, a, b, c, m[i + 1], 12, -389564586);
-        c = FF(c, d, a, b, m[i + 2], 17, 606105819);
-        b = FF(b, c, d, a, m[i + 3], 22, -1044525330);
-        a = FF(a, b, c, d, m[i + 4], 7, -176418897);
-        d = FF(d, a, b, c, m[i + 5], 12, 1200080426);
-        c = FF(c, d, a, b, m[i + 6], 17, -1473231341);
-        b = FF(b, c, d, a, m[i + 7], 22, -45705983);
-        a = FF(a, b, c, d, m[i + 8], 7, 1770035416);
-        d = FF(d, a, b, c, m[i + 9], 12, -1958414417);
-        c = FF(c, d, a, b, m[i + 10], 17, -42063);
-        b = FF(b, c, d, a, m[i + 11], 22, -1990404162);
-        a = FF(a, b, c, d, m[i + 12], 7, 1804603682);
-        d = FF(d, a, b, c, m[i + 13], 12, -40341101);
-        c = FF(c, d, a, b, m[i + 14], 17, -1502002290);
-        b = FF(b, c, d, a, m[i + 15], 22, 1236535329);
+var sha256_K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
 
-        a = GG(a, b, c, d, m[i + 1], 5, -165796510);
-        d = GG(d, a, b, c, m[i + 6], 9, -1069501632);
-        c = GG(c, d, a, b, m[i + 11], 14, 643717713);
-        b = GG(b, c, d, a, m[i + 0], 20, -373897302);
-        a = GG(a, b, c, d, m[i + 5], 5, -701558691);
-        d = GG(d, a, b, c, m[i + 10], 9, 38016083);
-        c = GG(c, d, a, b, m[i + 15], 14, -660478335);
-        b = GG(b, c, d, a, m[i + 4], 20, -405537848);
-        a = GG(a, b, c, d, m[i + 9], 5, 568446438);
-        d = GG(d, a, b, c, m[i + 14], 9, -1019803690);
-        c = GG(c, d, a, b, m[i + 3], 14, -187363961);
-        b = GG(b, c, d, a, m[i + 8], 20, 1163531501);
-        a = GG(a, b, c, d, m[i + 13], 5, -1444681467);
-        d = GG(d, a, b, c, m[i + 2], 9, -51403784);
-        c = GG(c, d, a, b, m[i + 7], 14, 1735328473);
-        b = GG(b, c, d, a, m[i + 12], 20, -1926607734);
+function SHA256() {
+  if (!(this instanceof SHA256)) return new SHA256();
 
-        a = HH(a, b, c, d, m[i + 5], 4, -378558);
-        d = HH(d, a, b, c, m[i + 8], 11, -2022574463);
-        c = HH(c, d, a, b, m[i + 11], 16, 1839030562);
-        b = HH(b, c, d, a, m[i + 14], 23, -35309556);
-        a = HH(a, b, c, d, m[i + 1], 4, -1530992060);
-        d = HH(d, a, b, c, m[i + 4], 11, 1272893353);
-        c = HH(c, d, a, b, m[i + 7], 16, -155497632);
-        b = HH(b, c, d, a, m[i + 10], 23, -1094730640);
-        a = HH(a, b, c, d, m[i + 13], 4, 681279174);
-        d = HH(d, a, b, c, m[i + 0], 11, -358537222);
-        c = HH(c, d, a, b, m[i + 3], 16, -722521979);
-        b = HH(b, c, d, a, m[i + 6], 23, 76029189);
-        a = HH(a, b, c, d, m[i + 9], 4, -640364487);
-        d = HH(d, a, b, c, m[i + 12], 11, -421815835);
-        c = HH(c, d, a, b, m[i + 15], 16, 530742520);
-        b = HH(b, c, d, a, m[i + 2], 23, -995338651);
+  BlockHash$1.call(this);
+  this.h = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+  this.k = sha256_K;
+  this.W = new Array(64);
+}
+utils.inherits(SHA256, BlockHash$1);
+var _256 = SHA256;
 
-        a = II(a, b, c, d, m[i + 0], 6, -198630844);
-        d = II(d, a, b, c, m[i + 7], 10, 1126891415);
-        c = II(c, d, a, b, m[i + 14], 15, -1416354905);
-        b = II(b, c, d, a, m[i + 5], 21, -57434055);
-        a = II(a, b, c, d, m[i + 12], 6, 1700485571);
-        d = II(d, a, b, c, m[i + 3], 10, -1894986606);
-        c = II(c, d, a, b, m[i + 10], 15, -1051523);
-        b = II(b, c, d, a, m[i + 1], 21, -2054922799);
-        a = II(a, b, c, d, m[i + 8], 6, 1873313359);
-        d = II(d, a, b, c, m[i + 15], 10, -30611744);
-        c = II(c, d, a, b, m[i + 6], 15, -1560198380);
-        b = II(b, c, d, a, m[i + 13], 21, 1309151649);
-        a = II(a, b, c, d, m[i + 4], 6, -145523070);
-        d = II(d, a, b, c, m[i + 11], 10, -1120210379);
-        c = II(c, d, a, b, m[i + 2], 15, 718787259);
-        b = II(b, c, d, a, m[i + 9], 21, -343485551);
+SHA256.blockSize = 512;
+SHA256.outSize = 256;
+SHA256.hmacStrength = 192;
+SHA256.padLength = 64;
 
-        a = a + aa >>> 0;
-        b = b + bb >>> 0;
-        c = c + cc >>> 0;
-        d = d + dd >>> 0;
-      }
+SHA256.prototype._update = function _update(msg, start) {
+  var W = this.W;
 
-      return crypt$$1.endian([a, b, c, d]);
-    };
+  for (var i = 0; i < 16; i++) {
+    W[i] = msg[start + i];
+  }for (; i < W.length; i++) {
+    W[i] = sum32_4$1(g1_256$1(W[i - 2]), W[i - 7], g0_256$1(W[i - 15]), W[i - 16]);
+  }var a = this.h[0];
+  var b = this.h[1];
+  var c = this.h[2];
+  var d = this.h[3];
+  var e = this.h[4];
+  var f = this.h[5];
+  var g = this.h[6];
+  var h = this.h[7];
 
-    // Auxiliary functions
-    md5._ff = function (a, b, c, d, x, s, t) {
-      var n = a + (b & c | ~b & d) + (x >>> 0) + t;
-      return (n << s | n >>> 32 - s) + b;
-    };
-    md5._gg = function (a, b, c, d, x, s, t) {
-      var n = a + (b & d | c & ~d) + (x >>> 0) + t;
-      return (n << s | n >>> 32 - s) + b;
-    };
-    md5._hh = function (a, b, c, d, x, s, t) {
-      var n = a + (b ^ c ^ d) + (x >>> 0) + t;
-      return (n << s | n >>> 32 - s) + b;
-    };
-    md5._ii = function (a, b, c, d, x, s, t) {
-      var n = a + (c ^ (b | ~d)) + (x >>> 0) + t;
-      return (n << s | n >>> 32 - s) + b;
-    };
+  minimalisticAssert(this.k.length === W.length);
+  for (i = 0; i < W.length; i++) {
+    var T1 = sum32_5$1(h, s1_256$1(e), ch32$1(e, f, g), this.k[i], W[i]);
+    var T2 = sum32$1(s0_256$1(a), maj32$1(a, b, c));
+    h = g;
+    g = f;
+    f = e;
+    e = sum32$1(d, T1);
+    d = c;
+    c = b;
+    b = a;
+    a = sum32$1(T1, T2);
+  }
 
-    // Package private blocksize
-    md5._blocksize = 16;
-    md5._digestsize = 16;
+  this.h[0] = sum32$1(this.h[0], a);
+  this.h[1] = sum32$1(this.h[1], b);
+  this.h[2] = sum32$1(this.h[2], c);
+  this.h[3] = sum32$1(this.h[3], d);
+  this.h[4] = sum32$1(this.h[4], e);
+  this.h[5] = sum32$1(this.h[5], f);
+  this.h[6] = sum32$1(this.h[6], g);
+  this.h[7] = sum32$1(this.h[7], h);
+};
 
-    module.exports = function (message, options) {
-      if (message === undefined || message === null) throw new Error('Illegal argument ' + message);
-
-      var digestbytes = crypt$$1.wordsToBytes(md5(message, options));
-      return options && options.asBytes ? digestbytes : options && options.asString ? bin.bytesToString(digestbytes) : crypt$$1.bytesToHex(digestbytes);
-    };
-  })();
-});
+SHA256.prototype._digest = function digest(enc) {
+  if (enc === 'hex') return utils.toHex32(this.h, 'big');else return utils.split32(this.h, 'big');
+};
 
 var at,
     // The index of the current character
@@ -1666,7 +1839,7 @@ var objectKeys = Object.keys || function (obj) {
 // The MIT License
 
 function generateHash(object) {
-  return md5(jsonStableStringify(object));
+  return _256().update(jsonStableStringify(object)).digest('hex');
 }
 
 // The MIT License
@@ -2088,6 +2261,23 @@ var Math$1 = {
   refract: refract
 };
 
+// The MIT License
+// Copyright (C) 2016-Present Shota Matsuda
+
+function createNamespace(name) {
+  var symbol = Symbol(name);
+  return function namespace(object, init) {
+    if (object[symbol] == null) {
+      if (typeof init === 'function') {
+        object[symbol] = init({});
+      } else {
+        object[symbol] = {};
+      }
+    }
+    return object[symbol];
+  };
+}
+
 var EOL = {},
     EOF = {},
     QUOTE = 34,
@@ -2366,7 +2556,10 @@ var protocolre = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i,
  */
 var rules = [['#', 'hash'], // Extract from the back.
 ['?', 'query'], // Extract from the back.
-['/', 'pathname'], // Extract from the back.
+function sanitize(address) {
+  // Sanitize what is left of the address
+  return address.replace('\\', '/');
+}, ['/', 'pathname'], // Extract from the back.
 ['@', 'auth', 1], // Extract from the front.
 [NaN, 'host', undefined, 1, 1], // Set left over value.
 [/:(\d+)$/, 'port', undefined, 1], // RegExp the back.
@@ -2393,7 +2586,7 @@ var ignore = { hash: 1, query: 1 };
  *
  * @param {Object|String} loc Optional default location object.
  * @returns {Object} lolcation object.
- * @api public
+ * @public
  */
 function lolcation(loc) {
   var location = commonjsGlobal && commonjsGlobal.location || {};
@@ -2404,9 +2597,9 @@ function lolcation(loc) {
       key;
 
   if ('blob:' === loc.protocol) {
-    finaldestination = new URL(unescape(loc.pathname), {});
+    finaldestination = new Url(unescape(loc.pathname), {});
   } else if ('string' === type) {
-    finaldestination = new URL(loc, {});
+    finaldestination = new Url(loc, {});
     for (key in ignore) {
       delete finaldestination[key];
     }
@@ -2437,7 +2630,7 @@ function lolcation(loc) {
  *
  * @param {String} address URL we want to extract from.
  * @return {ProtocolExtract} Extracted information.
- * @api private
+ * @private
  */
 function extractProtocol(address) {
   var match = protocolre.exec(address);
@@ -2455,7 +2648,7 @@ function extractProtocol(address) {
  * @param {String} relative Pathname of the relative URL.
  * @param {String} base Pathname of the base URL.
  * @return {String} Resolved pathname.
- * @api private
+ * @private
  */
 function resolve$1(relative, base) {
   var path = (base || '/').split('/').slice(0, -1).concat(relative.split('/')),
@@ -2488,15 +2681,18 @@ function resolve$1(relative, base) {
  * create an actual constructor as it's much more memory efficient and
  * faster and it pleases my OCD.
  *
+ * It is worth noting that we should not use `URL` as class name to prevent
+ * clashes with the global URL instance that got introduced in browsers.
+ *
  * @constructor
  * @param {String} address URL we want to parse.
  * @param {Object|String} location Location defaults for relative paths.
  * @param {Boolean|Function} parser Parser for the query string.
- * @api public
+ * @private
  */
-function URL(address, location, parser) {
-  if (!(this instanceof URL)) {
-    return new URL(address, location, parser);
+function Url(address, location, parser) {
+  if (!(this instanceof Url)) {
+    return new Url(address, location, parser);
   }
 
   var relative,
@@ -2543,10 +2739,16 @@ function URL(address, location, parser) {
   // When the authority component is absent the URL starts with a path
   // component.
   //
-  if (!extracted.slashes) instructions[2] = [/(.*)/, 'pathname'];
+  if (!extracted.slashes) instructions[3] = [/(.*)/, 'pathname'];
 
   for (; i < instructions.length; i++) {
     instruction = instructions[i];
+
+    if (typeof instruction === 'function') {
+      address = instruction(address);
+      continue;
+    }
+
     parse = instruction[0];
     key = instruction[1];
 
@@ -2628,8 +2830,8 @@ function URL(address, location, parser) {
  *                               used to parse the query.
  *                               When setting the protocol, double slash will be
  *                               removed from the final url if it is true.
- * @returns {URL}
- * @api public
+ * @returns {URL} URL instance for chaining.
+ * @public
  */
 function set$1(part, value, fn) {
   var url = this;
@@ -2712,8 +2914,8 @@ function set$1(part, value, fn) {
  * Transform the properties back in to a valid and full URL string.
  *
  * @param {Function} stringify Optional query stringify function.
- * @returns {String}
- * @api public
+ * @returns {String} Compiled version of the URL.
+ * @public
  */
 function toString(stringify) {
   if (!stringify || 'function' !== typeof stringify) stringify = querystringify_1.stringify;
@@ -2742,17 +2944,17 @@ function toString(stringify) {
   return result;
 }
 
-URL.prototype = { set: set$1, toString: toString };
+Url.prototype = { set: set$1, toString: toString };
 
 //
 // Expose the URL parser and some additional properties that might be useful for
 // others or testing.
 //
-URL.extractProtocol = extractProtocol;
-URL.location = lolcation;
-URL.qs = querystringify_1;
+Url.extractProtocol = extractProtocol;
+Url.location = lolcation;
+Url.qs = querystringify_1;
 
-var urlParse = URL;
+var urlParse = Url;
 
 // The MIT License
 
@@ -2981,73 +3183,99 @@ Object.assign(performRequest, {
 });
 
 // The MIT License
-
-var internal$3 = createNamespace('Semaphore');
-
-var Task = function Task(semaphore, callback) {
-  var _this = this;
-
-  classCallCheck(this, Task);
-
-  var promises = [new Promise(function (resolve, reject) {
-    _this.resolve = resolve;
-    _this.reject = reject;
-  }), new Promise(function (resolve) {
-    _this.permit = resolve;
-  }).then(function () {
-    callback(_this.resolve, _this.reject);
-  })];
-  this.promise = Promise.all(promises).then(function (values) {
-    semaphore.signal();
-    return values[0];
-  }, function (reason) {
-    semaphore.signal();
-    return Promise.reject(reason);
-  });
-};
+// Copyright (C) 2016-Present Shota Matsuda
 
 var Semaphore = function () {
-  function Semaphore(capacity) {
+  function Semaphore() {
+    var capacity = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
     classCallCheck(this, Semaphore);
 
-    var scope = internal$3(this);
-    scope.capacity = capacity;
-    scope.available = capacity;
-    scope.queue = [];
+    var number = +capacity;
+    if (Number.isNaN(number) || number < 1) {
+      throw new Error("Invalid number of capacity: " + capacity);
+    }
+    this.capacity = number;
+    this.available = number;
+    this.queue = [];
   }
 
   createClass(Semaphore, [{
-    key: 'wait',
-    value: function wait(callback) {
-      var scope = internal$3(this);
-      var task = new Task(this, callback);
-      if (scope.available === 0) {
-        scope.queue.push(task);
-      } else {
-        --scope.available;
-        task.permit();
+    key: "wait",
+    value: function () {
+      var _ref = asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(callback) {
+        var resolveTask, rejectTask, runTask, task, result, _ref2, _ref3;
+
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                resolveTask = void 0;
+                rejectTask = void 0;
+                runTask = void 0;
+                task = Promise.all([new Promise(function (resolve, reject) {
+                  resolveTask = resolve;
+                  rejectTask = reject;
+                }), new Promise(function (resolve, reject) {
+                  runTask = resolve;
+                }).then(function () {
+                  var result = callback(resolveTask, rejectTask);
+                  if (result instanceof Promise) {
+                    return result.then(resolveTask).catch(rejectTask);
+                  }
+                  return result;
+                })]);
+
+                if (this.available === 0) {
+                  this.queue.push(runTask);
+                } else {
+                  --this.available;
+                  runTask();
+                }
+                result = void 0;
+                _context.prev = 6;
+                _context.next = 9;
+                return task;
+
+              case 9:
+                _ref2 = _context.sent;
+                _ref3 = slicedToArray(_ref2, 1);
+                result = _ref3[0];
+                _context.next = 18;
+                break;
+
+              case 14:
+                _context.prev = 14;
+                _context.t0 = _context["catch"](6);
+
+                this.signal();
+                throw _context.t0;
+
+              case 18:
+                this.signal();
+                return _context.abrupt("return", result);
+
+              case 20:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[6, 14]]);
+      }));
+
+      function wait(_x2) {
+        return _ref.apply(this, arguments);
       }
-      return task.promise;
-    }
+
+      return wait;
+    }()
   }, {
-    key: 'signal',
+    key: "signal",
     value: function signal() {
-      var scope = internal$3(this);
-      if (scope.queue.length === 0) {
-        ++scope.available;
+      if (this.queue.length === 0) {
+        ++this.available;
       } else {
-        scope.queue.shift().permit();
+        this.queue.shift()();
       }
-    }
-  }, {
-    key: 'capacity',
-    get: function get$$1() {
-      return internal$3(this).capacity;
-    }
-  }, {
-    key: 'available',
-    get: function get$$1() {
-      return internal$3(this).available;
     }
   }]);
   return Semaphore;
@@ -3155,7 +3383,6 @@ var Stride = {
 
 var index = {
   Aggregate: Aggregate,
-  AggregateFunction: AggregateFunction,
   Array: Array$1,
   AssertionError: AssertionError,
   FilePath: FilePath,
@@ -3171,5 +3398,5 @@ var index = {
 };
 
 export default index;
-export { Aggregate, AggregateFunction, Array$1 as Array, AssertionError, FilePath, Global, generateHash as Hash, ImplementationError, Math$1 as Math, createNamespace as Namespace, performRequest as Request, Semaphore, Stride, urlParse as URL, isBrowser, isWorker, isNode, globalScope };
+export { Aggregate, Array$1 as Array, AssertionError, FilePath, Global, generateHash as Hash, ImplementationError, Math$1 as Math, createNamespace as Namespace, performRequest as Request, Semaphore, Stride, urlParse as URL, isBrowser, isWorker, isNode, globalScope };
 //# sourceMappingURL=planck-core.module.js.map

@@ -12,7 +12,8 @@ export default {
   external: [
     'fs',
     'path',
-    'request'
+    'request',
+    'util'
   ],
   plugins: [
     nodeResolve(),
@@ -26,7 +27,12 @@ export default {
         'stage-2'
       ],
       plugins: [
-        'external-helpers'
+        'external-helpers',
+        ...(
+          process.env.NODE_ENV === 'test'
+            ? [['istanbul', { include: ['src/**/*.js'] }]]
+            : []
+        )
       ],
       babelrc: false
     })
