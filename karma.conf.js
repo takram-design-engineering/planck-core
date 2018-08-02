@@ -34,6 +34,7 @@ module.exports = function (config) {
     webpack,
     browsers: ['ChromeHeadless'],
     singleRun: true,
+    autoWatch: false,
     concurrency: Infinity
   })
 }
