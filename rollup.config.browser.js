@@ -14,7 +14,8 @@ export default {
     nullify([
       'fs',
       'path',
-      'request'
+      'request',
+      'util'
     ]),
     nodeResolve({ browser: true }),
     commonjs(),

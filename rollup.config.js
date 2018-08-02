@@ -12,7 +12,8 @@ export default {
   external: [
     'fs',
     'path',
-    'request'
+    'request',
+    'util'
   ],
   plugins: [
     nodeResolve(),
