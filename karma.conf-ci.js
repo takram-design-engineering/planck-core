@@ -78,7 +78,7 @@ module.exports = function (config) {
       '/node_modules/': '/base/node_modules/',
       '/dist/': '/base/dist/'
     },
-    reporters: ['spec', 'coverage-istanbul'],
+    reporters: ['spec', 'saucelabs', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['text', 'text-summary', 'lcov'],
       dir: 'coverage/browser',
@@ -88,7 +88,7 @@ module.exports = function (config) {
     sauceLabs: {
       testName: pkg.name,
       build: `${pkg.version} (${Date.now()})`,
-      recordScreenshots: false
+      public: 'public'
     },
     customLaunchers,
     browsers: Object.keys(customLaunchers),
