@@ -5,7 +5,7 @@
 
 import chai from 'chai'
 
-import { Aggregate, isAggregate } from '../..'
+import { Aggregate } from '../..'
 
 const { expect } = chai
 
@@ -69,11 +69,10 @@ describe('Aggregate', () => {
 
   describe('#isAggregate', () => {
     it('returns true for aggregates', () => {
-      expect(isAggregate).equal(Aggregate.isAggregate)
-      expect(isAggregate(Aggregate())).equal(true)
-      expect(isAggregate({})).equal(false)
-      expect(isAggregate(null)).equal(false)
-      expect(isAggregate()).equal(false)
+      expect(Aggregate.isAggregate(Aggregate())).equal(true)
+      expect(Aggregate.isAggregate({})).equal(false)
+      expect(Aggregate.isAggregate(null)).equal(false)
+      expect(Aggregate.isAggregate()).equal(false)
     })
   })
 })
