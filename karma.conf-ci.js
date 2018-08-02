@@ -70,7 +70,7 @@ module.exports = function (config) {
       '/node_modules/': '/base/node_modules/',
       '/dist/': '/base/dist/'
     },
-    reporters: ['spec', 'coverage'],
+    reporters: ['spec', 'coverage-istanbul'],
     coverageReporter: {
       dir: 'coverage/',
       subdir: browser => browser.toLowerCase(),
@@ -79,6 +79,11 @@ module.exports = function (config) {
         { type: 'text-summary' },
         { type: 'lcov' }
       ]
+    },
+    coverageIstanbulReporter: {
+      reports: ['text', 'text-summary', 'lcov'],
+      dir: 'coverage/browser',
+      combineBrowserReports: true
     },
     webpack,
     sauceLabs: {
