@@ -11,4 +11,8 @@ describe('ImplementationError', () => {
   it('supports instanceof', () => {
     expect(new ImplementationError()).instanceof(ImplementationError)
   })
+
+  it('is instanceof Error', () => {
+    expect(new ImplementationError()).instanceof(Error)
+  })
 })

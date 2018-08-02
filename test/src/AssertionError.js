@@ -11,4 +11,8 @@ describe('AssertionError', () => {
   it('supports instanceof', () => {
     expect(new AssertionError()).instanceof(AssertionError)
   })
+
+  it('is instanceof Error', () => {
+    expect(new AssertionError()).instanceof(Error)
+  })
 })
