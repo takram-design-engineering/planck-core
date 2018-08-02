@@ -20,7 +20,7 @@ module.exports = function (config) {
     preprocessors: {
       'test/src/**/*.js': ['webpack', 'sourcemap']
     },
-    reporters: ['spec', 'coverage'],
+    reporters: ['spec', 'coverage-istanbul'],
     proxies: {
       '/test/data/': '/base/test/data/',
       '/node_modules/': '/base/node_modules/',
@@ -34,6 +34,11 @@ module.exports = function (config) {
         { type: 'text-summary' },
         { type: 'lcov' }
       ]
+    },
+    coverageIstanbulReporter: {
+      reports: ['text', 'text-summary', 'lcov'],
+      dir: 'coverage/browser',
+      combineBrowserReports: true
     },
     webpack,
     browsers: ['ChromeHeadless'],
