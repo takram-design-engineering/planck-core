@@ -3,8 +3,6 @@
 
 /* eslint-env worker */
 
-import 'source-map-support/register'
-
 import chai from 'chai'
 import detectNode from 'detect-node'
 

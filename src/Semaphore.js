@@ -1,68 +1,58 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-import Namespace from './Namespace'
-
-export const internal = Namespace('Semaphore')
-
-class Task {
-  constructor (semaphore, callback) {
-    const promises = [
-      new Promise((resolve, reject) => {
-        this.resolve = resolve
-        this.reject = reject
-      }),
-      new Promise(resolve => {
-        this.permit = resolve
-      }).then(() => {
-        callback(this.resolve, this.reject)
-      })
-    ]
-    this.promise = Promise.all(promises)
-      .then(values => {
-        semaphore.signal()
-        return values[0]
-      }, reason => {
-        semaphore.signal()
-        return Promise.reject(reason)
-      })
-  }
-}
-
 export default class Semaphore {
-  constructor (capacity) {
-    const scope = internal(this)
-    scope.capacity = capacity
-    scope.available = capacity
-    scope.queue = []
+  constructor (capacity = 1) {
+    const number = +capacity
+    if (Number.isNaN(number) || number < 1) {
+      throw new Error(`Invalid number of capacity: ${capacity}`)
+    }
+    this.capacity = number
+    this.available = number
+    this.queue = []
   }
 
-  wait (callback) {
-    const scope = internal(this)
-    const task = new Task(this, callback)
-    if (scope.available === 0) {
-      scope.queue.push(task)
+  async wait (callback) {
+    let resolveTask
+    let rejectTask
+    let runTask
+    const task = Promise.all([
+      new Promise((resolve, reject) => {
+        resolveTask = resolve
+        rejectTask = reject
+      }),
+      new Promise((resolve, reject) => {
+        runTask = resolve
+      }).then(() => {
+        const result = callback(resolveTask, rejectTask)
+        if (result instanceof Promise) {
+          return result.then(resolveTask).catch(rejectTask)
+        }
+        return result
+      })
+    ])
+    if (this.available === 0) {
+      this.queue.push(runTask)
     } else {
-      --scope.available
-      task.permit()
+      --this.available
+      runTask()
     }
-    return task.promise
+    let result
+    try {
+      [result] = await task
+    } catch (error) {
+      this.signal()
+      throw error
+    }
+    this.signal()
+    return result
   }
 
   signal () {
-    const scope = internal(this)
-    if (scope.queue.length === 0) {
-      ++scope.available
+    if (this.queue.length === 0) {
+      ++this.available
     } else {
-      scope.queue.shift().permit()
+      this.queue.shift()()
     }
-  }
-
-  get capacity () {
-    return internal(this).capacity
-  }
-
-  get available () {
-    return internal(this).available
   }
 }

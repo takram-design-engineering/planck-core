@@ -14,7 +14,8 @@ export default {
     nullify([
       'fs',
       'path',
-      'request'
+      'request',
+      'util'
     ]),
     nodeResolve({ browser: true }),
     commonjs(),
@@ -27,7 +28,12 @@ export default {
         'stage-2'
       ],
       plugins: [
-        'external-helpers'
+        'external-helpers',
+        ...(
+          process.env.NODE_ENV === 'test'
+            ? [['istanbul', { include: ['src/**/*.js'] }]]
+            : []
+        )
       ],
       babelrc: false
     })

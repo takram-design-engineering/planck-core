@@ -3,59 +3,77 @@
 
 /* eslint-disable no-unused-expressions */
 
-import 'source-map-support/register'
-
 import chai from 'chai'
 
-import { Aggregate } from '../..'
+import { Aggregate, isAggregate } from '../..'
 
 const { expect } = chai
 
 describe('Aggregate', () => {
   class T {
-    set (other) {
-      this.value = other
+    get () {
+      return this.value
+    }
+
+    set (value) {
+      this.value = value
     }
   }
 
-  it('throws an error when new operator is used', () => {
-    expect(() => {
-      return new Aggregate()
-    }).throw(Error)
+  it('returns an empty array when no targets are given', () => {
+    const aggregate = Aggregate()
+    expect(aggregate.value).deep.equal([])
   })
 
-  it('returns undefined if no there’s no targets', () => {
-    const aggregate = Aggregate.new()
-    expect(aggregate.value).undefined
-  })
-
-  it('stores property', () => {
-    const targets = [new T(), new T(), new T()]
-    const aggregate = Aggregate.new(...targets)
-    aggregate.property = true
-    expect(aggregate.property).equal(true)
-  })
-
-  it('returns the property of the first target', () => {
-    const targets = [new T(), new T(), new T()]
-    const aggregate = Aggregate.new(...targets)
+  it('returns an array of properties of targets', () => {
+    const targets = [{}, {}, {}]
+    const aggregate = Aggregate(...targets)
+    expect(aggregate.value).deep.equal([undefined, undefined, undefined])
     targets.forEach((target, index) => {
       target.value = index
     })
-    expect(aggregate.value).equal(0)
+    expect(aggregate.value).deep.equal([0, 1, 2])
   })
 
-  it('propagates property set to all the targets', () => {
-    const targets = [new T(), new T(), new T()]
-    const aggregate = Aggregate.new(...targets)
+  it('applies assignments to all the targets', () => {
+    const targets = [{}, {}, {}]
+    const aggregate = Aggregate(...targets)
     aggregate.value = true
+    expect(aggregate.value).deep.equal([true, true, true])
     targets.forEach(target => expect(target.value).equal(true))
+    aggregate.value = 1
+    expect(aggregate.value).deep.equal([1, 1, 1])
+    targets.forEach(target => expect(target.value).equal(1))
   })
 
-  it('propagates function call to all the targets', () => {
+  it('collects return values of target functions', () => {
+    const targets = [() => 0, () => 1, () => 2]
+    const aggregate = Aggregate(...targets)
+    expect(aggregate()).deep.equal([0, 1, 2])
+  })
+
+  it('applies function calls to all the targets', () => {
     const targets = [new T(), new T(), new T()]
-    const aggregate = Aggregate.new(...targets)
+    const aggregate = Aggregate(...targets)
     aggregate.set('a')
+    expect(aggregate.value).deep.equal(['a', 'a', 'a'])
     targets.forEach(target => expect(target.value).equal('a'))
+  })
+
+  it('collects return values of target methods', () => {
+    const targets = [new T(), new T(), new T()]
+    const aggregate = Aggregate(...targets)
+    targets.forEach((target, index) => { target.value = index })
+    expect(aggregate.get()).deep.equal([0, 1, 2])
+  })
+
+  describe('#isAggregate', () => {
+    it('returns true for aggregates', () => {
+      expect(isAggregate).equal(Aggregate.isAggregate)
+      expect(isAggregate(Aggregate())).equal(true)
+      expect(isAggregate({})).equal(false)
+      expect(isAggregate(null)).equal(false)
+      expect(isAggregate()).equal(false)
+    })
   })
 })
