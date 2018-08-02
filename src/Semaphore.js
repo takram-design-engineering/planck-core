@@ -7,22 +7,22 @@ export default class Semaphore {
     if (Number.isNaN(number) || number < 1) {
       throw new Error(`Invalid number of capacity: ${capacity}`)
     }
-    this.capacity = +capacity
-    this.available = +capacity
+    this.capacity = number
+    this.available = number
     this.queue = []
   }
 
   async wait (callback) {
     let resolveTask
     let rejectTask
-    let shift
-    const promises = [
+    let runTask
+    const task = Promise.all([
       new Promise((resolve, reject) => {
         resolveTask = resolve
         rejectTask = reject
       }),
       new Promise((resolve, reject) => {
-        shift = resolve
+        runTask = resolve
       }).then(() => {
         const result = callback(resolveTask, rejectTask)
         if (result instanceof Promise) {
@@ -30,16 +30,16 @@ export default class Semaphore {
         }
         return result
       })
-    ]
+    ])
     if (this.available === 0) {
-      this.queue.push(shift)
+      this.queue.push(runTask)
     } else {
       --this.available
-      shift()
+      runTask()
     }
     let result
     try {
-      [result] = await Promise.all(promises)
+      [result] = await task
     } catch (error) {
       this.signal()
       throw error
