@@ -14,7 +14,9 @@ const { expect } = chai
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
-describe('Semaphore', () => {
+describe('Semaphore', function () {
+  this.timeout(10000)
+
   it('throws error if invalid number of capacity is given', () => {
     expect(() => {
       new Semaphore(null) // eslint-disable-line no-new
