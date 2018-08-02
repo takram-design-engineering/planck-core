@@ -73,6 +73,7 @@ module.exports = function (config) {
     reporters: ['spec', 'coverage'],
     coverageReporter: {
       dir: 'coverage/',
+      subdir: browser => browser.toLowerCase(),
       reporters: [
         { type: 'text' },
         { type: 'text-summary' },
@@ -90,12 +91,12 @@ module.exports = function (config) {
     singleRun: true,
 
     // SauceLabs provides a limited amount of browsers at once
-    concurrency: 5,
+    concurrency: 2,
 
-    // Increase timeout values 3 times longer than the standard values
-    captureTimeout: 180000,
-    browserNoActivityTimeout: 30000,
-    browserDisconnectTimeout: 6000,
-    processKillTimeout: 6000
+    // Increase timeout values 5 times longer than the standard values
+    captureTimeout: config.captureTimeout * 5,
+    browserNoActivityTimeout: config.browserNoActivityTimeout * 5,
+    browserDisconnectTimeout: config.browserDisconnectTimeout * 5,
+    processKillTimeout: config.processKillTimeout * 5
   })
 }

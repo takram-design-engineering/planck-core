@@ -1,13 +1,10 @@
 {
   "sourceMap": false,
   "instrument": false,
-  "include": [
-    "src/**/*.js"
-  ],
   "reporter": [
     "text",
     "text-summary",
     "lcov"
   ],
-  "report-dir": "coverage/Node"
+  "report-dir": "coverage/node"
 }

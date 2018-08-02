@@ -7,6 +7,7 @@ const webpack = require('./webpack.config.test.js')
 module.exports = function (config) {
   config.set({
     basePath: './',
+    frameworks: ['mocha'],
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
       'node_modules/mocha/mocha.js',
@@ -19,7 +20,6 @@ module.exports = function (config) {
     preprocessors: {
       'test/src/**/*.js': ['webpack', 'sourcemap']
     },
-    frameworks: ['mocha'],
     reporters: ['spec', 'coverage'],
     proxies: {
       '/test/data/': '/base/test/data/',
@@ -27,13 +27,17 @@ module.exports = function (config) {
       '/dist/': '/base/dist/'
     },
     coverageReporter: {
+      dir: 'coverage/',
+      subdir: browser => browser.toLowerCase(),
       reporters: [
         { type: 'text' },
-        { type: 'text-summary' }
+        { type: 'text-summary' },
+        { type: 'lcov' }
       ]
     },
     webpack,
     browsers: ['ChromeHeadless'],
+    singleRun: true,
     concurrency: Infinity
   })
 }
