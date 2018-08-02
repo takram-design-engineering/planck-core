@@ -7,7 +7,8 @@ A collection of classes and functions that are used anywhere in [Planck framewor
 )](http://mit-license.org)
 [![npm version](https://badge.fury.io/js/%40takram%2Fplanck-core.svg)](http://badge.fury.io/js/%40takram%2Fplanck-core)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-[![Build Status](https://travis-ci.org/takram-design-engineering/planck-core.svg?branch=master)](https://travis-ci.org/takram-design-engineering/planck-core)
+[![Build Status](https://travis-ci.org/takram-design-engineering/planck-core.svg?branch=develop)](https://travis-ci.org/takram-design-engineering/planck-core)
+[![codecov](https://codecov.io/gh/takram-design-engineering/planck-core/branch/develop/graph/badge.svg)](https://codecov.io/gh/takram-design-engineering/planck-core)
 [![Sauce Test Status](https://saucelabs.com/buildstatus/planck-core)](https://saucelabs.com/u/planck-core)
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/planck-core.svg)](https://saucelabs.com/u/planck-core)
@@ -125,8 +126,8 @@ function load(url) {
 
 ### Aggregate
 
-<a id="aggregate-new" href="#aggregate-new">#</a>
-Aggregate.**new**(_target1_ [, _target2_ [, ...]])
+<a id="aggregate-function-apply" href="#aggregate-function-apply">#</a>
+**Aggregate**(_target1_ [, _target2_ [, ...]])
 
 <a id="aggregate-get" href="#aggregate-get">#</a>
 _aggregate_[**property**]
@@ -134,13 +135,8 @@ _aggregate_[**property**]
 <a id="aggregate-set" href="#aggregate-set">#</a>
 _aggregate_[**property**] = _value_
 
-### AggregateFunction
-
-<a id="aggregatefunction-new" href="#aggregatefunction-new">#</a>
-AggregateFunction.**new**(_target1_ [, _target2_ [, ...]])
-
-<a id="aggregatefunction-apply" href="#aggregatefunction-apply">#</a>
-_aggregateFunction_([_arg1_ [, _arg2_ [, ...]]])
+<a id="aggregate-apply" href="#aggregate-apply">#</a>
+_aggregate_([_arg1_ [, _arg2_ [, ...]]])
 
 ### Array
 
