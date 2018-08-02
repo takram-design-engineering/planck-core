@@ -7,8 +7,8 @@ A collection of classes and functions that are used anywhere in [Planck framewor
 )](http://mit-license.org)
 [![npm version](https://badge.fury.io/js/%40takram%2Fplanck-core.svg)](http://badge.fury.io/js/%40takram%2Fplanck-core)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-[![Build Status](https://travis-ci.org/takram-design-engineering/planck-core.svg?branch=develop)](https://travis-ci.org/takram-design-engineering/planck-core)
-[![codecov](https://codecov.io/gh/takram-design-engineering/planck-core/branch/develop/graph/badge.svg)](https://codecov.io/gh/takram-design-engineering/planck-core)
+[![Build Status](https://travis-ci.org/takram-design-engineering/planck-core.svg?branch=master)](https://travis-ci.org/takram-design-engineering/planck-core)
+[![codecov](https://codecov.io/gh/takram-design-engineering/planck-core/branch/master/graph/badge.svg)](https://codecov.io/gh/takram-design-engineering/planck-core)
 [![Sauce Test Status](https://saucelabs.com/buildstatus/planck-core)](https://saucelabs.com/u/planck-core)
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/planck-core.svg)](https://saucelabs.com/u/planck-core)
