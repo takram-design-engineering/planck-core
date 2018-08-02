@@ -1,6 +1,8 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
+/* eslint-disable no-unused-expressions */
+
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
@@ -15,7 +17,7 @@ chai.use(sinonChai)
 describe('Semaphore', () => {
   it('throws error if invalid number of capacity is given', () => {
     expect(() => {
-      new Semaphore(null)
+      new Semaphore(null) // eslint-disable-line no-new
     }).throws(Error)
   })
 

@@ -1,13 +1,13 @@
 // The MIT License
 // Copyright (C) 2016-Present Shota Matsuda
 
-const symbol = Symbol()
+const isAggregateSymbol = Symbol('isAggregate')
 
 export function isAggregate (object) {
   if (object == null) {
     return false
   }
-  return !!object[symbol]
+  return !!object[isAggregateSymbol]
 }
 
 export default function Aggregate (...targets) {
@@ -18,7 +18,7 @@ export default function Aggregate (...targets) {
     },
 
     get (target, property, receiver) {
-      if (property === symbol) {
+      if (property === isAggregateSymbol) {
         return true
       }
       let callable = targets.length > 0
